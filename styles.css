@@ -1,0 +1,61 @@
+@layer theme, utilities;
+
+@import 'tailwindcss/theme.css' layer(theme);
+@import 'tailwindcss/utilities.css' layer(utilities);
+
+@source './src';
+
+:root {
+  --ribbon-purple: #6b2ca6;
+  --ribbon-purple-mid: #7b3cb6;
+  --ribbon-bg: var(--background-primary, #ffffff);
+  --ribbon-border: var(--background-modifier-border, #e1dfdd);
+  --btn-hover-bg: var(--background-modifier-hover, #f0eeec);
+  --btn-hover-border: var(--background-modifier-border-hover, #c8c6c4);
+  --btn-active-bg: var(--interactive-accent, #c7e0f4);
+  --btn-active-border: var(--interactive-accent-hover, #90c2e8);
+  --btn-focus-ring: var(--interactive-accent, #0078d4);
+  --text-primary: var(--text-normal, #201f1e);
+  --text-secondary: var(--text-muted, #484644);
+  --text-muted: var(--text-faint, #605e5c);
+  --text-disabled: var(--text-faint, #a19f9d);
+  --shadow-ribbon: var(--shadow-s, 0 2px 8px rgb(0 0 0 / 12%));
+  --transition-fast: 150ms ease-out;
+  --transition-mid: 200ms ease-out;
+  --radius-sm: 3px;
+  --icon-color: var(--text-normal, #3b3a39);
+  --icon-purple: var(--ribbon-purple);
+  --icon-blue: var(--color-blue, #0078d4);
+  --icon-green: var(--color-green, #107c10);
+  --icon-orange: var(--color-orange, #c45911);
+  --icon-red: var(--color-red, #a80000);
+  --icon-teal: var(--color-cyan, #006b6b);
+}
+
+@theme inline {
+  --font-sans: 'Segoe UI', system-ui, -apple-system, sans-serif;
+  --color-ribbon-purple: var(--ribbon-purple);
+  --color-ribbon-purple-mid: var(--ribbon-purple-mid);
+  --color-ribbon-bg: var(--ribbon-bg);
+  --color-ribbon-border: var(--ribbon-border);
+  --color-button-hover-bg: var(--btn-hover-bg);
+  --color-button-hover-border: var(--btn-hover-border);
+  --color-button-active-bg: var(--btn-active-bg);
+  --color-button-active-border: var(--btn-active-border);
+  --color-button-focus-ring: var(--btn-focus-ring);
+  --color-text-primary: var(--text-primary);
+  --color-text-secondary: var(--text-secondary);
+  --color-text-muted: var(--text-muted);
+  --color-text-disabled: var(--text-disabled);
+  --color-icon-default: var(--icon-color);
+  --color-icon-purple: var(--icon-purple);
+  --color-icon-blue: var(--icon-blue);
+  --color-icon-green: var(--icon-green);
+  --color-icon-orange: var(--icon-orange);
+  --color-icon-red: var(--icon-red);
+  --color-icon-teal: var(--icon-teal);
+  --radius-ribbon-sm: var(--radius-sm);
+  --shadow-ribbon-raised: var(--shadow-ribbon);
+  --ease-ribbon-fast: ease-out;
+  --ease-ribbon-mid: ease-out;
+}

@@ -1,0 +1,52 @@
+{
+  "name": "libre-note-editor",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "build": "tsc --noEmit && node esbuild.config.mjs",
+    "build:dev": "tsc --noEmit && node esbuild.config.mjs --sourcemap",
+    "dev": "node esbuild.config.mjs --watch",
+    "format": "prettier . --write",
+    "format:check": "prettier . --check",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "obsidian:dev": "start \"\" \"obsidian://open?vault=Obsidian%20Vault\"",
+    "test": "jest --passWithNoTests",
+    "typecheck": "tsc --noEmit"
+  },
+  "description": "Standalone rich-note editor workspace for Obsidian with a React-based custom view.",
+  "dependencies": {
+    "@fluentui/react-icons": "^2.0.328",
+    "classnames": "^2.5.1",
+    "obsidian": "latest",
+    "react": "^18.3.0",
+    "react-dom": "^18.3.0"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.29.0",
+    "@tailwindcss/postcss": "^4.3.0",
+    "@testing-library/dom": "^10.4.1",
+    "@testing-library/jest-dom": "^6.9.1",
+    "@testing-library/react": "^16.3.2",
+    "@types/jest": "^30.0.0",
+    "@types/node": "^20.0.0",
+    "@types/react": "^18.3.0",
+    "@types/react-dom": "^18.3.0",
+    "esbuild": "^0.20.0",
+    "eslint": "^9.29.0",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-import-resolver-typescript": "^4.4.4",
+    "eslint-plugin-import": "^2.32.0",
+    "eslint-plugin-react": "^7.37.5",
+    "eslint-plugin-react-hooks": "^7.1.1",
+    "jest": "^30.4.2",
+    "jest-environment-jsdom": "^30.4.1",
+    "postcss": "^8.5.15",
+    "prettier": "^3.8.3",
+    "tailwindcss": "^4.3.0",
+    "ts-jest": "^29.4.11",
+    "tsx": "^4.19.2",
+    "typescript": "^5.3.0",
+    "typescript-eslint": "^8.58.2"
+  }
+}

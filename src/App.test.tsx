@@ -1,0 +1,26 @@
+import { fireEvent, render, screen } from '@testing-library/react';
+
+import { App } from './App';
+
+test('renders the OneNote-style ribbon editor shell', () => {
+  const { container } = render(<App />);
+
+  expect(screen.getByRole('navigation', { name: 'Ribbon tabs' })).toHaveTextContent('Home');
+  expect(screen.getByRole('heading', { name: 'Untitled rich note' })).toBeInTheDocument();
+
+  expect(
+    screen.getByText('Markdown mirror stays synchronized beside the LibreOffice-backed editor.')
+  ).toBeInTheDocument();
+  expect(container).toMatchSnapshot();
+});
+
+test('switches ribbon tabs to show insert commands', () => {
+  render(<App />);
+
+  fireEvent.click(screen.getByRole('button', { name: 'Insert' }));
+
+  expect(
+    screen.getByRole('button', { name: 'Insert an image and keep the markdown reference in sync.' })
+  ).toBeInTheDocument();
+  expect(screen.getByRole('button', { name: 'Insert' })).toHaveAttribute('aria-pressed', 'true');
+});

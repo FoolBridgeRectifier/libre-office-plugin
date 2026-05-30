@@ -1,0 +1,9 @@
+{
+  "id": "libre-note-editor",
+  "name": "Libre Note Editor",
+  "version": "0.1.0",
+  "minAppVersion": "1.5.0",
+  "description": "Standalone rich-note editor workspace for Obsidian with a React-based custom view and a future OneNote-inspired ribbon.",
+  "author": "local",
+  "isDesktopOnly": false
+}
