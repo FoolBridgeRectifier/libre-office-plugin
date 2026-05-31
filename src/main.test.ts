@@ -15,8 +15,10 @@ jest.mock(
     Plugin: class MockPlugin {
       addCommand = jest.fn();
       app: unknown;
+      loadData = jest.fn(async () => null);
       registerEvent = jest.fn();
       registerView = jest.fn();
+      saveData = jest.fn();
 
       constructor(app: unknown) {
         this.app = app;
@@ -40,21 +42,36 @@ function createWorkspaceMock() {
   };
 }
 
+function createVaultMock() {
+  return {
+    adapter: {
+      exists: jest.fn(async () => false),
+      list: jest.fn(async () => ({ files: [], folders: [] })),
+      mkdir: jest.fn(),
+      read: jest.fn(),
+      rename: jest.fn(),
+      write: jest.fn(),
+    },
+    on: jest.fn(() => ({ id: 'vault-event-ref' })),
+  };
+}
+
 test('registers the Libre markdown view and routing events on load', async () => {
   const { default: LibreNoteEditorPlugin } = await import('./main');
   const workspace = createWorkspaceMock();
+  const vault = createVaultMock();
 
-  const plugin = new LibreNoteEditorPlugin({ workspace } as never, {} as never) as never as {
+  const plugin = new LibreNoteEditorPlugin({ vault, workspace } as never, {} as never) as never as {
     addCommand: jest.Mock;
-    onload(): void;
+    onload(): Promise<void>;
     registerEvent: jest.Mock;
     registerView: jest.Mock;
   };
 
-  plugin.onload();
+  await plugin.onload();
 
   expect(plugin.registerView).toHaveBeenCalledWith(LIBRE_MARKDOWN_VIEW_TYPE, expect.any(Function));
 
   expect(plugin.addCommand).toHaveBeenCalledTimes(1);
-  expect(plugin.registerEvent).toHaveBeenCalledTimes(2);
+  expect(plugin.registerEvent).toHaveBeenCalledTimes(4);
 });

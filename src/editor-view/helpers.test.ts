@@ -14,6 +14,7 @@ import {
   routeOpenMarkdownLeavesToLibreEditor,
   routeWorkspaceLeafToLibreEditor,
   shouldRouteFileToLibreEditor,
+  shouldRoutePathToLibreEditor,
 } from './helpers';
 
 import type { TFile, ViewCreator, Workspace, WorkspaceLeaf } from 'obsidian';
@@ -67,6 +68,9 @@ test('detects markdown files and handles missing active files safely', () => {
   expect(shouldRouteFileToLibreEditor(createFile('Archive.MD', 'MD'))).toBe(true);
   expect(shouldRouteFileToLibreEditor(createFile('Image.png', 'png'))).toBe(false);
   expect(shouldRouteFileToLibreEditor(null)).toBe(false);
+
+  expect(shouldRoutePathToLibreEditor('Folder/Uppercase.MD')).toBe(true);
+  expect(shouldRoutePathToLibreEditor('Folder/NotMarkdown.txt')).toBe(false);
 });
 
 test('creates Libre and native markdown view states for a file path', () => {

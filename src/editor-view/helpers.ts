@@ -122,5 +122,11 @@ export async function routeOpenMarkdownLeavesToLibreEditor(workspace: Workspace)
 }
 
 export function shouldRouteFileToLibreEditor(file: TFile | null): file is TFile {
-  return file?.extension.toLowerCase() === MARKDOWN_FILE_EXTENSIONS[0];
+  return file !== null && shouldRoutePathToLibreEditor(file.path);
+}
+
+export function shouldRoutePathToLibreEditor(filePath: string): boolean {
+  const fileExtension = filePath.split('.').pop()?.toLowerCase();
+
+  return fileExtension === MARKDOWN_FILE_EXTENSIONS[0];
 }
