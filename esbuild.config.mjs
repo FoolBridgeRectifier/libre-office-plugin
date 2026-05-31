@@ -26,7 +26,17 @@ const injectCssPlugin = {
 
       return {
         contents: `
+          for (const existingStyle of document.querySelectorAll('style')) {
+            if (
+              existingStyle.dataset.libreNoteEditorStyle === 'true' ||
+              existingStyle.textContent?.includes('--ribbon-purple')
+            ) {
+              existingStyle.remove();
+            }
+          }
+
           const style = document.createElement('style');
+          style.dataset.libreNoteEditorStyle = 'true';
           style.textContent = ${escaped};
           document.head.appendChild(style);
           export default undefined;

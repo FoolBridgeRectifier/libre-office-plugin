@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
 
-exports[`renders the OneNote-style ribbon editor shell 1`] = `
+exports[`sets the Home ribbon tab active by default 1`] = `
 <div>
   <section
     aria-label="Libre Note Editor"

@@ -24,3 +24,9 @@ test('switches ribbon tabs to show insert commands', () => {
   ).toBeInTheDocument();
   expect(screen.getByRole('button', { name: 'Insert' })).toHaveAttribute('aria-pressed', 'true');
 });
+
+test('shows the active markdown file path when a note is loaded', () => {
+  render(<App activeFilePath="Folder/Plan.md" />);
+
+  expect(screen.getByLabelText('Active markdown file')).toHaveTextContent('Folder/Plan.md');
+});

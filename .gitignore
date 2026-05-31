@@ -1,6 +1,7 @@
 node_modules/
 dist/
 coverage/
+output/
 main.js
 data.json
 *.log

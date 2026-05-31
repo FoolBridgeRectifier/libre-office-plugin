@@ -9,7 +9,7 @@ These rules are strict and mandatory.
 
 - Preferred stack: React, React Testing Library, Node, and TypeScript.
 - Extract new logical blocks into dedicated files and cover every path with tests.
-- Add one-line comments above non-obvious logic only.
+- Add short orienting comments above non-obvious logic, framework lifecycle hooks, routing side effects, and cross-boundary integration points.
 - Separate logical code sections with blank lines.
 - Use full descriptive names. Do not abbreviate identifiers.
 - Prioritize readability, maintainability, and reduced redundancy.
@@ -125,8 +125,18 @@ Code quality, readability, and redundancy reduction are the highest priorities. 
 8. Leave no `console.log` in production code. Debug logs are acceptable in tests only.
 9. Separate distinct statement groups with a blank line. No statement group may exceed 4 lines unless it is one multi-line statement such as a function call, parameter list, object literal, or JSX return.
 10. Keep one blank line between third-party imports and local imports.
-11. Add comments only above code that is not immediately obvious.
+11. Add comments above code whose purpose is not immediately obvious, especially lifecycle hooks, event routing, type narrowing, persistence boundaries, Obsidian workspace behavior, and cleanup paths.
 12. Keep source files at or below 150 lines, excluding imports.
+
+## Comments
+
+Comments should make the next reader faster without narrating syntax.
+
+- Prefer one short line above the code it explains.
+- Explain why the code exists or when an external framework calls it.
+- Comment Obsidian lifecycle hooks, workspace leaf routing, file state restoration, plugin unload cleanup, async ordering, and any fallback path.
+- Do not comment obvious assignments, JSX labels, imports, or names that already describe the behavior.
+- If a comment needs more than two lines, consider extracting a helper with a descriptive name.
 
 ## Completion Checklist
 

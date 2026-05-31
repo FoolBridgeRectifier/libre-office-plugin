@@ -131,7 +131,7 @@ Tailwind CSS is available through `styles.css` at the repo root and is compiled 
 - `postcss.config.mjs` registers `@tailwindcss/postcss`.
 - `esbuild.config.mjs` runs imported CSS through PostCSS before injecting it into the plugin bundle.
 - `src/main.ts` imports `../styles.css` once at plugin entry.
-- `styles.css` imports Tailwind theme and utilities only.
+- `styles.css` declares Tailwind theme and utilities only.
 - `styles.css` is the only allowed CSS file; it exists only for Tailwind setup and token aliases.
 - Tailwind Preflight is intentionally disabled so Obsidian's host UI is not reset by plugin styles.
 - Tailwind scans only `src/` for utility classes through the CSS `@source './src';` directive.
