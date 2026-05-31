@@ -8,6 +8,8 @@ It is the source of truth for structure, naming, testing, linting, and quality r
 These rules are strict and mandatory.
 
 - Preferred stack: React, React Testing Library, Node, and TypeScript.
+- Write React components as functional components with hooks.
+- Use classes only when an external API requires inheritance, such as Obsidian `Plugin` and `FileView` subclasses.
 - Extract new logical blocks into dedicated files and cover every path with tests.
 - Add short orienting comments above non-obvious logic, framework lifecycle hooks, routing side effects, and cross-boundary integration points.
 - Separate logical code sections with blank lines.

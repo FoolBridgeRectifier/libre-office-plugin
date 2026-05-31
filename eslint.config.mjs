@@ -124,6 +124,61 @@ const strictStructurePlugin = {
       },
     },
 
+    'no-react-class-components': {
+      meta: {
+        type: 'problem',
+        docs: {
+          description: 'Require React components to be written as functional components.',
+        },
+        schema: [],
+      },
+      create(context) {
+        const currentFilePath = context.filename.replace(/\\/g, '/');
+        const isReactComponentFile = currentFilePath.endsWith('.tsx');
+
+        if (!isReactComponentFile) {
+          return {};
+        }
+
+        const isReactClassSuper = (superClassNode) => {
+          if (!superClassNode) {
+            return false;
+          }
+
+          if (superClassNode.type === 'Identifier') {
+            return superClassNode.name === 'Component' || superClassNode.name === 'PureComponent';
+          }
+
+          if (superClassNode.type !== 'MemberExpression') {
+            return false;
+          }
+
+          const objectNode = superClassNode.object;
+          const propertyNode = superClassNode.property;
+          const isReactObject = objectNode.type === 'Identifier' && objectNode.name === 'React';
+          const isComponentProperty =
+            propertyNode.type === 'Identifier' &&
+            (propertyNode.name === 'Component' || propertyNode.name === 'PureComponent');
+
+          return isReactObject && isComponentProperty;
+        };
+
+        return {
+          ClassDeclaration(node) {
+            if (!isReactClassSuper(node.superClass)) {
+              return;
+            }
+
+            context.report({
+              node,
+              message:
+                'Write React components as functional components with hooks. Use classes only for framework inheritance such as Obsidian Plugin or FileView.',
+            });
+          },
+        };
+      },
+    },
+
     'svg-only-in-assets': {
       meta: {
         type: 'problem',
@@ -948,6 +1003,7 @@ export default [
       'strict-structure/module-consts-only-in-constants-file': 'error',
       'strict-structure/strict-file-name': 'error',
       'strict-structure/no-double-cast': 'error',
+      'strict-structure/no-react-class-components': 'error',
       'strict-structure/svg-only-in-assets': 'error',
       'strict-structure/max-statement-group-lines': ['error', { max: 4 }],
       'strict-structure/tailwind-only-styles': 'error',

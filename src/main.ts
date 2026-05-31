@@ -17,6 +17,7 @@ import {
 } from './editor-view/constants';
 import '../styles.css';
 
+// Obsidian plugins are inheritance-based, so this wrapper stays as a class.
 export default class LibreNoteEditorPlugin extends Plugin {
   private nativeFallbackLeaves = new WeakSet<WorkspaceLeaf>();
 

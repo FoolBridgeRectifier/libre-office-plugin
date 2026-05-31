@@ -8,6 +8,7 @@ import { App } from '../App';
 import { LIBRE_MARKDOWN_VIEW_TYPE } from './constants';
 import { shouldRouteFileToLibreEditor } from './helpers';
 
+// Obsidian custom views must extend FileView; React remains functional inside it.
 export class EditorView extends FileView {
   // FileView can be restored before Obsidian has assigned a file.
   allowNoFile = true;
