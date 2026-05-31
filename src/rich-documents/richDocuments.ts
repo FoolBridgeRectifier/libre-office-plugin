@@ -37,6 +37,7 @@ export function createRichDocumentStore(options: RichDocumentStoreOptions) {
     }
 
     const pluginData = normalizeRichDocumentPluginData(await options.persistenceTarget.loadData());
+
     cachedMappings = pluginData.mappings.length > 0 ? pluginData.mappings : await recoverMappings();
 
     return cachedMappings;
@@ -65,6 +66,7 @@ export function createRichDocumentStore(options: RichDocumentStoreOptions) {
 
   const replaceMapping = async (mapping: RichDocumentMapping) => {
     const mappings = await loadMappings();
+
     const nextMappings = mappings.filter(
       (existingMapping) => existingMapping.richDocumentId !== mapping.richDocumentId
     );

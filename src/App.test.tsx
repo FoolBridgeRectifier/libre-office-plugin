@@ -30,3 +30,16 @@ test('shows the active markdown file path when a note is loaded', () => {
 
   expect(screen.getByLabelText('Active markdown file')).toHaveTextContent('Folder/Plan.md');
 });
+
+test('renders imported html without showing preserved frontmatter as text', () => {
+  render(
+    <App
+      activeFilePath="Imported.md"
+      importedHtmlSource='<article><template data-libre-protected="frontmatter">title: Hidden</template><h1>Imported title</h1><p>Readable body</p></article>'
+    />
+  );
+
+  expect(screen.getByRole('heading', { name: 'Imported title' })).toBeInTheDocument();
+  expect(screen.getByText('Readable body')).toBeInTheDocument();
+  expect(screen.queryByText('title: Hidden')).not.toBeInTheDocument();
+});

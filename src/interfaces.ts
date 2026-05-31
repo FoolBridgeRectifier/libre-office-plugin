@@ -1,3 +1,4 @@
-export interface AppProperties {
+export interface AppProps {
   readonly activeFilePath?: string | null;
+  readonly importedHtmlSource?: string | null;
 }

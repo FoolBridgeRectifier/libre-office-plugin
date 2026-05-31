@@ -12,6 +12,7 @@ export function createRichDocumentMapping(
   timestamp: string,
   lastEditorPlatform: RichDocumentEditorPlatform
 ): RichDocumentMapping {
+  // All rich files are addressed by the stable rich id, never by the markdown filename.
   const richDocumentFilePaths = createRichDocumentFilePaths(richDocumentId);
 
   return {
@@ -34,6 +35,7 @@ export function createArchivedRichDocumentMapping(
   odtPath: string,
   timestamp: string
 ): RichDocumentMapping {
+  // Archiving keeps the identity intact while marking the rich files as no longer active.
   return {
     ...mapping,
     archivedAt: timestamp,
@@ -44,6 +46,7 @@ export function createArchivedRichDocumentMapping(
 }
 
 export function createStableRichDocumentId(timestamp: string, randomValue: number): string {
+  // Timestamp helps humans inspect folders; random segment prevents collisions.
   const timestampSegment = timestamp.replace(/[^0-9]/g, '').slice(0, 14) || 'current';
   const randomSegment = Math.floor(randomValue * Number.MAX_SAFE_INTEGER).toString(36);
 
@@ -51,6 +54,7 @@ export function createStableRichDocumentId(timestamp: string, randomValue: numbe
 }
 
 function createSyncTimestamps(timestamp: string): RichDocumentSyncTimestamps {
+  // A fresh mapping begins as markdown-sourced until HTML or ODT imports are created.
   return {
     htmlSyncedAt: null,
     lastSyncedAt: timestamp,

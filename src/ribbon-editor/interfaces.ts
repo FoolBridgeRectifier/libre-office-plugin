@@ -19,6 +19,7 @@ export interface RibbonTabDefinition {
   readonly label: string;
 }
 
-export interface RibbonEditorProperties {
+export interface RibbonEditorProps {
   readonly activeFilePath?: string | null;
+  readonly importedHtmlSource?: string | null;
 }

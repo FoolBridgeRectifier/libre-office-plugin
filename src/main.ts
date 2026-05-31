@@ -11,12 +11,13 @@ import {
   routeOpenMarkdownLeavesToLibreEditor,
   routeWorkspaceLeafToLibreEditor,
   shouldRouteFileToLibreEditor,
-  shouldRoutePathToLibreEditor,
 } from './editor-view/helpers';
 import {
   OPEN_NATIVE_MARKDOWN_COMMAND_ID,
   OPEN_NATIVE_MARKDOWN_COMMAND_NAME,
 } from './editor-view/constants';
+import { registerRichDocumentMappingEvents } from './helpers';
+import { ensureFirstMarkdownImport } from './markdown-sync/markdownSync';
 import { createRichDocumentStore } from './rich-documents/richDocuments';
 import type { RichDocumentStore } from './rich-documents/interfaces';
 import '../styles.css';
@@ -24,6 +25,7 @@ import '../styles.css';
 // Obsidian plugins are inheritance-based, so this wrapper stays as a class.
 export default class LibreNoteEditorPlugin extends Plugin {
   private nativeFallbackLeaves = new WeakSet<WorkspaceLeaf>();
+
   private richDocumentStore: RichDocumentStore | null = null;
 
   async onload(): Promise<void> {
@@ -33,13 +35,23 @@ export default class LibreNoteEditorPlugin extends Plugin {
       vaultAdapter: this.app.vault.adapter,
     });
 
+    // Plugin data must be loaded before routing, otherwise open leaves could create duplicates.
     await this.richDocumentStore.loadMappings();
 
-    registerLibreMarkdownRouting(this, (workspaceLeaf) => new EditorView(workspaceLeaf));
+    // This registers the custom FileView factory Obsidian uses when a leaf has our view type.
+    registerLibreMarkdownRouting(
+      this,
+      (workspaceLeaf) =>
+        new EditorView(workspaceLeaf, {
+          loadImportedHtmlSource: (file) => this.ensureRichDocumentHtml(file),
+        })
+    );
+
     this.registerNativeMarkdownFallbackCommand();
     this.registerMarkdownRoutingEvents();
-    this.registerRichDocumentMappingEvents();
+    registerRichDocumentMappingEvents(this, this.richDocumentStore);
 
+    // Layout readiness means the initial workspace leaves exist and can be inspected safely.
     this.app.workspace.onLayoutReady(() => {
       this.ensureMappingsForOpenMarkdownLeaves();
       void routeOpenMarkdownLeavesToLibreEditor(this.app.workspace);
@@ -57,10 +69,12 @@ export default class LibreNoteEditorPlugin extends Plugin {
         const navigationLeaf = this.app.workspace.getLeaf(false);
         const canOpenNativeMarkdown = shouldRouteFileToLibreEditor(activeFile);
 
+        // During command-palette checks, Obsidian only wants to know if the command is available.
         if (checking || !canOpenNativeMarkdown) {
           return canOpenNativeMarkdown;
         }
 
+        // Mark this leaf before opening so our routing events do not immediately hijack it back.
         this.nativeFallbackLeaves.add(navigationLeaf);
         void openFileInNativeMarkdownView(navigationLeaf, activeFile);
 
@@ -74,13 +88,15 @@ export default class LibreNoteEditorPlugin extends Plugin {
   private registerMarkdownRoutingEvents() {
     this.registerEvent(
       this.app.workspace.on('file-open', (file) => {
+        // file-open follows the most recent navigation target, not always a passed leaf.
         const navigationLeaf = this.app.workspace.getMostRecentLeaf();
 
         if (this.shouldSkipMarkdownRouting(navigationLeaf)) {
           return;
         }
 
-        void this.ensureRichDocumentMapping(file);
+        // HTML import can happen in parallel with leaf routing; the view reloads it when ready.
+        void this.ensureRichDocumentHtml(file);
         void routeMostRecentMarkdownLeafToLibreEditor(this.app.workspace, file);
       })
     );
@@ -91,48 +107,41 @@ export default class LibreNoteEditorPlugin extends Plugin {
           return;
         }
 
-        void this.ensureRichDocumentMapping(getWorkspaceLeafFile(workspaceLeaf));
+        // A leaf is Obsidian's pane object; routing swaps its view type while preserving the file.
+        void this.ensureRichDocumentHtml(getWorkspaceLeafFile(workspaceLeaf));
         void routeWorkspaceLeafToLibreEditor(workspaceLeaf);
-      })
-    );
-  }
-
-  private registerRichDocumentMappingEvents() {
-    this.registerEvent(
-      this.app.vault.on('rename', (file, previousPath) => {
-        if (shouldRoutePathToLibreEditor(file.path)) {
-          void this.richDocumentStore?.renameMapping(previousPath, file.path);
-          return;
-        }
-
-        if (shouldRoutePathToLibreEditor(previousPath)) {
-          void this.richDocumentStore?.archiveMapping(previousPath);
-        }
-      })
-    );
-
-    this.registerEvent(
-      this.app.vault.on('delete', (file) => {
-        if (shouldRoutePathToLibreEditor(file.path)) {
-          void this.richDocumentStore?.deleteMapping(file.path);
-        }
       })
     );
   }
 
   private ensureMappingsForOpenMarkdownLeaves() {
     this.app.workspace.iterateAllLeaves((workspaceLeaf) => {
-      void this.ensureRichDocumentMapping(getWorkspaceLeafFile(workspaceLeaf));
+      void this.ensureRichDocumentHtml(getWorkspaceLeafFile(workspaceLeaf));
     });
   }
 
-  private async ensureRichDocumentMapping(file: TFile | null) {
-    // Mapping creation is queued by the store so multiple leaves share one record.
+  private async ensureRichDocumentHtml(file: TFile | null) {
     if (!shouldRouteFileToLibreEditor(file)) {
-      return;
+      return null;
     }
 
-    await this.richDocumentStore?.getOrCreateMapping(file.path);
+    // Import creation is queued by the store so multiple leaves share one record.
+    const mapping = await this.richDocumentStore?.getOrCreateMapping(file.path);
+
+    if (!mapping || !this.richDocumentStore) {
+      return null;
+    }
+
+    // First import writes document.html; later calls just read the richer HTML source back.
+    const importResult = await ensureFirstMarkdownImport({
+      markdownFile: file,
+      mapping,
+      richDocumentStore: this.richDocumentStore,
+      vaultAdapter: this.app.vault.adapter,
+      vaultReader: this.app.vault,
+    });
+
+    return importResult.htmlSource;
   }
 
   private shouldSkipMarkdownRouting(workspaceLeaf: WorkspaceLeaf | null) {

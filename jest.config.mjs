@@ -10,5 +10,12 @@ export default {
         tsconfig: '<rootDir>/tsconfig.jest.json',
       },
     ],
+    '^.+\\.m?js$': [
+      'babel-jest',
+      {
+        plugins: ['@babel/plugin-transform-modules-commonjs'],
+      },
+    ],
   },
+  transformIgnorePatterns: ['/node_modules/(?!markdown-it-github-alerts/)'],
 };
