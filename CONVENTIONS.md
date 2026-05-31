@@ -120,15 +120,17 @@ Code quality, readability, and redundancy reduction are the highest priorities. 
 1. No globals. Never use `window.*` or other global state; use React context.
 2. No side effects at module load. Put effects inside hooks, components, or explicit functions.
 3. TypeScript must stay strict. Run `tsc --noEmit`; do not use `any` except in test utility mock casts.
-4. Button handlers must guard the editor before use: `const editor = getEditor(); if (!editor) return;`.
-5. Define the editor accessor at component top level: `const getEditor = () => app.workspace.activeEditor?.editor;`.
-6. Do not use component-level polling with `requestAnimationFrame` or `setInterval` to synchronize editor UI state.
-7. Extract multi-line JSX handlers into named functions declared above the `return`.
-8. Leave no `console.log` in production code. Debug logs are acceptable in tests only.
-9. Separate distinct statement groups with a blank line. No statement group may exceed 4 lines unless it is one multi-line statement such as a function call, parameter list, object literal, or JSX return.
-10. Keep one blank line between third-party imports and local imports.
-11. Add comments above code whose purpose is not immediately obvious, especially lifecycle hooks, event routing, type narrowing, persistence boundaries, Obsidian workspace behavior, and cleanup paths.
-12. Keep source files at or below 150 lines, excluding imports.
+4. Interfaces, types, and enums must be as narrow as the real domain allows: prefer literal unions, readonly fields, discriminated unions, and precise nullable states over broad strings, loose objects, or optional fields.
+5. Shared domain types should be reused from the nearest appropriate `interfaces.ts`; move a type upward only when multiple folders genuinely need the same contract.
+6. Button handlers must guard the editor before use: `const editor = getEditor(); if (!editor) return;`.
+7. Define the editor accessor at component top level: `const getEditor = () => app.workspace.activeEditor?.editor;`.
+8. Do not use component-level polling with `requestAnimationFrame` or `setInterval` to synchronize editor UI state.
+9. Extract multi-line JSX handlers into named functions declared above the `return`.
+10. Leave no `console.log` in production code. Debug logs are acceptable in tests only.
+11. Separate distinct statement groups with a blank line. No statement group may exceed 4 lines unless it is one multi-line statement such as a function call, parameter list, object literal, or JSX return.
+12. Keep one blank line between third-party imports and local imports.
+13. Add comments above code whose purpose is not immediately obvious, especially lifecycle hooks, event routing, type narrowing, persistence boundaries, Obsidian workspace behavior, and cleanup paths.
+14. Keep source files at or below 150 lines, excluding imports.
 
 ## Comments
 
@@ -148,6 +150,8 @@ Before finishing any development task:
 - Run `npm run format:check`.
 - Run `npm run lint`.
 - Run `npm run typecheck` or `tsc --noEmit`.
+- Check touched `helpers.ts`, `constants.ts`, and `interfaces.ts` files for redundant exports, duplicate logic, unused types, and values that should be shared or removed.
+- Check touched interfaces and types for strictness, maximum practical reuse, and unnecessary local duplicates before finishing.
 - Confirm any new feature folder includes `constants.ts` and `interfaces.ts`.
 - Confirm any new component styling follows `DESIGN.md` and uses Tailwind utilities.
 - Dropdown and modal tests must include behavior assertions, snapshots, and computed CSS assertions.
