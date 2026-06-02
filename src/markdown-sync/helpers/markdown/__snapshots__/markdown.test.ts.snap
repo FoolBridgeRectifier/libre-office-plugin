@@ -1,0 +1,2301 @@
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
+
+exports[`matches md_1 markdown conversion snapshot 1`] = `
+{
+  "frontmatter": "title: ==Detection Engine Test==
+date: 2026-05-02",
+  "html": <div>
+    <article
+      data-libre-note-editor-html=""
+    >
+      <template
+        data-libre-protected="frontmatter"
+      />
+      <ul
+        class="contains-task-list"
+      >
+        
+
+        <li
+          class="task-list-item"
+        >
+          <input
+            checked=""
+            disabled=""
+            type="checkbox"
+          />
+           # dd
+        </li>
+        
+
+        <li
+          class="task-list-item"
+        >
+          <input
+            disabled=""
+            type="checkbox"
+          />
+           ss
+
+          <code>
+            ggg
+          </code>
+           gg 
+          <code>
+            ggg
+          </code>
+           gg 
+          <code>
+            ff
+          </code>
+        </li>
+        
+
+      </ul>
+      
+
+      <blockquote>
+        
+
+        <p>
+          <span
+            data-libre-markdown="[!info] - [ ] s"
+            data-libre-protected="obsidian-callout"
+            data-obsidian-callout-fold=""
+            data-obsidian-callout-type="info"
+          >
+            [!info] - [ ] s
+          </span>
+          
+gg
+        </p>
+        
+
+      </blockquote>
+      
+
+      <ul>
+        
+
+        <li>
+          
+
+          <h1>
+            hh
+          </h1>
+          
+
+        </li>
+        
+
+      </ul>
+      
+
+      <p>
+        kkkk # ff
+      </p>
+      
+
+      <p>
+        <code>
+          &lt;b&gt;s&lt;/b&gt;&lt;b&gt;s&lt;/b&gt;
+        </code>
+        
+
+        <code>
+          s
+        </code>
+      </p>
+      
+
+      <pre>
+        <code>
+          ss
+
+        </code>
+      </pre>
+      
+
+      <h1>
+        <b>
+          gg
+        </b>
+      </h1>
+      
+
+      <h1>
+        <span
+          style="margin-left:24px"
+        >
+          *Heading 1
+        </span>
+      </h1>
+      
+
+      <h2>
+        Heading 2
+      </h2>
+      
+
+      <h3>
+        Heading 3
+      </h3>
+      
+
+      <h4>
+        Heading 4
+      </h4>
+      
+
+      <h5>
+        Heading 5
+      </h5>
+      
+
+      <h6>
+        Heading 6
+      </h6>
+      
+
+      <p>
+        ####### Not a heading (7 hashes — no match)
+      </p>
+      
+
+      <hr />
+      
+
+      <p>
+        <strong>
+          bold text
+        </strong>
+      </p>
+      
+
+      <p>
+        <em>
+          italic text
+        </em>
+      </p>
+      
+
+      <p>
+        <del>
+          strikethrough
+        </del>
+      </p>
+      
+
+      <p>
+        ==highlight==
+      </p>
+      
+
+      <p>
+        <strong>
+          nested 
+          <em>
+            italic inside bold
+          </em>
+           still bold
+        </strong>
+      </p>
+      
+
+      <p>
+        <em>
+          italic with ==highlight inside==
+        </em>
+      </p>
+      
+
+      <p>
+        <code>
+          inline code
+        </code>
+      </p>
+      
+
+      <pre>
+        <code
+          class="language-js"
+        >
+          const fenced = true;
+
+        </code>
+      </pre>
+      
+
+      <pre>
+        <code>
+          tab-indented code block (preceded by content above)
+second tab-indented line
+
+four-space indented code block
+second four-space line
+
+        </code>
+      </pre>
+      
+
+      <hr />
+      
+
+      <p>
+        <b>
+          html bold
+        </b>
+      </p>
+      
+
+      <p>
+        <i>
+          html italic
+        </i>
+      </p>
+      
+
+      <p>
+        <s>
+          html strikethrough
+        </s>
+      </p>
+      
+
+      <p>
+        <b>
+          whitespace-tolerant bold
+        </b>
+      </p>
+      
+
+      <p>
+        underlined
+      </p>
+      
+
+      <p>
+        H
+        <sub>
+          2
+        </sub>
+        O
+      </p>
+      
+
+      <p>
+        x
+        <sup>
+          2
+        </sup>
+      </p>
+      
+
+      <p>
+        <span
+          style="color: red"
+        >
+          red text
+        </span>
+      </p>
+      
+
+      <p>
+        <span
+          style="color: #ff6600"
+        >
+          orange text
+        </span>
+      </p>
+      
+
+      <p>
+        <span
+          style="font-size: 14px"
+        >
+          small
+        </span>
+      </p>
+      
+
+      <p>
+        <span
+          style="font-size: 2em"
+        >
+          large
+        </span>
+      </p>
+      
+
+      <p>
+        <span
+          style="font-family: Arial"
+        >
+          Arial
+        </span>
+      </p>
+      
+
+      <p>
+        <span
+          style="font-family: 'Times New Roman', serif"
+        >
+          serif
+        </span>
+      </p>
+      
+
+      <p>
+        <span
+          style="background: yellow"
+        >
+          yellow highlight
+        </span>
+      </p>
+      
+
+      <p>
+        <span
+          style="background: rgba(255,200,0,0.4)"
+        >
+          transparent highlight
+        </span>
+      </p>
+      
+
+      <p>
+        <span
+          style="text-align: center; display: block"
+        >
+          centered
+        </span>
+        
+[]
+
+        <span
+          style="\`\`\`text-align: right"
+        >
+          right-aligned
+        </span>
+      </p>
+      
+
+      <hr />
+      
+
+      <blockquote>
+        
+
+        <p>
+          plain blockquote — QUOTE matches
+        </p>
+        
+
+      </blockquote>
+      
+
+      <blockquote>
+        
+
+        <blockquote>
+          
+
+          <p>
+            nested blockquote depth-2 — QUOTE matches
+          </p>
+          
+
+        </blockquote>
+        
+
+      </blockquote>
+      
+
+      <blockquote>
+        
+
+        <blockquote>
+          
+
+          <blockquote>
+            
+
+            <p>
+              triple depth — QUOTE matches
+            </p>
+            
+
+          </blockquote>
+          
+
+        </blockquote>
+        
+
+      </blockquote>
+      
+
+      <blockquote>
+        
+
+        <p>
+          q1
+q2
+        </p>
+        
+
+      </blockquote>
+      
+
+      <blockquote>
+        
+
+        <p>
+          <span
+            data-libre-markdown="[!note] Callout with title — CALLOUT matches, QUOTE does not"
+            data-libre-protected="obsidian-callout"
+            data-obsidian-callout-fold=""
+            data-obsidian-callout-type="note"
+          >
+            [!note] Callout with title — CALLOUT matches, QUOTE does not
+          </span>
+        </p>
+        
+
+      </blockquote>
+      
+
+      <blockquote>
+        
+
+        <p>
+          <span
+            data-libre-markdown="[!warning]"
+            data-libre-protected="obsidian-callout"
+            data-obsidian-callout-fold=""
+            data-obsidian-callout-type="warning"
+          >
+            [!warning]
+          </span>
+          
+callout body — CALLOUT continuation, QUOTE does not match this line
+        </p>
+        
+
+      </blockquote>
+      
+
+      <blockquote>
+        
+
+        <p>
+          <span
+            data-libre-markdown="[!info] Title"
+            data-libre-protected="obsidian-callout"
+            data-obsidian-callout-fold=""
+            data-obsidian-callout-type="info"
+          >
+            [!info] Title
+          </span>
+          
+gg
+        </p>
+        
+
+        <blockquote>
+          
+
+          <p>
+            <span
+              data-libre-markdown="[!tip] Nested callout — CALLOUT matches (continuation arm), QUOTE also matches >> here"
+              data-libre-protected="obsidian-callout"
+              data-obsidian-callout-fold=""
+              data-obsidian-callout-type="tip"
+            >
+              [!tip] Nested callout — CALLOUT matches (continuation arm), QUOTE also matches &gt;&gt; here
+            </span>
+          </p>
+          
+
+        </blockquote>
+        
+
+      </blockquote>
+      
+
+      <blockquote>
+        
+
+        <p>
+          [!note\`\`\`]
+another body line — CALLOUT continuation only
+        </p>
+        
+
+      </blockquote>
+      
+
+      <hr />
+      
+
+      <ul
+        class="contains-task-list"
+      >
+        
+
+        <li>
+          
+
+          <p>
+            plain list item — LIST matches
+          </p>
+          
+
+        </li>
+        
+
+        <li>
+          
+
+          <p>
+            another list item
+          </p>
+          
+
+          <ul>
+            
+
+            <li>
+              indented list item (tab prefix) — LIST matches, INDENT also matches
+
+              <ul>
+                
+
+                <li>
+                  double-indented list item — LIST matches
+                </li>
+                
+
+              </ul>
+              
+
+            </li>
+            
+
+          </ul>
+          
+
+        </li>
+        
+
+        <li
+          class="task-list-item"
+        >
+          
+
+          <p>
+            <input
+              disabled=""
+              type="checkbox"
+            />
+             unchecked checkbox — CHECKBOX matches
+          </p>
+          
+
+        </li>
+        
+
+        <li
+          class="task-list-item"
+        >
+          
+
+          <p>
+            <input
+              checked=""
+              disabled=""
+              type="checkbox"
+            />
+             checked checkbox
+          </p>
+          
+
+        </li>
+        
+
+        <li
+          class="task-list-item"
+        >
+          
+
+          <p>
+            <input
+              checked=""
+              disabled=""
+              type="checkbox"
+            />
+             checked checkbox uppercase
+          </p>
+          
+
+        </li>
+        
+
+        <li>
+          
+
+          <p>
+            [/] in-progress checkbox
+          </p>
+          
+
+        </li>
+        
+
+        <li>
+          
+
+          <p>
+            [-] cancelled checkbox
+          </p>
+          
+
+        </li>
+        
+
+        <li>
+          
+
+          <p>
+            [] empty brackets — LIST matches (not checkbox)
+          </p>
+          
+
+        </li>
+        
+
+        <li>
+          
+
+          <p>
+            [^] footnote bracket — LIST matches (not checkbox)
+          </p>
+          
+
+        </li>
+        
+
+        <li>
+          
+
+          <p>
+            [!] callout bracket — LIST matches (not checkbox)
+          </p>
+          
+
+        </li>
+        
+
+      </ul>
+      
+
+      <p>
+        -[x] no space before bracket — LIST matches (not checkbox)
+      </p>
+      
+
+      <hr />
+      
+
+      <pre>
+        <code>
+          tab-indented line (preceded by list above) — INDENT matches
+
+	double tab indent
+
+four-space indent
+
+&lt;span style="margin-left: 2em"&gt;tab + span indent&lt;/span&gt;rest of line
+
+        </code>
+      </pre>
+      
+
+      <hr />
+      
+
+      <p>
+        [[wikil\`\`\`ink]] — WIKILINK matches
+      </p>
+      
+
+      <p>
+        <span
+          data-libre-markdown="[[wikilink with spaces]]"
+          data-libre-protected="obsidian-wiki-link"
+          data-obsidian-target="wikilink with spaces"
+        >
+          wikilink with spaces
+        </span>
+      </p>
+      
+
+      <p>
+        <span
+          data-libre-markdown="[[folder/path/note]]"
+          data-libre-protected="obsidian-wiki-link"
+          data-obsidian-target="folder/path/note"
+        >
+          folder/path/note
+        </span>
+         — WIKILINK with path
+      </p>
+      
+
+      <p>
+        <span
+          data-libre-markdown="![[embed-file]]"
+          data-libre-protected="obsidian-embed"
+          data-obsidian-target="embed-file"
+        >
+          ![[embed-file]]
+        </span>
+         — EMBED matches
+      </p>
+      
+
+      <p>
+        <span
+          data-libre-markdown="![[images/photo.png]]"
+          data-libre-protected="obsidian-embed"
+          data-obsidian-target="images/photo.png"
+        >
+          ![[images/photo.png]]
+        </span>
+         — EMBED with path
+      </p>
+      
+
+      <p>
+        <img
+          alt="inline svg image"
+          src="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20width='320'%20height='180'%20viewBox='0%200%20320%20180'%3E%3Crect%20width='320'%20height='180'%20rx='16'%20fill='%236f42c1'/%3E%3Ctext%20x='160'%20y='96'%20text-anchor='middle'%20fill='white'%20font-size='22'%20font-family='Segoe%20UI,Arial,sans-serif'%3ELibre%20Embed%20Test%3C/text%3E%3C/svg%3E"
+        />
+         — self-contained markdown IMAGE
+      </p>
+      
+
+      <p>
+        Self-contained embed target paragraph in this same markdown file. 
+        <span
+          data-libre-markdown="^libre-note-editor-self-embed"
+          data-libre-protected="obsidian-block-id"
+          data-obsidian-block-id="libre-note-editor-self-embed"
+        >
+          ^libre-note-editor-self-embed
+        </span>
+      </p>
+      
+
+      <p>
+        <span
+          data-libre-markdown="![[#Heading 2]]"
+          data-libre-protected="obsidian-embed"
+          data-obsidian-target="#Heading 2"
+        >
+          ![[#Heading 2]]
+        </span>
+         — same-note HEADING embed
+      </p>
+      
+
+      <p>
+        <span
+          data-libre-markdown="![[#^libre-note-editor-self-embed]]"
+          data-libre-protected="obsidian-embed"
+          data-obsidian-target="#^libre-note-editor-self-embed"
+        >
+          ![[#^libre-note-editor-self-embed]]
+        </span>
+         — same-note BLOCK embed
+      </p>
+      
+
+      <ul>
+        
+
+        <li>
+          <span
+            data-libre-markdown="[[list wikilink]]"
+            data-libre-protected="obsidian-wiki-link"
+            data-obsidian-target="list wikilink"
+          >
+            list wikilink
+          </span>
+           — lookbehind blocks WIKILINK (preceded by dash)
+        </li>
+        
+
+      </ul>
+      
+
+      <p>
+        <a
+          href="https://example.com"
+        >
+          markdown link
+        </a>
+         — EXTERNAL_LINK matches
+      </p>
+      
+
+      <p>
+        <a
+          href="https://example.com/path?q=1"
+        >
+          https://example.com/path?q=1
+        </a>
+         — EXTERNAL_LINK bare URL
+      </p>
+      
+
+      <p>
+        <a
+          href="http://insecure.exa%60%60%60mple.com"
+        >
+          http://insecure.exa\`\`\`mple.com
+        </a>
+      </p>
+      
+
+      <p>
+        <a
+          href="http://www.example.com"
+        >
+          www.example.com
+        </a>
+      </p>
+      
+
+      <p>
+        example.io/path
+      </p>
+      
+
+      <p>
+        api.example.dev/v2
+      </p>
+      
+
+      <hr />
+      
+
+      <p>
+        <span
+          data-libre-markdown="#todo"
+          data-libre-protected="obsidian-tag"
+          data-obsidian-tag="todo"
+        >
+          #todo
+        </span>
+         inline todo — INLINE_TODO matches
+      </p>
+      
+
+      <p>
+        text before 
+        <span
+          data-libre-markdown="#todo"
+          data-libre-protected="obsidian-tag"
+          data-obsidian-tag="todo"
+        >
+          #todo
+        </span>
+         mid-sentence
+      </p>
+      
+
+      <p>
+        <span
+          data-libre-markdown="#todos"
+          data-libre-protected="obsidian-tag"
+          data-obsidian-tag="todos"
+        >
+          #todos
+        </span>
+         should NOT match (word boundary blocks plural)
+      </p>
+      
+
+      <p>
+        <span
+          data-libre-markdown="#todoitem"
+          data-libre-protected="obsidian-tag"
+          data-obsidian-tag="todoitem"
+        >
+          #todoitem
+        </span>
+         should NOT match
+      </p>
+      
+
+      <hr />
+      
+
+      <p>
+        <sup
+          id="fnref-footnote"
+        >
+          <a
+            class="footnote-ref"
+            href="#fn-footnote"
+          >
+            footnote
+          </a>
+        </sup>
+         inline reference — FOOTNOTE_REF matches
+      </p>
+      
+
+      <hr />
+      
+
+      <p>
+        **unclosed bold — no close delimiter in this line
+      </p>
+      
+
+      <p>
+        *unclosed italic
+      </p>
+      
+
+      <p>
+        ==unclosed highlight
+      </p>
+      
+
+      <p>
+        ~~unclosed strikethrough
+      </p>
+      
+
+      <div
+        class="footnotes"
+      >
+        
+
+        <hr />
+        
+
+        <ol>
+          
+
+          <li
+            id="fn-footnote"
+          >
+            footnote definition
+            <a
+              class="footnote-backref"
+              href="#fnref-footnote"
+            >
+              ↩
+            </a>
+          </li>
+          
+
+        </ol>
+        
+
+      </div>
+    </article>
+  </div>,
+}
+`;
+
+exports[`matches md_2 complex nested markdown conversion snapshot 1`] = `
+{
+  "frontmatter": "title: 'Complex Nested Markdown Reference'
+aliases:
+  - 'Stress Fixture'
+  - 'Nested Tags And Embeds'
+date: 2026-05-31
+tags:
+  - fixture/markdown/stress
+  - fixture/embed/deep
+  - status/in-progress
+cssclasses:
+  - libre-note-fixture
+  - markdown-torture-test
+metadata:
+  owner:
+    name: Dragus
+    tags:
+      - person/test-owner
+      - person/editor-reviewer
+  nested:
+    level_one:
+      level_two:
+        level_three: 'frontmatter nesting should stay preserved'",
+  "html": <div>
+    <article
+      data-libre-note-editor-html=""
+    >
+      <template
+        data-libre-protected="frontmatter"
+      />
+      <h1>
+        Complex Nested Markdown Reference
+      </h1>
+      
+
+      <p>
+        This fixture intentionally mixes valid markdown, Obsidian syntax, raw HTML, malformed
+markdown, nested tags, embeds, callouts, tables, footnotes, block IDs, and code fences.
+It is modeled after 
+        <code>
+          tag-regex-reference.md
+        </code>
+        , but pushes more nested combinations.
+      </p>
+      
+
+      <h2>
+        Inline Formatting And Tags
+      </h2>
+      
+
+      <p>
+        Paragraph with 
+        <strong>
+          bold and 
+          <em>
+            italic and ==highlight with 
+            <code>
+              inline code
+            </code>
+             inside==
+          </em>
+        </strong>
+         plus
+
+        <del>
+          strike with 
+          <span
+            data-libre-markdown="#status/in-progress"
+            data-libre-protected="obsidian-tag"
+            data-obsidian-tag="status/in-progress"
+          >
+            #status/in-progress
+          </span>
+           nested beside 
+          <span
+            data-libre-markdown="[[Project Hub#Deep Heading|hub link]]"
+            data-libre-protected="obsidian-wiki-link"
+            data-obsidian-target="Project Hub#Deep Heading"
+          >
+            hub link
+          </span>
+        </del>
+        .
+      </p>
+      
+
+      <p>
+        Tags in sequence: 
+        <span
+          data-libre-markdown="#alpha"
+          data-libre-protected="obsidian-tag"
+          data-obsidian-tag="alpha"
+        >
+          #alpha
+        </span>
+         
+        <span
+          data-libre-markdown="#alpha/beta"
+          data-libre-protected="obsidian-tag"
+          data-obsidian-tag="alpha/beta"
+        >
+          #alpha/beta
+        </span>
+         
+        <span
+          data-libre-markdown="#alpha/beta/gamma"
+          data-libre-protected="obsidian-tag"
+          data-obsidian-tag="alpha/beta/gamma"
+        >
+          #alpha/beta/gamma
+        </span>
+         
+        <span
+          data-libre-markdown="#alpha-beta/gamma_delta"
+          data-libre-protected="obsidian-tag"
+          data-obsidian-tag="alpha-beta/gamma_delta"
+        >
+          #alpha-beta/gamma_delta
+        </span>
+        
+
+        <span
+          data-libre-markdown="#emoji-ish/smile-test"
+          data-libre-protected="obsidian-tag"
+          data-obsidian-tag="emoji-ish/smile-test"
+        >
+          #emoji-ish/smile-test
+        </span>
+         
+        <span
+          data-libre-markdown="#todo"
+          data-libre-protected="obsidian-tag"
+          data-obsidian-tag="todo"
+        >
+          #todo
+        </span>
+         
+        <span
+          data-libre-markdown="#todo/deep/item"
+          data-libre-protected="obsidian-tag"
+          data-obsidian-tag="todo/deep/item"
+        >
+          #todo/deep/item
+        </span>
+         
+        <span
+          data-libre-markdown="#todos-should-not-collapse"
+          data-libre-protected="obsidian-tag"
+          data-obsidian-tag="todos-should-not-collapse"
+        >
+          #todos-should-not-collapse
+        </span>
+        .
+      </p>
+      
+
+      <p>
+        Escaped and adjacent tags: text#not-a-tag, 
+        <code>
+          #code/not-tag
+        </code>
+        , #escaped/tag,
+(
+        <span
+          data-libre-markdown="#wrapped/tag"
+          data-libre-protected="obsidian-tag"
+          data-obsidian-tag="wrapped/tag"
+        >
+          #wrapped/tag
+        </span>
+        ), 
+        <a
+          href="https://example.com/tagged"
+        >
+          <span
+            data-libre-markdown="#linked/tag"
+            data-libre-protected="obsidian-tag"
+            data-obsidian-tag="linked/tag"
+          >
+            #linked/tag
+          </span>
+        </a>
+        , and 
+        <span
+          data-libre-markdown="#final/tag"
+          data-libre-protected="obsidian-tag"
+          data-obsidian-tag="final/tag"
+        >
+          #final/tag
+        </span>
+        .
+      </p>
+      
+
+      <h2>
+        Headings With Raw Html And Strange Markers
+      </h2>
+      
+
+      <h1>
+        <b>
+          HTML-looking Heading
+        </b>
+      </h1>
+      
+
+      <h2>
+        <span
+          style="color:red"
+        >
+          Styled Heading Text
+        </span>
+      </h2>
+      
+
+      <h3>
+        Heading With 
+        <span
+          data-libre-markdown="[[Nested Link#Inside Heading|linked alias]]"
+          data-libre-protected="obsidian-wiki-link"
+          data-obsidian-target="Nested Link#Inside Heading"
+        >
+          linked alias
+        </span>
+      </h3>
+      
+
+      <h4>
+        Heading With 
+        <span
+          data-libre-markdown="#heading/tag"
+          data-libre-protected="obsidian-tag"
+          data-obsidian-tag="heading/tag"
+        >
+          #heading/tag
+        </span>
+         and 
+        <span
+          data-libre-markdown="![[Heading Embed.png]]"
+          data-libre-protected="obsidian-embed"
+          data-obsidian-target="Heading Embed.png"
+        >
+          ![[Heading Embed.png]]
+        </span>
+      </h4>
+      
+
+      <h5>
+        Heading With 
+        <code>
+          inline code
+        </code>
+         and ==highlight==
+      </h5>
+      
+
+      <h6>
+        Deep Legal Heading
+      </h6>
+      
+
+      <p>
+        ####### Seven Hashes Should Stay Paragraph Text
+      </p>
+      
+
+      <h2>
+        Lists, Tasks, And Nested Tags
+      </h2>
+      
+
+      <ul
+        class="contains-task-list"
+      >
+        
+
+        <li>
+          Top item 
+          <span
+            data-libre-markdown="#list/top"
+            data-libre-protected="obsidian-tag"
+            data-obsidian-tag="list/top"
+          >
+            #list/top
+          </span>
+          
+
+          <ul>
+            
+
+            <li>
+              Nested item with 
+              <span
+                data-libre-markdown="[[Nested/Path/Note#Anchor|alias]]"
+                data-libre-protected="obsidian-wiki-link"
+                data-obsidian-target="Nested/Path/Note#Anchor"
+              >
+                alias
+              </span>
+               
+              <span
+                data-libre-markdown="#list/top/child"
+                data-libre-protected="obsidian-tag"
+                data-obsidian-tag="list/top/child"
+              >
+                #list/top/child
+              </span>
+              
+
+              <ul>
+                
+
+                <li>
+                  Deep item with 
+                  <span
+                    data-libre-markdown="![[Nested Image.png|320x180]]"
+                    data-libre-protected="obsidian-embed"
+                    data-obsidian-target="Nested Image.png"
+                  >
+                    ![[Nested Image.png|320x180]]
+                  </span>
+                   
+                  <span
+                    data-libre-markdown="#list/top/child/embed"
+                    data-libre-protected="obsidian-tag"
+                    data-obsidian-tag="list/top/child/embed"
+                  >
+                    #list/top/child/embed
+                  </span>
+                  
+
+                  <ul>
+                    
+
+                    <li>
+                      Deeper item with 
+                      <a
+                        href="https://example.com/deep?x=1#hash"
+                      >
+                        external link
+                      </a>
+                    </li>
+                    
+
+                  </ul>
+                  
+
+                </li>
+                
+
+              </ul>
+              
+
+            </li>
+            
+
+          </ul>
+          
+
+        </li>
+        
+
+        <li
+          class="task-list-item"
+        >
+          <input
+            disabled=""
+            type="checkbox"
+          />
+           Task with 
+          <span
+            data-libre-markdown="#task/open"
+            data-libre-protected="obsidian-tag"
+            data-obsidian-tag="task/open"
+          >
+            #task/open
+          </span>
+           and 
+          <span
+            data-libre-markdown="![[Task Evidence.pdf#page=2|evidence]]"
+            data-libre-protected="obsidian-embed"
+            data-obsidian-target="Task Evidence.pdf#page=2"
+          >
+            ![[Task Evidence.pdf#page=2|evidence]]
+          </span>
+        </li>
+        
+
+        <li
+          class="task-list-item"
+        >
+          <input
+            checked=""
+            disabled=""
+            type="checkbox"
+          />
+           Done task with nested tag 
+          <span
+            data-libre-markdown="#task/done/archive"
+            data-libre-protected="obsidian-tag"
+            data-obsidian-tag="task/done/archive"
+          >
+            #task/done/archive
+          </span>
+        </li>
+        
+
+        <li>
+          [/] In progress task 
+          <span
+            data-libre-markdown="#task/progress"
+            data-libre-protected="obsidian-tag"
+            data-obsidian-tag="task/progress"
+          >
+            #task/progress
+          </span>
+        </li>
+        
+
+        <li>
+          [-] Cancelled task 
+          <span
+            data-libre-markdown="#task/cancelled"
+            data-libre-protected="obsidian-tag"
+            data-obsidian-tag="task/cancelled"
+          >
+            #task/cancelled
+          </span>
+        </li>
+        
+
+        <li>
+          [!] Alert-looking task marker 
+          <span
+            data-libre-markdown="#task/bang"
+            data-libre-protected="obsidian-tag"
+            data-obsidian-tag="task/bang"
+          >
+            #task/bang
+          </span>
+        </li>
+        
+
+        <li>
+          [] Empty bracket list item
+        </li>
+        
+
+        <li>
+          <sup
+            id="fnref-fixture-footnote"
+          >
+            <a
+              class="footnote-ref"
+              href="#fn-fixture-footnote"
+            >
+              fixture-footnote
+            </a>
+          </sup>
+           Footnote-looking list item
+        </li>
+        
+
+      </ul>
+      
+
+      <ol>
+        
+
+        <li>
+          Ordered item with 
+          <span
+            data-libre-markdown="#ordered/one"
+            data-libre-protected="obsidian-tag"
+            data-obsidian-tag="ordered/one"
+          >
+            #ordered/one
+          </span>
+        </li>
+        
+
+        <li>
+          Ordered item with nested embed 
+          <span
+            data-libre-markdown="![[Audio Clip.mp3]]"
+            data-libre-protected="obsidian-embed"
+            data-obsidian-target="Audio Clip.mp3"
+          >
+            ![[Audio Clip.mp3]]
+          </span>
+          
+
+          <ol>
+            
+
+            <li>
+              Nested ordered item with 
+              <span
+                data-libre-markdown="[[Order Note^block-ref]]"
+                data-libre-protected="obsidian-wiki-link"
+                data-obsidian-target="Order Note^block-ref"
+              >
+                Order Note^block-ref
+              </span>
+            </li>
+            
+
+            <li>
+              Nested ordered item with 
+              <span
+                data-libre-markdown="#ordered/two/nested"
+                data-libre-protected="obsidian-tag"
+                data-obsidian-tag="ordered/two/nested"
+              >
+                #ordered/two/nested
+              </span>
+            </li>
+            
+
+          </ol>
+          
+
+        </li>
+        
+
+      </ol>
+      
+
+      <h2>
+        Nested Callouts And Quotes
+      </h2>
+      
+
+      <blockquote>
+        
+
+        <p>
+          Plain quote line with 
+          <span
+            data-libre-markdown="#quote/plain"
+            data-libre-protected="obsidian-tag"
+            data-obsidian-tag="quote/plain"
+          >
+            #quote/plain
+          </span>
+           and 
+          <span
+            data-libre-markdown="[[Quote Target]]"
+            data-libre-protected="obsidian-wiki-link"
+            data-obsidian-target="Quote Target"
+          >
+            Quote Target
+          </span>
+          .
+        </p>
+        
+
+        <blockquote>
+          
+
+          <p>
+            Nested quote level two with 
+            <span
+              data-libre-markdown="![[Quote Embed.svg]]"
+              data-libre-protected="obsidian-embed"
+              data-obsidian-target="Quote Embed.svg"
+            >
+              ![[Quote Embed.svg]]
+            </span>
+            .
+          </p>
+          
+
+          <blockquote>
+            
+
+            <p>
+              Nested quote level three with 
+              <code>
+                code
+              </code>
+               and ==highlight==.
+            </p>
+            
+
+          </blockquote>
+          
+
+        </blockquote>
+        
+
+      </blockquote>
+      
+
+      <blockquote>
+        
+
+        <p>
+          <span
+            data-libre-markdown="[!note] Parent callout with [[Callout Note|alias]] and #callout/parent"
+            data-libre-protected="obsidian-callout"
+            data-obsidian-callout-fold=""
+            data-obsidian-callout-type="note"
+          >
+            [!note] Parent callout with [[Callout Note|alias]] and #callout/parent
+          </span>
+          
+Body line before nested callout.
+        </p>
+        
+
+        <blockquote>
+          
+
+          <p>
+            <span
+              data-libre-markdown="[!tip] Nested callout tip"
+              data-libre-protected="obsidian-callout"
+              data-obsidian-callout-fold=""
+              data-obsidian-callout-type="tip"
+            >
+              [!tip] Nested callout tip
+            </span>
+            
+Tip body with 
+            <span
+              data-libre-markdown="![[Nested Tip Image.webp|480]]"
+              data-libre-protected="obsidian-embed"
+              data-obsidian-target="Nested Tip Image.webp"
+            >
+              ![[Nested Tip Image.webp|480]]
+            </span>
+             and 
+            <span
+              data-libre-markdown="#callout/parent/tip"
+              data-libre-protected="obsidian-tag"
+              data-obsidian-tag="callout/parent/tip"
+            >
+              #callout/parent/tip
+            </span>
+            .
+          </p>
+          
+
+          <blockquote>
+            
+
+            <p>
+              <span
+                data-libre-markdown="[!warning] Third-level warning"
+                data-libre-protected="obsidian-callout"
+                data-obsidian-callout-fold=""
+                data-obsidian-callout-type="warning"
+              >
+                [!warning] Third-level warning
+              </span>
+              
+Warning body with raw 
+              <span
+                style="color: orange"
+              >
+                HTML-looking span
+              </span>
+              .
+Final parent line after nested callouts.
+            </p>
+            
+
+          </blockquote>
+          
+
+        </blockquote>
+        
+
+      </blockquote>
+      
+
+      <blockquote>
+        
+
+        <p>
+          <span
+            data-libre-markdown="[!danger]- Collapsed danger with malformed child"
+            data-libre-protected="obsidian-callout"
+            data-obsidian-callout-fold="-"
+            data-obsidian-callout-type="danger"
+          >
+            [!danger]- Collapsed danger with malformed child
+          </span>
+        </p>
+        
+
+        <pre>
+          <code
+            class="language-not"
+          >
+            - [ ] task inside collapsed callout 
+            <span
+              data-libre-markdown="#callout/danger/task"
+              data-libre-protected="obsidian-tag"
+              data-obsidian-tag="callout/danger/task"
+            >
+              #callout/danger/task
+            </span>
+            
+
+            <span
+              data-libre-markdown="![[Danger Embed.mov]]"
+              data-libre-protected="obsidian-embed"
+              data-obsidian-target="Danger Embed.mov"
+            >
+              ![[Danger Embed.mov]]
+            </span>
+            
+
+          </code>
+        </pre>
+        
+
+      </blockquote>
+      
+
+      <h2>
+        Wiki Links, Embeds, Blocks, And Aliases
+      </h2>
+      
+
+      <p>
+        <span
+          data-libre-markdown="[[Simple Link]]"
+          data-libre-protected="obsidian-wiki-link"
+          data-obsidian-target="Simple Link"
+        >
+          Simple Link
+        </span>
+        
+
+        <span
+          data-libre-markdown="[[Folder/Sub Folder/Deep Note]]"
+          data-libre-protected="obsidian-wiki-link"
+          data-obsidian-target="Folder/Sub Folder/Deep Note"
+        >
+          Folder/Sub Folder/Deep Note
+        </span>
+        
+
+        <span
+          data-libre-markdown="[[Folder/Sub Folder/Deep Note#Heading One]]"
+          data-libre-protected="obsidian-wiki-link"
+          data-obsidian-target="Folder/Sub Folder/Deep Note#Heading One"
+        >
+          Folder/Sub Folder/Deep Note#Heading One
+        </span>
+        
+
+        <span
+          data-libre-markdown="[[Folder/Sub Folder/Deep Note#Heading One^block-id|Deep heading block alias]]"
+          data-libre-protected="obsidian-wiki-link"
+          data-obsidian-target="Folder/Sub Folder/Deep Note#Heading One^block-id"
+        >
+          Deep heading block alias
+        </span>
+        
+
+        <span
+          data-libre-markdown="![[Simple Embed]]"
+          data-libre-protected="obsidian-embed"
+          data-obsidian-target="Simple Embed"
+        >
+          ![[Simple Embed]]
+        </span>
+        
+
+        <span
+          data-libre-markdown="![[Folder/Sub Folder/Deep Note#Heading One]]"
+          data-libre-protected="obsidian-embed"
+          data-obsidian-target="Folder/Sub Folder/Deep Note#Heading One"
+        >
+          ![[Folder/Sub Folder/Deep Note#Heading One]]
+        </span>
+        
+
+        <span
+          data-libre-markdown="![[Folder/Sub Folder/Deep Note#Heading One^block-id|Embed alias]]"
+          data-libre-protected="obsidian-embed"
+          data-obsidian-target="Folder/Sub Folder/Deep Note#Heading One^block-id"
+        >
+          ![[Folder/Sub Folder/Deep Note#Heading One^block-id|Embed alias]]
+        </span>
+        
+
+        <span
+          data-libre-markdown="![[Images/Complex Diagram.svg|640x360]]"
+          data-libre-protected="obsidian-embed"
+          data-obsidian-target="Images/Complex Diagram.svg"
+        >
+          ![[Images/Complex Diagram.svg|640x360]]
+        </span>
+        
+
+        <span
+          data-libre-markdown="![[Images/Complex Diagram.svg|diagram alias]]"
+          data-libre-protected="obsidian-embed"
+          data-obsidian-target="Images/Complex Diagram.svg"
+        >
+          ![[Images/Complex Diagram.svg|diagram alias]]
+        </span>
+        
+
+        <span
+          data-libre-markdown="![[Media/Audio Sample.flac]]"
+          data-libre-protected="obsidian-embed"
+          data-obsidian-target="Media/Audio Sample.flac"
+        >
+          ![[Media/Audio Sample.flac]]
+        </span>
+        
+
+        <span
+          data-libre-markdown="![[Media/Video Sample.webm]]"
+          data-libre-protected="obsidian-embed"
+          data-obsidian-target="Media/Video Sample.webm"
+        >
+          ![[Media/Video Sample.webm]]
+        </span>
+        
+
+        <span
+          data-libre-markdown="![[Documents/Spec Sheet.pdf#page=4|PDF page four]]"
+          data-libre-protected="obsidian-embed"
+          data-obsidian-target="Documents/Spec Sheet.pdf#page=4"
+        >
+          ![[Documents/Spec Sheet.pdf#page=4|PDF page four]]
+        </span>
+        
+
+        <span
+          data-libre-markdown="![[Canvas/Architecture.canvas]]"
+          data-libre-protected="obsidian-embed"
+          data-obsidian-target="Canvas/Architecture.canvas"
+        >
+          ![[Canvas/Architecture.canvas]]
+        </span>
+      </p>
+      
+
+      <p>
+        Block target paragraph with inline 
+        <span
+          data-libre-markdown="#block/tag"
+          data-libre-protected="obsidian-tag"
+          data-obsidian-tag="block/tag"
+        >
+          #block/tag
+        </span>
+         and 
+        <span
+          data-libre-markdown="[[Block Backlink]]"
+          data-libre-protected="obsidian-wiki-link"
+          data-obsidian-target="Block Backlink"
+        >
+          Block Backlink
+        </span>
+        . 
+        <span
+          data-libre-markdown="^fixture-block-target"
+          data-libre-protected="obsidian-block-id"
+          data-obsidian-block-id="fixture-block-target"
+        >
+          ^fixture-block-target
+        </span>
+      </p>
+      
+
+      <p>
+        Another paragraph linking to 
+        <span
+          data-libre-markdown="^fixture-block-target"
+          data-libre-protected="obsidian-block-id"
+          data-obsidian-block-id="fixture-block-target"
+        >
+          ^fixture-block-target
+        </span>
+         with 
+        <span
+          data-libre-markdown="[[#^fixture-block-target]]"
+          data-libre-protected="obsidian-wiki-link"
+          data-obsidian-target="#^fixture-block-target"
+        >
+          #^fixture-block-target
+        </span>
+        .
+      </p>
+      
+
+      <h2>
+        Tables With Links, Tags, Embeds, And Pipes
+      </h2>
+      
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      <table>
+        <thead>
+          <tr>
+            <th>
+              Case
+            </th>
+            <th>
+              Markdown
+            </th>
+            <th>
+              Expected Stress
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>
+              Link
+            </td>
+            <td>
+              <span
+                data-libre-markdown="[[Table Note#Heading\\|alias]]"
+                data-libre-protected="obsidian-wiki-link"
+                data-obsidian-target="Table Note#Heading\\|alias"
+              >
+                Table Note#Heading\\|alias
+              </span>
+            </td>
+            <td>
+              pipe in alias
+            </td>
+          </tr>
+          <tr>
+            <td>
+              Embed
+            </td>
+            <td>
+              <span
+                data-libre-markdown="![[Table Image.png\\|120x80]]"
+                data-libre-protected="obsidian-embed"
+                data-obsidian-target="Table Image.png\\|120x80"
+              >
+                ![[Table Image.png\\|120x80]]
+              </span>
+            </td>
+            <td>
+              embedded image syntax
+            </td>
+          </tr>
+          <tr>
+            <td>
+              Tag
+            </td>
+            <td>
+              <span
+                data-libre-markdown="#table/nested/tag"
+                data-libre-protected="obsidian-tag"
+                data-obsidian-tag="table/nested/tag"
+              >
+                #table/nested/tag
+              </span>
+            </td>
+            <td>
+              nested tag in cell
+            </td>
+          </tr>
+          <tr>
+            <td>
+              Code
+            </td>
+            <td>
+              <code>
+                a | b | c
+              </code>
+            </td>
+            <td>
+              escaped pipes
+            </td>
+          </tr>
+          <tr>
+            <td>
+              HTML
+            </td>
+            <td>
+              <span
+                style="background: yellow"
+              >
+                cell highlight
+              </span>
+            </td>
+            <td>
+              raw styling
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      
+
+      <h2>
+        Raw Html Styling And Runtime Tags
+      </h2>
+      
+
+      <div
+        class="outer-fixture"
+      >
+        
+  
+        <p>
+          <strong>
+            Nested raw HTML
+          </strong>
+           with 
+          <em>
+            emphasis
+          </em>
+           and underline.
+        </p>
+        
+  
+        <span
+          style="color: #ff6600; background: rgba(255, 200, 0, 0.35)"
+        >
+          styled span
+        </span>
+        
+  
+        <sub>
+          subscript
+        </sub>
+        <sup>
+          superscript
+        </sup>
+        
+  
+  
+  
+  
+  
+  canvas fallback
+  
+  x=1
+  
+
+      </div>
+      
+
+      <h2>
+        Code Fences And Fence Bait
+      </h2>
+      
+
+      <pre>
+        <code
+          class="language-ts"
+        >
+          const nestedTag = '#inside/code/not-a-real-tag';
+const embedText = '![[inside-code.png]]';
+const wikiLink = '[[inside code link]]';
+
+        </code>
+      </pre>
+      
+
+      <pre>
+        <code
+          class="language-md"
+        >
+          \`\`\`broken-inner-fence
+# heading inside code
+
+          <span
+            data-libre-markdown="![[embed-inside-code]]"
+            data-libre-protected="obsidian-embed"
+            data-obsidian-target="embed-inside-code"
+          >
+            ![[embed-inside-code]]
+          </span>
+          
+\`\`\`
+
+        </code>
+      </pre>
+      
+
+      <pre>
+        <code
+          class="language-mermaid"
+        >
+          graph TD
+  A[Start #diagram/tag] --&gt; B[[Wiki-looking node]]
+  B --&gt; C["![[embed-looking-node.png]]"]
+
+        </code>
+      </pre>
+      
+
+      <pre>
+        <code
+          class="language-dataview"
+        >
+          TABLE file.tags, file.outlinks
+FROM #fixture/markdown/stress
+WHERE contains(file.name, "Complex")
+
+        </code>
+      </pre>
+      
+
+      <pre>
+        <code>
+          Unlabeled code fence with &lt;b&gt;HTML&lt;/b&gt;, [[wiki]], ![[embed]], and #tag/not-real.
+
+        </code>
+      </pre>
+      
+
+      <h2>
+        Footnotes, Definitions, And References
+      </h2>
+      
+
+      <p>
+        Inline footnote reference 
+        <sup
+          id="fnref-fixture-footnote"
+        >
+          <a
+            class="footnote-ref"
+            href="#fn-fixture-footnote"
+          >
+            fixture-footnote
+          </a>
+        </sup>
+         beside 
+        <span
+          data-libre-markdown="#footnote/tag"
+          data-libre-protected="obsidian-tag"
+          data-obsidian-tag="footnote/tag"
+        >
+          #footnote/tag
+        </span>
+         and 
+        <span
+          data-libre-markdown="[[Footnote Link]]"
+          data-libre-protected="obsidian-wiki-link"
+          data-obsidian-target="Footnote Link"
+        >
+          Footnote Link
+        </span>
+        .
+      </p>
+      
+
+      <h2>
+        Malformed And Ambiguous Markdown
+      </h2>
+      
+
+      <p>
+        **unclosed bold with 
+        <span
+          data-libre-markdown="#broken/bold"
+          data-libre-protected="obsidian-tag"
+          data-obsidian-tag="broken/bold"
+        >
+          #broken/bold
+        </span>
+        
+*unclosed italic with [[Broken Link
+==unclosed highlight with ![[Broken Embed
+~~unclosed strike with 
+        <span
+          data-libre-markdown="#broken/strike"
+          data-libre-protected="obsidian-tag"
+          data-obsidian-tag="broken/strike"
+        >
+          #broken/strike
+        </span>
+      </p>
+      
+
+      <pre>
+        <code
+          class="language-unterminated-fence"
+        >
+          This fence intentionally has no closing marker and includes #broken/fence,
+[[broken fence link]], ![[broken fence embed]], and &lt;iframe src="https://example.com/no-close"&gt;&lt;/iframe&gt;.
+
+        </code>
+      </pre>
+      
+
+      <div
+        class="footnotes"
+      >
+        
+
+        <hr />
+        
+
+        <ol>
+          
+
+          <li
+            id="fn-fixture-footnote"
+          >
+            Footnote body with nested 
+            <span
+              data-libre-markdown="[[Footnote Target]]"
+              data-libre-protected="obsidian-wiki-link"
+              data-obsidian-target="Footnote Target"
+            >
+              Footnote Target
+            </span>
+            , 
+            <span
+              data-libre-markdown="#footnote/nested"
+              data-libre-protected="obsidian-tag"
+              data-obsidian-tag="footnote/nested"
+            >
+              #footnote/nested
+            </span>
+            ,
+and an indented continuation containing 
+            <span
+              data-libre-markdown="![[Footnote Embed.png]]"
+              data-libre-protected="obsidian-embed"
+              data-obsidian-target="Footnote Embed.png"
+            >
+              ![[Footnote Embed.png]]
+            </span>
+            .
+            <a
+              class="footnote-backref"
+              href="#fnref-fixture-footnote"
+            >
+              ↩
+            </a>
+          </li>
+          
+
+        </ol>
+        
+
+      </div>
+    </article>
+  </div>,
+}
+`;

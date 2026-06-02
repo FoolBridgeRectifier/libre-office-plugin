@@ -61,6 +61,14 @@ function createVaultAdapter(initialFiles: ReadonlyMap<string, string> = new Map(
   return { adapter, files, folders };
 }
 
+function createHtmlContainer(htmlSource: string): HTMLDivElement {
+  const htmlContainerElement = document.createElement('div');
+
+  htmlContainerElement.innerHTML = htmlSource;
+
+  return htmlContainerElement;
+}
+
 test('splits valid frontmatter without reordering keys', () => {
   const markdownSource = '---\ntitle: Alpha\ntags: [one, two]\n---\n# Body';
 
@@ -82,7 +90,7 @@ test('leaves invalid or body-like frontmatter delimiters in markdown body', () =
   );
 });
 
-test('converts markdown through package-backed GFM, wiki link, and alert plugins', () => {
+test('converts markdown through package-backed GFM and preserves Obsidian syntax', () => {
   const markdownSource = [
     '---',
     'title: Import Fixture',
@@ -116,19 +124,87 @@ test('converts markdown through package-backed GFM, wiki link, and alert plugins
 
   expect(result.htmlSource).toContain('<a href="https://example.com">link</a>');
 
-  expect(result.htmlSource).toContain('<a href="Note">alias</a>');
-  expect(result.htmlSource).toContain('<img src="Image.png"');
+  expect(result.htmlSource).toContain('[[Note|alias]]');
+  expect(result.htmlSource).toContain('![[Image.png]]');
   expect(result.htmlSource).toContain('class="contains-task-list"');
-  expect(result.htmlSource).toContain('class="libre-markdown-alert libre-markdown-alert-note"');
+  expect(result.htmlSource).toContain('<blockquote>');
 
-  expect(result.htmlSource).toContain('&lt;script&gt;alert(&quot;no&quot;)&lt;/script&gt;');
+  expect(result.htmlSource).toContain('[!NOTE]');
+
+  expect(result.htmlSource).toContain('&#x3C;script>alert("no")&#x3C;/script>');
   expect(result.htmlSource).toContain('<table>');
 });
 
-test('sanitizes dangerous inline html and unsafe links', () => {
-  const result = convertMarkdownToHtml('<img src=x onerror=alert(1)>\n[bad](javascript:alert(1))');
+test('protects Obsidian-specific syntax outside code spans', () => {
+  const markdownSource = [
+    '[[Note|Alias]] ![[Image.png|320x200]] #tag/deep ^block-id',
+    '`[[code]] ![[code.png]] #code/tag ^code-block`',
+    '> [!warning]- Collapsed title',
+  ].join('\n');
 
-  expect(result.htmlSource).not.toContain('<img src=x');
+  const result = convertMarkdownToHtml(markdownSource);
+  const htmlContainerElement = createHtmlContainer(result.htmlSource);
+
+  expect(htmlContainerElement.querySelectorAll('[data-libre-protected^="obsidian-"]')).toHaveLength(
+    5
+  );
+
+  expect(
+    htmlContainerElement
+      .querySelector('[data-libre-protected="obsidian-wiki-link"]')
+      ?.getAttribute('data-obsidian-target')
+  ).toBe('Note');
+
+  expect(
+    htmlContainerElement.querySelector('[data-libre-protected="obsidian-wiki-link"]')?.textContent
+  ).toBe('Alias');
+
+  expect(
+    htmlContainerElement
+      .querySelector('[data-libre-protected="obsidian-embed"]')
+      ?.getAttribute('data-obsidian-target')
+  ).toBe('Image.png');
+
+  expect(
+    htmlContainerElement
+      .querySelector('[data-libre-protected="obsidian-tag"]')
+      ?.getAttribute('data-obsidian-tag')
+  ).toBe('tag/deep');
+
+  expect(
+    htmlContainerElement
+      .querySelector('[data-libre-protected="obsidian-block-id"]')
+      ?.getAttribute('data-obsidian-block-id')
+  ).toBe('block-id');
+
+  expect(
+    htmlContainerElement
+      .querySelector('[data-libre-protected="obsidian-callout"]')
+      ?.getAttribute('data-obsidian-callout-fold')
+  ).toBe('-');
+
+  expect(htmlContainerElement.querySelector('code')?.textContent).toBe(
+    '[[code]] ![[code.png]] #code/tag ^code-block'
+  );
+});
+
+test('keeps safe raw html while sanitizing active html and unsafe links', () => {
+  const markdownSource = [
+    '<span style="color: #ff6600">orange</span>',
+    '<img src=x onerror=alert(1)>',
+    '<script>alert("no")</script>',
+    '[bad](javascript:alert(1))',
+  ].join('\n');
+
+  const result = convertMarkdownToHtml(markdownSource);
+  const htmlContainerElement = createHtmlContainer(result.htmlSource);
+
+  expect(htmlContainerElement.querySelector('span')?.getAttribute('style')).toBe('color: #ff6600');
+  expect(htmlContainerElement.querySelector('span')?.textContent).toBe('orange');
+  expect(htmlContainerElement.querySelector('img')?.getAttribute('src')).toBe('x');
+
+  expect(result.htmlSource).not.toContain('onerror');
+  expect(result.htmlSource).not.toContain('<script');
   expect(result.htmlSource).not.toContain('href="javascript:alert');
 });
 
