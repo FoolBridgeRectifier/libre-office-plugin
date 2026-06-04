@@ -1,36 +1,22 @@
-import { readFileSync } from 'fs';
-import { convertMarkdownToHtml } from './markdown';
+import { splitFrontmatter } from '../../helpers';
 
-function readMockMarkdownFixture(fileName: string): string {
-  return readFileSync(`mocks/${fileName}`, 'utf8').replace(/\r\n/g, '\n');
-}
+test('splits valid frontmatter without reordering keys', () => {
+  const markdownSource = '---\ntitle: Alpha\ntags: [one, two]\n---\n# Body';
 
-function createHtmlSnapshotContainer(htmlSource: string): HTMLDivElement {
-  const snapshotContainerElement = document.createElement('div');
-
-  snapshotContainerElement.innerHTML = htmlSource;
-
-  return snapshotContainerElement;
-}
-
-test('matches md_1 markdown conversion snapshot', () => {
-  const markdownSource = readMockMarkdownFixture('md_1.md');
-  const result = convertMarkdownToHtml(markdownSource);
-  const snapshotContainerElement = createHtmlSnapshotContainer(result.htmlSource);
-
-  expect({
-    frontmatter: result.frontmatter,
-    html: snapshotContainerElement,
-  }).toMatchSnapshot();
+  expect(splitFrontmatter('No frontmatter').frontmatter).toBe(null);
+  expect(splitFrontmatter(markdownSource).frontmatter).toBe('title: Alpha\ntags: [one, two]');
+  expect(splitFrontmatter(markdownSource).bodyMarkdown).toBe('# Body');
 });
 
-test('matches md_2 complex nested markdown conversion snapshot', () => {
-  const markdownSource = readMockMarkdownFixture('md_2.md');
-  const result = convertMarkdownToHtml(markdownSource);
-  const snapshotContainerElement = createHtmlSnapshotContainer(result.htmlSource);
+test('leaves invalid or body-like frontmatter delimiters in markdown body', () => {
+  const invalidFrontmatter = '---\ntitle Alpha\n---\nBody';
+  const bodyBeginningWithDelimiter = '---\nThis is a horizontal-rule style opening';
 
-  expect({
-    frontmatter: result.frontmatter,
-    html: snapshotContainerElement,
-  }).toMatchSnapshot();
+  expect(splitFrontmatter(invalidFrontmatter).frontmatter).toBe(null);
+  expect(splitFrontmatter(invalidFrontmatter).bodyMarkdown).toBe(invalidFrontmatter);
+
+  expect(splitFrontmatter(bodyBeginningWithDelimiter).frontmatter).toBe(null);
+  expect(splitFrontmatter(bodyBeginningWithDelimiter).bodyMarkdown).toBe(
+    bodyBeginningWithDelimiter
+  );
 });

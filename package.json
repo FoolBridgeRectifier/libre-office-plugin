@@ -12,6 +12,7 @@
     "lint:fix": "eslint . --fix",
     "obsidian:dev": "start \"\" \"obsidian://open?vault=Obsidian%20Vault\"",
     "test": "jest --passWithNoTests",
+    "test:markdown-sync:coverage": "jest --runInBand --coverage --collectCoverageFrom=src/markdown-sync/**/*.ts --coverageDirectory=coverage/markdown-sync",
     "typecheck": "tsc --noEmit"
   },
   "description": "Standalone rich-note editor workspace for Obsidian with a React-based custom view.",
@@ -22,14 +23,6 @@
     "obsidian": "latest",
     "react": "^18.3.0",
     "react-dom": "^18.3.0",
-    "rehype-raw": "^5.1.0",
-    "rehype-sanitize": "^4.0.0",
-    "rehype-stringify": "^8.0.0",
-    "remark-footnotes": "^3.0.0",
-    "remark-gfm": "^1.0.0",
-    "remark-parse": "^9.0.0",
-    "remark-rehype": "^8.1.0",
-    "unified": "^9.2.2",
     "util": "^0.12.5"
   },
   "devDependencies": {

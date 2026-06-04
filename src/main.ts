@@ -18,6 +18,7 @@ import {
 } from './editor-view/constants';
 import { registerRichDocumentMappingEvents } from './helpers';
 import { ensureFirstMarkdownImport } from './markdown-sync/markdownSync';
+import { renderMarkdownWithObsidian } from './markdown-sync/helpers';
 import { createRichDocumentStore } from './rich-documents/richDocuments';
 import type { RichDocumentStore } from './rich-documents/interfaces';
 import '../styles.css';
@@ -25,7 +26,6 @@ import '../styles.css';
 // Obsidian plugins are inheritance-based, so this wrapper stays as a class.
 export default class LibreNoteEditorPlugin extends Plugin {
   private nativeFallbackLeaves = new WeakSet<WorkspaceLeaf>();
-
   private richDocumentStore: RichDocumentStore | null = null;
 
   async onload(): Promise<void> {
@@ -125,15 +125,15 @@ export default class LibreNoteEditorPlugin extends Plugin {
       return null;
     }
 
-    // Import creation is queued by the store so multiple leaves share one record.
     const mapping = await this.richDocumentStore?.getOrCreateMapping(file.path);
 
     if (!mapping || !this.richDocumentStore) {
       return null;
     }
 
-    // First import writes document.html; later calls just read the richer HTML source back.
     const importResult = await ensureFirstMarkdownImport({
+      markdownRenderer: (bodyMarkdown, containerElement, sourcePath) =>
+        renderMarkdownWithObsidian(this.app, bodyMarkdown, containerElement, sourcePath),
       markdownFile: file,
       mapping,
       richDocumentStore: this.richDocumentStore,

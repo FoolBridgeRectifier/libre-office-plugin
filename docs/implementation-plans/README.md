@@ -24,6 +24,7 @@ After every plan:
 2. [Plan 02: Register Markdown Editor View](./02-register-markdown-editor-view.md)
 3. [Plan 03: Rich Document Mapping Store](./03-rich-document-mapping-store.md)
 4. [Plan 04: First Markdown Import To HTML](./04-first-markdown-import-to-html.md)
+   4A. [Plan 04A: Obsidian Rendered HTML Markdown Import](./04a-obsidian-rendered-html-markdown-import.md)
 5. [Plan 05: Local HTML Editor Source](./05-local-html-editor-source.md)
 6. [Plan 06: Autosave And Markdown Mirror](./06-autosave-and-markdown-mirror.md)
 7. [Plan 07: Obsidian Link Model](./07-obsidian-link-model.md)
