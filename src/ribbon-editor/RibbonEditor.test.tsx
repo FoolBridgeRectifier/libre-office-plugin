@@ -53,6 +53,23 @@ test('shows dirty autosave status from the editor view', () => {
   expect(screen.getByLabelText('HTML source status')).toHaveTextContent('Unsaved HTML changes');
 });
 
+test('shows conflict recovery choices when a resolver is available', () => {
+  const handleResolveConflict = jest.fn();
+
+  render(
+    <RibbonEditor
+      autosaveStatus="conflicted"
+      importedHtmlSource="<article><p>Conflicted</p></article>"
+      onResolveConflict={handleResolveConflict}
+    />
+  );
+
+  fireEvent.click(screen.getByRole('button', { name: 'Mobile' }));
+
+  expect(screen.getByLabelText('Conflict recovery')).toBeInTheDocument();
+  expect(handleResolveConflict).toHaveBeenCalledWith('mobile');
+});
+
 test('shows unresolved Obsidian link warning count', () => {
   render(<RibbonEditor linkWarningCount={2} />);
 

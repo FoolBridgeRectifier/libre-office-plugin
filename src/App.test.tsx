@@ -40,6 +40,16 @@ test('shows unresolved link warnings from the editor view', () => {
   );
 });
 
+test('passes conflict recovery choices through to the ribbon editor', () => {
+  const handleResolveConflict = jest.fn();
+
+  render(<App autosaveStatus="conflicted" onResolveConflict={handleResolveConflict} />);
+
+  fireEvent.click(screen.getByRole('button', { name: 'Duplicate' }));
+
+  expect(handleResolveConflict).toHaveBeenCalledWith('duplicate-conflict-copy');
+});
+
 test('renders imported html without showing preserved frontmatter as text', () => {
   render(
     <App

@@ -4,6 +4,7 @@ import type {
   RichDocumentMapping,
   RichDocumentSourceKind,
   RichDocumentSourceState,
+  RichDocumentStore,
   RichDocumentVaultAdapter,
 } from '../rich-documents/interfaces';
 
@@ -46,3 +47,18 @@ export type ConflictResolutionChoice =
   | RichDocumentActiveSource
   | 'desktop'
   | 'mobile';
+
+export interface ConflictResolutionOptions {
+  readonly choice: ConflictResolutionChoice;
+  readonly getCurrentTimestamp?: () => string;
+  readonly markdownPath: string;
+  readonly markdownToHtmlSource?: MarkdownToHtmlSource;
+  readonly richDocumentStore: RichDocumentStore;
+  readonly vaultAdapter: RichDocumentVaultAdapter;
+}
+
+export interface ConflictResolutionResult {
+  readonly htmlSource: string | null;
+}
+
+export type MarkdownToHtmlSource = (markdownSource: string, sourcePath: string) => Promise<string>;

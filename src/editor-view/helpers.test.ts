@@ -5,6 +5,7 @@ import {
   createNativeMarkdownViewState,
   detachLibreMarkdownLeaves,
   getWorkspaceLeafFile,
+  getWorkspaceLeafViewType,
   openFileInNativeMarkdownView,
   registerLibreMarkdownRouting,
   routeMostRecentMarkdownLeafToLibreEditor,
@@ -14,7 +15,7 @@ import {
   shouldRoutePathToLibreEditor,
 } from './helpers';
 
-import type { ViewCreator } from 'obsidian';
+import type { ViewCreator, WorkspaceLeaf } from 'obsidian';
 
 test('detects markdown files and handles missing active files safely', () => {
   expect(shouldRouteFileToLibreEditor(createFile('Daily.md', 'md'))).toBe(true);
@@ -138,4 +139,10 @@ test('reads a leaf file when the view provides one', () => {
     markdownFile
   );
   expect(getWorkspaceLeafFile(createLeaf(NATIVE_MARKDOWN_VIEW_TYPE, null))).toBe(null);
+});
+
+test('treats leaves without view type accessors as unroutable', () => {
+  const transitionalLeaf = { view: {} } as WorkspaceLeaf;
+
+  expect(getWorkspaceLeafViewType(transitionalLeaf)).toBe(null);
 });

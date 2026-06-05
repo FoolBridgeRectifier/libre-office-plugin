@@ -50,6 +50,7 @@ function createEditorViewOptions(): EditorViewOptions {
   return {
     getLinkWarnings: jest.fn(() => []),
     loadImportedHtmlSource: jest.fn(async (file: TFile) => `<article>${file.path}</article>`),
+    resolveConflict: jest.fn(async () => '<article>Resolved</article>'),
     saveHtmlSource: jest.fn(async () => undefined),
     syncMarkdownMirror: jest.fn(async () => undefined),
   };

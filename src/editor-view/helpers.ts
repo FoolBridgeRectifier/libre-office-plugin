@@ -56,7 +56,9 @@ export function getWorkspaceLeafFile(workspaceLeaf: WorkspaceLeaf) {
 }
 
 export function getWorkspaceLeafViewType(workspaceLeaf: WorkspaceLeaf) {
-  return workspaceLeaf.view.getViewType();
+  const fileTrackingView = workspaceLeaf.view as Partial<FileTrackingView>;
+
+  return typeof fileTrackingView.getViewType === 'function' ? fileTrackingView.getViewType() : null;
 }
 
 export async function openFileInLibreEditor(workspaceLeaf: WorkspaceLeaf, file: TFile) {

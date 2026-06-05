@@ -1,0 +1,44 @@
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
+
+exports[`shows conflict recovery choices and emits selected choice 1`] = `
+<div>
+  <section
+    aria-label="Conflict recovery"
+    class="flex flex-wrap items-center justify-between gap-3 border-b border-ribbon-border bg-ribbon-bg pb-4 font-sans"
+  >
+    <span
+      class="text-[12px] font-medium text-text-primary"
+    >
+      Conflict detected
+    </span>
+    <div
+      class="flex flex-wrap gap-2"
+    >
+      <button
+        class="rounded-ribbon-sm border px-3 py-1.5 font-sans text-[11px] transition-colors duration-150 ease-ribbon-fast focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-button-focus-ring border-button-hover-border text-text-primary hover:bg-button-hover-bg"
+        type="button"
+      >
+        Desktop
+      </button>
+      <button
+        class="rounded-ribbon-sm border px-3 py-1.5 font-sans text-[11px] transition-colors duration-150 ease-ribbon-fast focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-button-focus-ring border-button-hover-border text-text-primary hover:bg-button-hover-bg"
+        type="button"
+      >
+        Mobile
+      </button>
+      <button
+        class="rounded-ribbon-sm border px-3 py-1.5 font-sans text-[11px] transition-colors duration-150 ease-ribbon-fast focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-button-focus-ring border-button-hover-border text-text-primary hover:bg-button-hover-bg"
+        type="button"
+      >
+        Markdown
+      </button>
+      <button
+        class="rounded-ribbon-sm border px-3 py-1.5 font-sans text-[11px] transition-colors duration-150 ease-ribbon-fast focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-button-focus-ring border-button-hover-border text-text-primary hover:bg-button-hover-bg"
+        type="button"
+      >
+        Duplicate
+      </button>
+    </div>
+  </section>
+</div>
+`;

@@ -5,7 +5,8 @@ import type { TFile, ViewStateResult, WorkspaceLeaf } from 'obsidian';
 
 import { LIBRE_MARKDOWN_VIEW_TYPE } from './constants';
 import { createEditorViewAutosaveController } from './helpers';
-import { createEditorViewAppElement } from './helpers/app-element/appElement';
+import { renderEditorViewAppElement } from './helpers/app-element/appElement';
+import { resolveEditorViewConflict } from './helpers/conflict/conflict';
 import {
   applyEditorViewLoadedState,
   getEditorViewLinkWarningCount,
@@ -13,21 +14,22 @@ import {
   setEditorViewAutosaveDocument,
 } from './helpers/state/state';
 import type { AutosaveController, AutosaveStatus } from '../autosave/interfaces';
+import type { ConflictResolutionChoice } from '../conflicts/interfaces';
 import type { EditorViewOptions } from './interfaces';
 
 export class EditorView extends FileView {
   allowNoFile = true;
   autosaveStatus: AutosaveStatus = 'saved';
   importedHtmlSource: string | null = null;
+  isResolvingConflict = false;
   linkWarningCount = 0;
-  private activeMarkdownFile: TFile | null = null;
-  private readonly autosaveController: AutosaveController;
+  activeMarkdownFile: TFile | null = null;
+  readonly autosaveController: AutosaveController;
   private reactRoot: Root | null = null;
-  private readonly editorViewOptions: EditorViewOptions;
+  readonly editorViewOptions: EditorViewOptions;
 
   constructor(workspaceLeaf: WorkspaceLeaf, editorViewOptions: EditorViewOptions) {
     super(workspaceLeaf);
-
     this.navigation = true;
     this.editorViewOptions = editorViewOptions;
 
@@ -58,9 +60,7 @@ export class EditorView extends FileView {
     }
 
     this.activeMarkdownFile = file;
-
     const loadedState = await loadEditorViewLoadedState(this.editorViewOptions, file);
-
     applyEditorViewLoadedState(this, loadedState);
 
     setEditorViewAutosaveDocument(this.autosaveController, file, this.importedHtmlSource);
@@ -69,14 +69,7 @@ export class EditorView extends FileView {
   }
   async onRename(file: TFile): Promise<void> {
     if (this.activeMarkdownFile?.path === file.path) {
-      const loadedState = await loadEditorViewLoadedState(this.editorViewOptions, file);
-
-      this.activeMarkdownFile = file;
-      applyEditorViewLoadedState(this, loadedState);
-
-      setEditorViewAutosaveDocument(this.autosaveController, file, this.importedHtmlSource);
-      this.autosaveStatus = loadedState.autosaveStatus;
-      this.renderReactApp();
+      await this.onLoadFile(file);
     }
   }
   async onUnloadFile(_file: TFile): Promise<void> {
@@ -87,9 +80,9 @@ export class EditorView extends FileView {
     this.linkWarningCount = 0;
     this.renderReactApp();
   }
-  async flushPendingAutosave(): Promise<void> {
+  flushPendingAutosave = async (): Promise<void> => {
     await this.autosaveController.flushAll();
-  }
+  };
   refreshLinkWarnings(): void {
     if (!this.activeMarkdownFile || this.importedHtmlSource === null) {
       return;
@@ -114,15 +107,14 @@ export class EditorView extends FileView {
   }
   protected async onClose(): Promise<void> {
     await this.autosaveController.clearActiveDocument();
-
     this.reactRoot?.unmount();
     this.reactRoot = null;
     this.contentEl.empty();
   }
-  private handleEditorBlur = () => {
+  handleEditorBlur = () => {
     void this.autosaveController.flushAll();
   };
-  private handleHtmlSourceChange = (htmlSource: string) => {
+  handleHtmlSourceChange = (htmlSource: string) => {
     this.importedHtmlSource = htmlSource;
 
     if (this.activeMarkdownFile) {
@@ -135,16 +127,17 @@ export class EditorView extends FileView {
 
     this.autosaveController.handleHtmlSourceChange(htmlSource);
   };
-  private renderReactApp() {
-    this.reactRoot?.render(
-      createEditorViewAppElement(
-        this.activeMarkdownFile,
-        this.autosaveStatus,
-        this.importedHtmlSource,
-        this.linkWarningCount,
-        this.handleEditorBlur,
-        this.handleHtmlSourceChange
-      )
-    );
-  }
+  handleResolveConflict = async (choice: ConflictResolutionChoice) => {
+    const result = await resolveEditorViewConflict(this, choice);
+
+    if (result === null) {
+      return;
+    }
+
+    this.autosaveStatus = result.autosaveStatus;
+    this.importedHtmlSource = result.htmlSource;
+    this.linkWarningCount = result.linkWarningCount;
+    this.renderReactApp();
+  };
+  renderReactApp = () => renderEditorViewAppElement(this.reactRoot, this);
 }

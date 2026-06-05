@@ -1,15 +1,18 @@
 import type { App as ObsidianApp, EventRef, TAbstractFile, TFile } from 'obsidian';
 
 import type { AutosaveStatus } from './autosave/interfaces';
+import type { ConflictResolutionChoice } from './conflicts/interfaces';
 import type { RichDocumentStore, RichDocumentVaultAdapter } from './rich-documents/interfaces';
 
 export interface AppProps {
   readonly activeFilePath?: string | null;
   readonly autosaveStatus?: AutosaveStatus;
   readonly importedHtmlSource?: string | null;
+  readonly isResolvingConflict?: boolean;
   readonly linkWarningCount?: number;
   readonly onEditorBlur?: () => void;
   readonly onHtmlSourceChange?: (htmlSource: string) => void;
+  readonly onResolveConflict?: (choice: ConflictResolutionChoice) => void;
 }
 
 export interface RichDocumentMappingEventPlugin {

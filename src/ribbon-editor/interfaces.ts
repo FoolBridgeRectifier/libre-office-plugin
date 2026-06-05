@@ -1,4 +1,5 @@
 import type { AutosaveStatus } from '../autosave/interfaces';
+import type { ConflictResolutionChoice } from '../conflicts/interfaces';
 
 export interface RibbonCommandDefinition {
   readonly description: string;
@@ -25,7 +26,9 @@ export interface RibbonEditorProps {
   readonly activeFilePath?: string | null;
   readonly autosaveStatus?: AutosaveStatus;
   readonly importedHtmlSource?: string | null;
+  readonly isResolvingConflict?: boolean;
   readonly linkWarningCount?: number;
   readonly onEditorBlur?: () => void;
   readonly onHtmlSourceChange?: (htmlSource: string) => void;
+  readonly onResolveConflict?: (choice: ConflictResolutionChoice) => void;
 }

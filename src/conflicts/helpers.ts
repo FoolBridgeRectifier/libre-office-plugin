@@ -6,4 +6,7 @@ export {
   createSourceStates,
   hasSourceStateChanged,
 } from './helpers/source-state/sourceState';
-export { resolveConflictMapping } from './helpers/resolution/resolution';
+export {
+  resolveConflictMapping,
+  resolveRichDocumentConflict,
+} from './helpers/resolution/resolution';

@@ -17,17 +17,9 @@ import {
   OPEN_NATIVE_MARKDOWN_COMMAND_NAME,
 } from './editor-view/constants';
 import { registerEditorViewLinkWarningRefresh } from './editor-view/helpers/link-warnings/linkWarnings';
-import {
-  flushOpenLibreEditors,
-  registerRichDocumentMappingEvents,
-  saveRichDocumentHtml,
-  syncMarkdownMirror,
-} from './helpers';
-import {
-  getInitialRichDocumentAutosaveStatus,
-  loadRichDocumentHtmlForStore,
-} from './helpers/rich-html/richHtml';
-import { collectObsidianLinkWarningsForApp } from './obsidian-links/helpers/resolver/resolver';
+import { createRichDocumentEditorViewOptions } from './editor-view/helpers/options/options';
+import { flushOpenLibreEditors, registerRichDocumentMappingEvents } from './helpers';
+import { loadRichDocumentHtmlForStore } from './helpers/rich-html/richHtml';
 import { createRichDocumentStore } from './rich-documents/richDocuments';
 import type { RichDocumentStore } from './rich-documents/interfaces';
 import '../styles.css';
@@ -48,28 +40,10 @@ export default class LibreNoteEditorPlugin extends Plugin {
     registerLibreMarkdownRouting(
       this,
       (workspaceLeaf) =>
-        new EditorView(workspaceLeaf, {
-          getInitialAutosaveStatus: (file) =>
-            getInitialRichDocumentAutosaveStatus(file, richDocumentStore),
-          getLinkWarnings: (markdownPath, htmlSource) =>
-            collectObsidianLinkWarningsForApp(this.app, markdownPath, htmlSource),
-          loadImportedHtmlSource: (file) => this.ensureRichDocumentHtml(file),
-          saveHtmlSource: (markdownPath, htmlSource, previousHtmlSource) =>
-            saveRichDocumentHtml({
-              htmlSource,
-              markdownPath,
-              previousHtmlSource,
-              richDocumentStore,
-              vaultAdapter: this.app.vault.adapter,
-            }),
-          syncMarkdownMirror: (markdownPath, htmlSource) =>
-            syncMarkdownMirror({
-              htmlSource,
-              markdownPath,
-              richDocumentStore,
-              vaultAdapter: this.app.vault.adapter,
-            }),
-        })
+        new EditorView(
+          workspaceLeaf,
+          createRichDocumentEditorViewOptions(this.app, richDocumentStore)
+        )
     );
 
     this.registerNativeMarkdownFallbackCommand();

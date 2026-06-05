@@ -9,6 +9,7 @@ import type { RichDocumentHtmlLoadOptions, RichDocumentMappingEventPlugin } from
 import type { RichDocumentStore } from './rich-documents/interfaces';
 
 export { saveRichDocumentHtml, syncMarkdownMirror } from './helpers/source-write/sourceWrite';
+export { resolveRichDocumentConflict } from './conflicts/helpers';
 
 export function registerRichDocumentMappingEvents(
   plugin: RichDocumentMappingEventPlugin,

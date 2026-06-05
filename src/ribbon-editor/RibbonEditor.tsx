@@ -1,5 +1,6 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 
+import { ConflictRecoveryPanel } from '../conflict-recovery/ConflictRecovery';
 import { HtmlEditor } from '../html-editor/HtmlEditor';
 import { DEFAULT_RIBBON_TAB_ID, RIBBON_TABS } from './constants';
 import {
@@ -16,28 +17,25 @@ export function RibbonEditor({
   activeFilePath = null,
   autosaveStatus = 'saved',
   importedHtmlSource = null,
+  isResolvingConflict = false,
   linkWarningCount = 0,
   onEditorBlur,
   onHtmlSourceChange,
+  onResolveConflict,
 }: RibbonEditorProps) {
   const [activeRibbonTabId, setActiveRibbonTabId] = useState(DEFAULT_RIBBON_TAB_ID);
-  const [editableHtmlSource, setEditableHtmlSource] = useState(importedHtmlSource);
 
   const activeRibbonTabDefinition = findRibbonTab(RIBBON_TABS, activeRibbonTabId);
   const activeFileStatusText = activeFilePath ?? 'No markdown file loaded yet.';
 
   const htmlSourceStatusText =
-    editableHtmlSource === null ? 'No HTML source loaded' : getAutosaveStatusText(autosaveStatus);
+    importedHtmlSource === null ? 'No HTML source loaded' : getAutosaveStatusText(autosaveStatus);
   const linkWarningStatusText = getLinkWarningStatusText(linkWarningCount);
 
-  useEffect(() => {
-    setEditableHtmlSource(importedHtmlSource);
-  }, [importedHtmlSource]);
+  const shouldShowConflictRecovery =
+    autosaveStatus === 'conflicted' && onResolveConflict !== undefined;
 
-  const handleHtmlSourceChange = (htmlSource: string) => {
-    setEditableHtmlSource(htmlSource);
-    onHtmlSourceChange?.(htmlSource);
-  };
+  const handleHtmlSourceChange = (htmlSource: string) => onHtmlSourceChange?.(htmlSource);
 
   const shellClassName =
     'flex h-full min-h-[480px] flex-col overflow-hidden bg-ribbon-bg font-sans text-text-primary';
@@ -123,6 +121,13 @@ export function RibbonEditor({
       </div>
 
       <main className={editorSurfaceClassName}>
+        {shouldShowConflictRecovery ? (
+          <ConflictRecoveryPanel
+            isResolvingConflict={isResolvingConflict}
+            onResolveConflict={onResolveConflict}
+          />
+        ) : null}
+
         <article aria-label="Editor surface" className={pageClassName}>
           <HtmlEditor
             htmlSource={importedHtmlSource}
