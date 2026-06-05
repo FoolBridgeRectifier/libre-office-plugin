@@ -7,6 +7,7 @@ import {
   getAutosaveStatusText,
   getCommandButtonClassName,
   getCommandIcon,
+  getLinkWarningStatusText,
   getTabButtonClassName,
 } from './helpers';
 import type { RibbonEditorProps } from './interfaces';
@@ -15,6 +16,7 @@ export function RibbonEditor({
   activeFilePath = null,
   autosaveStatus = 'saved',
   importedHtmlSource = null,
+  linkWarningCount = 0,
   onEditorBlur,
   onHtmlSourceChange,
 }: RibbonEditorProps) {
@@ -26,6 +28,7 @@ export function RibbonEditor({
 
   const htmlSourceStatusText =
     editableHtmlSource === null ? 'No HTML source loaded' : getAutosaveStatusText(autosaveStatus);
+  const linkWarningStatusText = getLinkWarningStatusText(linkWarningCount);
 
   useEffect(() => {
     setEditableHtmlSource(importedHtmlSource);
@@ -131,6 +134,7 @@ export function RibbonEditor({
 
       <footer className={statusClassName}>
         <span aria-label="HTML source status">{htmlSourceStatusText}</span>
+        <span aria-label="Obsidian link warnings">{linkWarningStatusText}</span>
         <span aria-label="Active markdown file" className={filePathClassName}>
           {activeFileStatusText}
         </span>

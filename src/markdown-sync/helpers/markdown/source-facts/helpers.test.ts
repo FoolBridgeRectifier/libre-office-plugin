@@ -25,3 +25,29 @@ test('keeps reading fenced code until the matching marker closes it', () => {
     type: 'code-fence',
   });
 });
+
+test('collects Obsidian tags outside fenced code blocks', () => {
+  const sourceFacts = collectMarkdownSourceFacts(
+    '#parent/child outside\n\n```md\n#not-a-tag\n```\n\nEscaped \\#hash'
+  );
+
+  expect(sourceFacts.facts).toContainEqual({
+    text: '#parent/child',
+    type: 'tag',
+  });
+
+  expect(sourceFacts.facts).not.toContainEqual({
+    text: '#not-a-tag',
+    type: 'tag',
+  });
+});
+
+test('keeps source facts in markdown source order', () => {
+  const sourceFacts = collectMarkdownSourceFacts('#tag before [[Note]] and ^block');
+
+  expect(sourceFacts.facts.map((sourceFact) => sourceFact.type)).toEqual([
+    'tag',
+    'wikilink',
+    'block-id',
+  ]);
+});

@@ -53,6 +53,14 @@ test('shows dirty autosave status from the editor view', () => {
   expect(screen.getByLabelText('HTML source status')).toHaveTextContent('Unsaved HTML changes');
 });
 
+test('shows unresolved Obsidian link warning count', () => {
+  render(<RibbonEditor linkWarningCount={2} />);
+
+  expect(screen.getByLabelText('Obsidian link warnings')).toHaveTextContent(
+    '2 unresolved link targets'
+  );
+});
+
 test('emits changed html source from the local editor', () => {
   const handleHtmlSourceChange = jest.fn();
 

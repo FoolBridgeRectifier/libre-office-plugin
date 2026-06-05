@@ -7,6 +7,7 @@ export interface AppProps {
   readonly activeFilePath?: string | null;
   readonly autosaveStatus?: AutosaveStatus;
   readonly importedHtmlSource?: string | null;
+  readonly linkWarningCount?: number;
   readonly onEditorBlur?: () => void;
   readonly onHtmlSourceChange?: (htmlSource: string) => void;
 }

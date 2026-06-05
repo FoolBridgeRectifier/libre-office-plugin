@@ -84,6 +84,12 @@ export function getAutosaveStatusText(autosaveStatus: AutosaveStatus): string {
   }
 }
 
+export function getLinkWarningStatusText(linkWarningCount: number): string {
+  return linkWarningCount === 0
+    ? 'No unresolved link targets'
+    : `${linkWarningCount} unresolved link ${linkWarningCount === 1 ? 'target' : 'targets'}`;
+}
+
 export function getTabButtonClassName(isActiveRibbonTab: boolean) {
   return classNames(
     'min-h-8 whitespace-nowrap px-4 font-sans text-[11px] font-medium transition-colors',

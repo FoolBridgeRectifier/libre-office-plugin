@@ -3,6 +3,10 @@ export interface MarkdownSourceFact {
   readonly type: MarkdownSourceFactType;
 }
 
+export interface MarkdownSourceFactWithOffset extends MarkdownSourceFact {
+  readonly sourceOffset: number;
+}
+
 export type MarkdownSourceFactType =
   | 'block-id'
   | 'code-fence'
@@ -10,8 +14,14 @@ export type MarkdownSourceFactType =
   | 'embed'
   | 'hard-break'
   | 'raw-html'
+  | 'tag'
   | 'wikilink';
 
 export interface MarkdownSourceFacts {
   readonly facts: ReadonlyArray<MarkdownSourceFact>;
+}
+
+export interface SourceRange {
+  readonly endOffset: number;
+  readonly startOffset: number;
 }

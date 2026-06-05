@@ -48,6 +48,7 @@ function createMarkdownFile(path: string): TFile {
 
 function createEditorViewOptions(): EditorViewOptions {
   return {
+    getLinkWarnings: jest.fn(() => []),
     loadImportedHtmlSource: jest.fn(async (file: TFile) => `<article>${file.path}</article>`),
     saveHtmlSource: jest.fn(async () => undefined),
     syncMarkdownMirror: jest.fn(async () => undefined),

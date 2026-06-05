@@ -1,6 +1,9 @@
 import { NATIVE_MARKDOWN_VIEW_TYPE } from './editor-view/constants';
+import { createMetadataCacheMock } from './mainMetadataCacheTestHelpers';
 import { createRichDocumentMapping } from './rich-documents/helpers';
 import type { TFile, WorkspaceLeaf } from 'obsidian';
+
+export { createMetadataCacheMock } from './mainMetadataCacheTestHelpers';
 
 export const mockMapping = createRichDocumentMapping(
   'Note.md',
@@ -102,9 +105,10 @@ export function createLeaf(
 
 export function createPluginMockArguments(
   vault: ReturnType<typeof createVaultMock>,
-  workspace: ReturnType<typeof createWorkspaceMock>
+  workspace: ReturnType<typeof createWorkspaceMock>,
+  metadataCache = createMetadataCacheMock()
 ) {
-  return [{ vault, workspace } as never, {} as never] as const;
+  return [{ metadataCache, vault, workspace } as never, {} as never] as const;
 }
 
 export function createWorkspaceMock() {

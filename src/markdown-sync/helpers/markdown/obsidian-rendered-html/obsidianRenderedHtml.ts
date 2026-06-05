@@ -5,6 +5,7 @@ import {
   MARKDOWN_IMPORT_ARTICLE_ATTRIBUTE,
   MARKDOWN_IMPORT_ARTICLE_CLASS,
 } from '../../../constants';
+import { annotateObsidianLinkHtml } from '../../../../obsidian-links/helpers';
 import { createFrontmatterTemplate, createProtectedJsonTemplate, escapeHtml } from '../helpers';
 import { splitFrontmatter } from '../markdown';
 import { collectMarkdownSourceFacts } from '../source-facts/helpers';
@@ -101,13 +102,15 @@ export async function convertMarkdownToHtmlWithObsidianRenderer(
     options.markdownRenderer
   );
 
+  const annotatedBodyHtml = annotateObsidianLinkHtml(bodyHtml, sourceFacts.facts);
+
   const frontmatterTemplate = createFrontmatterTemplate(frontmatterSplitResult.frontmatter);
   const sourceFactsTemplate = createProtectedJsonTemplate('markdown-source-facts', sourceFacts);
 
-  const htmlSource = `<article ${MARKDOWN_IMPORT_ARTICLE_ATTRIBUTE} class="${MARKDOWN_IMPORT_ARTICLE_CLASS}">${frontmatterTemplate}${sourceFactsTemplate}${bodyHtml}</article>`;
+  const htmlSource = `<article ${MARKDOWN_IMPORT_ARTICLE_ATTRIBUTE} class="${MARKDOWN_IMPORT_ARTICLE_CLASS}">${frontmatterTemplate}${sourceFactsTemplate}${annotatedBodyHtml}</article>`;
 
   return {
-    bodyHtml,
+    bodyHtml: annotatedBodyHtml,
     frontmatter: frontmatterSplitResult.frontmatter,
     htmlSource,
   };

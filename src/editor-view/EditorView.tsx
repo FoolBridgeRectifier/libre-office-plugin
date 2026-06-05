@@ -1,12 +1,16 @@
 import { FileView } from 'obsidian';
-import { createElement } from 'react';
 import { createRoot, type Root } from 'react-dom/client';
 
 import type { TFile, ViewStateResult, WorkspaceLeaf } from 'obsidian';
 
-import { App } from '../App';
 import { LIBRE_MARKDOWN_VIEW_TYPE } from './constants';
-import { createEditorViewAutosaveController, shouldRouteFileToLibreEditor } from './helpers';
+import { createEditorViewAutosaveController } from './helpers';
+import { createEditorViewAppElement } from './helpers/app-element/appElement';
+import {
+  getEditorViewLinkWarningCount,
+  loadEditorViewLoadedState,
+  setEditorViewAutosaveDocument,
+} from './helpers/state/state';
 import type { AutosaveController, AutosaveStatus } from '../autosave/interfaces';
 import type { EditorViewOptions } from './interfaces';
 
@@ -16,6 +20,7 @@ export class EditorView extends FileView {
   private autosaveStatus: AutosaveStatus = 'saved';
   private readonly autosaveController: AutosaveController;
   private importedHtmlSource: string | null = null;
+  private linkWarningCount = 0;
   private reactRoot: Root | null = null;
   private readonly editorViewOptions: EditorViewOptions;
 
@@ -37,21 +42,15 @@ export class EditorView extends FileView {
   canAcceptExtension(extension: string): boolean {
     return extension.toLowerCase() === 'md';
   }
-
   getDisplayText(): string {
     return this.activeMarkdownFile?.basename ?? 'Libre Note Editor';
   }
-
   getState(): Record<string, unknown> {
-    return {
-      file: this.activeMarkdownFile?.path ?? null,
-    };
+    return { file: this.activeMarkdownFile?.path ?? null };
   }
-
   getViewType(): string {
     return LIBRE_MARKDOWN_VIEW_TYPE;
   }
-
   async onLoadFile(file: TFile): Promise<void> {
     if (this.activeMarkdownFile?.path !== file.path) {
       await this.autosaveController.clearActiveDocument();
@@ -59,43 +58,58 @@ export class EditorView extends FileView {
 
     this.activeMarkdownFile = file;
 
-    this.importedHtmlSource = await this.loadImportedHtmlSource(file);
-    this.setAutosaveDocument(file, this.importedHtmlSource);
+    const loadedState = await loadEditorViewLoadedState(this.editorViewOptions, file);
+    this.importedHtmlSource = loadedState.htmlSource;
+    this.linkWarningCount = loadedState.linkWarningCount;
+
+    setEditorViewAutosaveDocument(this.autosaveController, file, this.importedHtmlSource);
     this.renderReactApp();
   }
-
   async onRename(file: TFile): Promise<void> {
     if (this.activeMarkdownFile?.path === file.path) {
+      const loadedState = await loadEditorViewLoadedState(this.editorViewOptions, file);
+
       this.activeMarkdownFile = file;
-      this.importedHtmlSource = await this.loadImportedHtmlSource(file);
-      this.setAutosaveDocument(file, this.importedHtmlSource);
+      this.importedHtmlSource = loadedState.htmlSource;
+      this.linkWarningCount = loadedState.linkWarningCount;
+
+      setEditorViewAutosaveDocument(this.autosaveController, file, this.importedHtmlSource);
       this.renderReactApp();
     }
   }
-
   async onUnloadFile(_file: TFile): Promise<void> {
     await this.autosaveController.clearActiveDocument();
 
     this.activeMarkdownFile = null;
     this.importedHtmlSource = null;
+    this.linkWarningCount = 0;
     this.renderReactApp();
   }
-
   async flushPendingAutosave(): Promise<void> {
     await this.autosaveController.flushAll();
   }
+  refreshLinkWarnings(): void {
+    if (!this.activeMarkdownFile || this.importedHtmlSource === null) {
+      return;
+    }
 
+    this.linkWarningCount = getEditorViewLinkWarningCount(
+      this.editorViewOptions,
+      this.activeMarkdownFile,
+      this.importedHtmlSource
+    );
+
+    this.renderReactApp();
+  }
   async setState(state: unknown, result: ViewStateResult): Promise<void> {
     await super.setState(state, result);
     this.renderReactApp();
   }
-
   protected async onOpen(): Promise<void> {
     this.contentEl.empty();
     this.reactRoot = createRoot(this.contentEl);
     this.renderReactApp();
   }
-
   protected async onClose(): Promise<void> {
     await this.autosaveController.clearActiveDocument();
 
@@ -103,46 +117,33 @@ export class EditorView extends FileView {
     this.reactRoot = null;
     this.contentEl.empty();
   }
-
-  private async loadImportedHtmlSource(file: TFile) {
-    if (!shouldRouteFileToLibreEditor(file)) {
-      return null;
-    }
-
-    return this.editorViewOptions.loadImportedHtmlSource(file);
-  }
-
-  private setAutosaveDocument(file: TFile, htmlSource: string | null): void {
-    if (htmlSource === null) {
-      this.autosaveController.setActiveDocument(null);
-      return;
-    }
-
-    this.autosaveController.setActiveDocument({ htmlSource, markdownPath: file.path });
-  }
-
   private handleEditorBlur = () => {
     void this.autosaveController.flushAll();
   };
-
   private handleHtmlSourceChange = (htmlSource: string) => {
     this.importedHtmlSource = htmlSource;
+
+    if (this.activeMarkdownFile) {
+      this.linkWarningCount = getEditorViewLinkWarningCount(
+        this.editorViewOptions,
+        this.activeMarkdownFile,
+        htmlSource
+      );
+    }
+
     this.autosaveController.handleHtmlSourceChange(htmlSource);
   };
 
   private renderReactApp() {
-    const activeFilePath = shouldRouteFileToLibreEditor(this.activeMarkdownFile)
-      ? this.activeMarkdownFile.path
-      : null;
-
     this.reactRoot?.render(
-      createElement(App, {
-        activeFilePath,
-        autosaveStatus: this.autosaveStatus,
-        importedHtmlSource: this.importedHtmlSource,
-        onEditorBlur: this.handleEditorBlur,
-        onHtmlSourceChange: this.handleHtmlSourceChange,
-      })
+      createEditorViewAppElement(
+        this.activeMarkdownFile,
+        this.autosaveStatus,
+        this.importedHtmlSource,
+        this.linkWarningCount,
+        this.handleEditorBlur,
+        this.handleHtmlSourceChange
+      )
     );
   }
 }

@@ -125,6 +125,11 @@ exports[`sets the Home ribbon tab active by default 1`] = `
         No HTML source loaded
       </span>
       <span
+        aria-label="Obsidian link warnings"
+      >
+        No unresolved link targets
+      </span>
+      <span
         aria-label="Active markdown file"
         class="max-w-full truncate text-text-secondary"
       >

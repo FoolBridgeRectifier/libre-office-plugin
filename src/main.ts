@@ -16,13 +16,15 @@ import {
   OPEN_NATIVE_MARKDOWN_COMMAND_ID,
   OPEN_NATIVE_MARKDOWN_COMMAND_NAME,
 } from './editor-view/constants';
+import { registerEditorViewLinkWarningRefresh } from './editor-view/helpers/link-warnings/linkWarnings';
 import {
   flushOpenLibreEditors,
-  loadRichDocumentHtml,
   registerRichDocumentMappingEvents,
   saveRichDocumentHtml,
   syncMarkdownMirror,
 } from './helpers';
+import { loadRichDocumentHtmlForStore } from './helpers/rich-html/richHtml';
+import { collectObsidianLinkWarningsForApp } from './obsidian-links/helpers/resolver/resolver';
 import { createRichDocumentStore } from './rich-documents/richDocuments';
 import type { RichDocumentStore } from './rich-documents/interfaces';
 import '../styles.css';
@@ -44,6 +46,8 @@ export default class LibreNoteEditorPlugin extends Plugin {
       this,
       (workspaceLeaf) =>
         new EditorView(workspaceLeaf, {
+          getLinkWarnings: (markdownPath, htmlSource) =>
+            collectObsidianLinkWarningsForApp(this.app, markdownPath, htmlSource),
           loadImportedHtmlSource: (file) => this.ensureRichDocumentHtml(file),
           saveHtmlSource: (markdownPath, htmlSource, previousHtmlSource) =>
             saveRichDocumentHtml({
@@ -66,6 +70,7 @@ export default class LibreNoteEditorPlugin extends Plugin {
     this.registerNativeMarkdownFallbackCommand();
     this.registerMarkdownRoutingEvents();
     registerRichDocumentMappingEvents(this, this.richDocumentStore);
+    registerEditorViewLinkWarningRefresh(this);
 
     this.app.workspace.onLayoutReady(() => {
       this.ensureMappingsForOpenMarkdownLeaves();
@@ -137,14 +142,6 @@ export default class LibreNoteEditorPlugin extends Plugin {
       return null;
     }
 
-    if (!this.richDocumentStore) {
-      return null;
-    }
-
-    return loadRichDocumentHtml({
-      app: this.app,
-      file,
-      richDocumentStore: this.richDocumentStore,
-    });
+    return loadRichDocumentHtmlForStore(this.app, file, this.richDocumentStore);
   }
 }

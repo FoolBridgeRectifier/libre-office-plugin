@@ -2,6 +2,7 @@ import { LIBRE_MARKDOWN_VIEW_TYPE, NATIVE_MARKDOWN_VIEW_TYPE } from './editor-vi
 import {
   createLeaf,
   createMarkdownFile,
+  createMetadataCacheMock,
   createPluginMockArguments,
   createVaultMock,
   createWorkspaceMock,
@@ -31,7 +32,7 @@ test('registers the Libre markdown view and routing events on load', async () =>
   expect(registerView).toHaveBeenCalledWith(LIBRE_MARKDOWN_VIEW_TYPE, expect.any(Function));
 
   expect(addCommand).toHaveBeenCalledTimes(1);
-  expect(registerEvent).toHaveBeenCalledTimes(4);
+  expect(registerEvent).toHaveBeenCalledTimes(5);
   expect(mockRichDocumentStore.getOrCreateMapping).toHaveBeenCalledWith('Open.md');
 });
 
@@ -113,6 +114,34 @@ test('routes markdown file-open and active-leaf-change events', async () => {
   expect(navigationLeaf.setViewState).toHaveBeenCalledWith(
     expect.objectContaining({ type: LIBRE_MARKDOWN_VIEW_TYPE })
   );
+});
+
+test('refreshes open Libre link warnings after metadata cache changes', async () => {
+  const { default: LibreNoteEditorPlugin } = await import('./main');
+  const metadataCache = createMetadataCacheMock();
+  const workspace = createWorkspaceMock();
+  const vault = createVaultMock();
+
+  const plugin = new LibreNoteEditorPlugin(
+    ...createPluginMockArguments(vault, workspace, metadataCache)
+  );
+  const registerView = jest.mocked(plugin.registerView);
+
+  await plugin.onload();
+
+  const createView = registerView.mock.calls[0]?.[1] as (leaf: WorkspaceLeaf) => unknown;
+  const editorView = createView(createLeaf(createMarkdownFile('Refresh.md'))) as {
+    refreshLinkWarnings(): void;
+  };
+
+  editorView.refreshLinkWarnings = jest.fn();
+  workspace.iterateAllLeaves.mockImplementation((callback) => {
+    callback({ view: editorView } as unknown as WorkspaceLeaf);
+  });
+
+  metadataCache.eventHandlers.get('changed')?.();
+
+  expect(editorView.refreshLinkWarnings).toHaveBeenCalledTimes(1);
 });
 
 test('detaches Libre leaves on plugin unload', async () => {

@@ -90,6 +90,27 @@ test('stores source-only markdown facts for export reconciliation', async () => 
   expect(sourceFactsJson).toContain('"type":"block-id"');
 });
 
+test('annotates rendered Obsidian link nodes with exact source markdown', async () => {
+  const markdownRenderer: jest.MockedFunction<MarkdownBodyRenderer> = jest.fn(
+    async (_bodyMarkdown, containerElement, _sourcePath) => {
+      containerElement.innerHTML = [
+        '<p>',
+        '<a class="internal-link" data-href="Note#Heading">Alias</a> ',
+        '<a class="tag" href="#parent/child">#parent/child</a>',
+        '</p>',
+      ].join('');
+    }
+  );
+
+  const result = await convertMarkdownToHtmlWithObsidianRenderer(
+    '[[Note#Heading|Alias]] #parent/child',
+    { markdownRenderer, sourcePath: 'Links.md' }
+  );
+
+  expect(result.htmlSource).toContain('data-libre-obsidian-link-source="[[Note#Heading|Alias]]"');
+  expect(result.htmlSource).toContain('data-libre-obsidian-tag-source="#parent/child"');
+});
+
 test('preserves raw markdown when Obsidian renders an empty non-empty body', async () => {
   const markdownRenderer: jest.MockedFunction<MarkdownBodyRenderer> = jest.fn(
     async (_bodyMarkdown, _containerElement, _sourcePath) => undefined

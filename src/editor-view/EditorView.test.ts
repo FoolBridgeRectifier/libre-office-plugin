@@ -48,9 +48,11 @@ beforeEach(() => {
 });
 
 function createEditorView(
-  loadImportedHtmlSource = jest.fn(async () => '<article>Loaded</article>')
+  loadImportedHtmlSource = jest.fn(async () => '<article>Loaded</article>'),
+  getLinkWarnings: EditorViewOptions['getLinkWarnings'] = jest.fn(() => [])
 ) {
   const options: EditorViewOptions = {
+    getLinkWarnings,
     loadImportedHtmlSource,
     saveHtmlSource: jest.fn(),
     syncMarkdownMirror: jest.fn(),
@@ -82,6 +84,27 @@ test('renders imported html for loaded markdown files', async () => {
   expect(loadImportedHtmlSource).toHaveBeenCalledWith(markdownFile);
   expect(editorView.getDisplayText()).toBe('Folder/Loaded');
   expect(editorView.getState()).toEqual({ file: 'Folder/Loaded.md' });
+});
+
+test('passes unresolved link warning count to the React app', async () => {
+  const unresolvedHeadingWarning = {
+    linkText: '[[Note#Old Heading]]',
+    targetNote: 'Note',
+    targetValue: 'Old Heading',
+    type: 'missing-heading-target' as const,
+  };
+
+  const getLinkWarnings = jest.fn(() => [unresolvedHeadingWarning]);
+  const editorView = createEditorView(undefined, getLinkWarnings);
+
+  await (editorView as EditorView & { onOpen(): Promise<void> }).onOpen();
+  await editorView.onLoadFile(createFile('Warnings.md', 'md'));
+
+  expect(mockReactRoot.render).toHaveBeenLastCalledWith(
+    expect.objectContaining({
+      props: expect.objectContaining({ linkWarningCount: 1 }),
+    })
+  );
 });
 
 test('opens and closes the React root inside the Obsidian content element', async () => {

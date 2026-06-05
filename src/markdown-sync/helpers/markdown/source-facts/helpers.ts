@@ -1,93 +1,98 @@
 import {
   BLOCK_ID_SOURCE_PATTERN,
   COMMENT_SOURCE_PATTERN,
-  FENCE_SOURCE_PATTERN,
   HARD_BREAK_SOURCE_PATTERN,
   RAW_HTML_SOURCE_PATTERN,
+  TAG_SOURCE_PATTERN,
   WIKI_LINK_SOURCE_PATTERN,
 } from './constants';
-import type { MarkdownSourceFact, MarkdownSourceFacts, MarkdownSourceFactType } from './interfaces';
-
-function readFenceCharacter(line: string): '`' | '~' | null {
-  const fenceMatch = FENCE_SOURCE_PATTERN.exec(line);
-
-  if (!fenceMatch) {
-    return null;
-  }
-
-  const typedFenceMatch = fenceMatch as RegExpMatchArray & { 1: string; 2: string };
-  const fenceCharacter = typedFenceMatch[1].charAt(0);
-  const fenceInfo = typedFenceMatch[2];
-
-  if (fenceCharacter === '`' && fenceInfo.includes('`')) {
-    return null;
-  }
-
-  return fenceCharacter === '`' ? '`' : '~';
-}
+import { collectCodeFenceFacts } from './helpers/code-fences/codeFences';
+import type {
+  MarkdownSourceFacts,
+  MarkdownSourceFactType,
+  MarkdownSourceFactWithOffset,
+  SourceRange,
+} from './interfaces';
 
 function collectPatternFacts(
   markdownSource: string,
   pattern: RegExp,
   type: MarkdownSourceFactType
-): MarkdownSourceFact[] {
+): MarkdownSourceFactWithOffset[] {
   return Array.from(markdownSource.matchAll(pattern)).map((sourceMatch) => ({
+    sourceOffset: sourceMatch.index,
     text: sourceMatch[0],
     type,
   }));
 }
 
-function collectWikiLinkFacts(markdownSource: string): MarkdownSourceFact[] {
+function collectWikiLinkFacts(markdownSource: string): MarkdownSourceFactWithOffset[] {
   return Array.from(markdownSource.matchAll(WIKI_LINK_SOURCE_PATTERN)).map((sourceMatch) => ({
+    sourceOffset: sourceMatch.index,
     text: sourceMatch[0],
     type: sourceMatch[1] === '!' ? 'embed' : 'wikilink',
   }));
 }
 
-function collectCodeFenceFacts(markdownSource: string): MarkdownSourceFact[] {
-  const facts: MarkdownSourceFact[] = [];
-  const lines = markdownSource.split('\n');
-  let activeFenceCharacter: '`' | '~' | null = null;
-  let openingLineIndex: number | null = null;
+function collectTagFacts(markdownSource: string, excludedRanges: SourceRange[]) {
+  return Array.from(markdownSource.matchAll(TAG_SOURCE_PATTERN))
+    .filter((sourceMatch) => !isOffsetInsideRanges(sourceMatch.index, excludedRanges))
+    .flatMap((sourceMatch) => {
+      const typedSourceMatch = sourceMatch as RegExpMatchArray & {
+        1: string;
+        2: string;
+        index: number;
+      };
 
-  for (const [lineIndex, line] of lines.entries()) {
-    const fenceCharacter = readFenceCharacter(line);
+      const prefixText = typedSourceMatch[1];
+      const tagText = typedSourceMatch[2];
 
-    if (!fenceCharacter) {
-      continue;
-    }
-
-    if (openingLineIndex === null) {
-      activeFenceCharacter = fenceCharacter;
-      openingLineIndex = lineIndex;
-      continue;
-    }
-
-    if (activeFenceCharacter !== fenceCharacter) {
-      continue;
-    }
-
-    facts.push({
-      text: lines.slice(openingLineIndex, lineIndex + 1).join('\n'),
-      type: 'code-fence',
+      return [
+        {
+          sourceOffset: typedSourceMatch.index + prefixText.length,
+          text: `#${tagText}`,
+          type: 'tag' as const,
+        },
+      ];
     });
+}
 
-    activeFenceCharacter = null;
-    openingLineIndex = null;
-  }
-
-  return facts;
+function isOffsetInsideRanges(
+  sourceOffset: number | undefined,
+  ranges: ReadonlyArray<SourceRange>
+) {
+  return ranges.some(
+    (sourceRange) =>
+      sourceOffset !== undefined &&
+      sourceOffset >= sourceRange.startOffset &&
+      sourceOffset < sourceRange.endOffset
+  );
 }
 
 export function collectMarkdownSourceFacts(markdownSource: string): MarkdownSourceFacts {
+  const codeFenceFacts = collectCodeFenceFacts(markdownSource);
+  const codeFenceRanges = getSourceFactRanges(codeFenceFacts);
+
   const facts = [
     ...collectPatternFacts(markdownSource, COMMENT_SOURCE_PATTERN, 'comment'),
     ...collectWikiLinkFacts(markdownSource),
-    ...collectCodeFenceFacts(markdownSource),
+    ...codeFenceFacts,
     ...collectPatternFacts(markdownSource, RAW_HTML_SOURCE_PATTERN, 'raw-html'),
     ...collectPatternFacts(markdownSource, BLOCK_ID_SOURCE_PATTERN, 'block-id'),
     ...collectPatternFacts(markdownSource, HARD_BREAK_SOURCE_PATTERN, 'hard-break'),
-  ];
+    ...collectTagFacts(markdownSource, codeFenceRanges),
+  ].sort((leftFact, rightFact) => leftFact.sourceOffset - rightFact.sourceOffset);
 
-  return { facts };
+  return {
+    facts: facts.map(({ sourceOffset: _sourceOffset, ...sourceFact }) => sourceFact),
+  };
+}
+
+function getSourceFactRanges(
+  sourceFacts: ReadonlyArray<MarkdownSourceFactWithOffset>
+): SourceRange[] {
+  return sourceFacts.map((sourceFact) => ({
+    endOffset: sourceFact.sourceOffset + sourceFact.text.length,
+    startOffset: sourceFact.sourceOffset,
+  }));
 }

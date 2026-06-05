@@ -5,6 +5,7 @@ export function App({
   activeFilePath = null,
   autosaveStatus = 'saved',
   importedHtmlSource = null,
+  linkWarningCount = 0,
   onEditorBlur,
   onHtmlSourceChange,
 }: AppProps) {
@@ -13,6 +14,7 @@ export function App({
       activeFilePath={activeFilePath}
       autosaveStatus={autosaveStatus}
       importedHtmlSource={importedHtmlSource}
+      linkWarningCount={linkWarningCount}
       {...(onEditorBlur ? { onEditorBlur } : {})}
       {...(onHtmlSourceChange ? { onHtmlSourceChange } : {})}
     />

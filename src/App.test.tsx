@@ -32,6 +32,14 @@ test('shows the active markdown file path when a note is loaded', () => {
   expect(screen.getByLabelText('Active markdown file')).toHaveTextContent('Folder/Plan.md');
 });
 
+test('shows unresolved link warnings from the editor view', () => {
+  render(<App linkWarningCount={1} />);
+
+  expect(screen.getByLabelText('Obsidian link warnings')).toHaveTextContent(
+    '1 unresolved link target'
+  );
+});
+
 test('renders imported html without showing preserved frontmatter as text', () => {
   render(
     <App
