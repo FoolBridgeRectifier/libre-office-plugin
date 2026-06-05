@@ -27,19 +27,51 @@ test('exports supported html blocks to exact markdown', () => {
 });
 
 test('preserves frontmatter above generated markdown body', () => {
-  const markdownSource = '---\ntags: [demo]\n---\n\nOld body';
+  const markdownSource = '---\ntitle: Alpha\ntags: [demo]\n---\n\nOld body';
   const htmlSource = '<article><p>New body</p></article>';
 
   expect(createMarkdownMirrorSource(markdownSource, htmlSource)).toBe(
-    '---\ntags: [demo]\n---\n\nNew body'
+    '---\ntitle: Alpha\ntags: [demo]\n---\n\nNew body'
   );
 });
 
 test('preserves protected raw markdown blocks as markdown source', () => {
-  const htmlSource =
-    '<article><pre data-libre-protected="raw-markdown">[[Wiki]]\n#tag</pre></article>';
+  const htmlSource = [
+    '<article><p>Before edit</p>',
+    '<pre data-libre-protected="raw-markdown">[[Wiki]]\n#tag</pre>',
+    '<p>After edit</p></article>',
+  ].join('');
 
-  expect(convertHtmlToMarkdownMirror(htmlSource)).toBe('[[Wiki]]\n#tag');
+  expect(convertHtmlToMarkdownMirror(htmlSource)).toBe(
+    'Before edit\n\n[[Wiki]]\n#tag\n\nAfter edit'
+  );
+});
+
+test('exports exact structured markdown sources from annotated html', () => {
+  const htmlSource = [
+    '<article>',
+    '<div class="callout" data-libre-structured-markdown-source="&gt; [!todo]- Custom&#10;&gt; Body" data-libre-structured-markdown-type="callout"></div>',
+    '<div class="callout" data-libre-structured-markdown-source="&gt; [!custom]+ Unknown&#10;&gt; Nested" data-libre-structured-markdown-type="callout"></div>',
+    '<pre data-libre-protected="code-fence" data-libre-structured-markdown-source="~~~js&#10;const value = `tick`;&#10;~~~" data-libre-structured-markdown-type="code-fence"><code>ignored</code></pre>',
+    '<p>Inline <code data-libre-structured-markdown-source="``code ` value``" data-libre-structured-markdown-type="inline-code">code ` value</code></p>',
+    '</article>',
+  ].join('');
+
+  expect(convertHtmlToMarkdownMirror(htmlSource)).toBe(
+    [
+      '> [!todo]- Custom',
+      '> Body',
+      '',
+      '> [!custom]+ Unknown',
+      '> Nested',
+      '',
+      '~~~js',
+      'const value = `tick`;',
+      '~~~',
+      '',
+      'Inline ``code ` value``',
+    ].join('\n')
+  );
 });
 
 test('exports Obsidian links, embeds, tags, and block ids as Obsidian markdown', () => {

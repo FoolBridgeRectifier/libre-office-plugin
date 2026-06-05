@@ -2,6 +2,7 @@ import {
   getObsidianBlockMarkdown,
   getObsidianInlineMarkdown,
 } from '../../../obsidian-links/helpers';
+import { getStructuredMarkdownSource } from '../../../markdown-sync/helpers/markdown/structured-blocks/structuredBlocks';
 
 function getInlineMarkdown(node: Node): string {
   if (node.nodeType === Node.TEXT_NODE) {
@@ -13,9 +14,14 @@ function getInlineMarkdown(node: Node): string {
   }
 
   const obsidianMarkdown = getObsidianInlineMarkdown(node);
+  const structuredMarkdownSource = getStructuredMarkdownSource(node);
 
   if (obsidianMarkdown !== null) {
     return obsidianMarkdown;
+  }
+
+  if (structuredMarkdownSource !== null) {
+    return structuredMarkdownSource;
   }
 
   const childMarkdown = Array.from(node.childNodes).map(getInlineMarkdown).join('');
@@ -68,9 +74,14 @@ function getListMarkdown(element: HTMLElement, isOrdered: boolean): string {
 
 function getBlockMarkdown(element: HTMLElement): string {
   const obsidianMarkdown = getObsidianBlockMarkdown(element);
+  const structuredMarkdownSource = getStructuredMarkdownSource(element);
 
   if (obsidianMarkdown !== null) {
     return obsidianMarkdown;
+  }
+
+  if (structuredMarkdownSource !== null) {
+    return structuredMarkdownSource;
   }
 
   const tagName = element.tagName.toLowerCase();

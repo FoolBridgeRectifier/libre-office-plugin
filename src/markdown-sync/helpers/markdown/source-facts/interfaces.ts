@@ -9,10 +9,12 @@ export interface MarkdownSourceFactWithOffset extends MarkdownSourceFact {
 
 export type MarkdownSourceFactType =
   | 'block-id'
+  | 'callout'
   | 'code-fence'
   | 'comment'
   | 'embed'
   | 'hard-break'
+  | 'inline-code'
   | 'raw-html'
   | 'tag'
   | 'wikilink';

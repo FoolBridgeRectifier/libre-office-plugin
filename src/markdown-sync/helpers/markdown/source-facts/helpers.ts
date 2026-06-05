@@ -6,7 +6,9 @@ import {
   TAG_SOURCE_PATTERN,
   WIKI_LINK_SOURCE_PATTERN,
 } from './constants';
+import { collectCalloutFacts } from './helpers/callouts/callouts';
 import { collectCodeFenceFacts } from './helpers/code-fences/codeFences';
+import { collectInlineCodeFacts } from './helpers/inline-code/inlineCode';
 import type {
   MarkdownSourceFacts,
   MarkdownSourceFactType,
@@ -72,11 +74,14 @@ function isOffsetInsideRanges(
 export function collectMarkdownSourceFacts(markdownSource: string): MarkdownSourceFacts {
   const codeFenceFacts = collectCodeFenceFacts(markdownSource);
   const codeFenceRanges = getSourceFactRanges(codeFenceFacts);
+  const calloutFacts = collectCalloutFacts(markdownSource);
 
   const facts = [
     ...collectPatternFacts(markdownSource, COMMENT_SOURCE_PATTERN, 'comment'),
     ...collectWikiLinkFacts(markdownSource),
+    ...calloutFacts,
     ...codeFenceFacts,
+    ...collectInlineCodeFacts(markdownSource, codeFenceRanges),
     ...collectPatternFacts(markdownSource, RAW_HTML_SOURCE_PATTERN, 'raw-html'),
     ...collectPatternFacts(markdownSource, BLOCK_ID_SOURCE_PATTERN, 'block-id'),
     ...collectPatternFacts(markdownSource, HARD_BREAK_SOURCE_PATTERN, 'hard-break'),

@@ -42,6 +42,42 @@ test('collects Obsidian tags outside fenced code blocks', () => {
   });
 });
 
+test('collects callouts and inline code as structured source facts', () => {
+  const sourceFacts = collectMarkdownSourceFacts(
+    [
+      '> [!warning]- Custom title',
+      '> Body with `inline code`',
+      '> > [!info] Nested',
+      '',
+      'After ``code with ` inside``.',
+    ].join('\n')
+  );
+
+  expect(sourceFacts.facts).toContainEqual({
+    text: '> [!warning]- Custom title\n> Body with `inline code`\n> > [!info] Nested',
+    type: 'callout',
+  });
+
+  expect(sourceFacts.facts).toContainEqual({
+    text: '``code with ` inside``',
+    type: 'inline-code',
+  });
+});
+
+test('does not collect inline code inside fenced code blocks', () => {
+  const sourceFacts = collectMarkdownSourceFacts('```md\n`not inline`\n```\n\n`inline`');
+
+  expect(sourceFacts.facts).toContainEqual({
+    text: '`inline`',
+    type: 'inline-code',
+  });
+
+  expect(sourceFacts.facts).not.toContainEqual({
+    text: '`not inline`',
+    type: 'inline-code',
+  });
+});
+
 test('keeps source facts in markdown source order', () => {
   const sourceFacts = collectMarkdownSourceFacts('#tag before [[Note]] and ^block');
 

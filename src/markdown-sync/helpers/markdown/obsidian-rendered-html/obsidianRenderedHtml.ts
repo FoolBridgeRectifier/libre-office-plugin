@@ -9,6 +9,7 @@ import { annotateObsidianLinkHtml } from '../../../../obsidian-links/helpers';
 import { createFrontmatterTemplate, createProtectedJsonTemplate, escapeHtml } from '../helpers';
 import { splitFrontmatter } from '../markdown';
 import { collectMarkdownSourceFacts } from '../source-facts/helpers';
+import { annotateStructuredMarkdownHtml } from '../structured-blocks/structuredBlocks';
 import { splitMarkdownIntoRenderedChunks } from './helpers/chunks/chunks';
 import { mapRenderedMarkdownElementToHtml } from './helpers';
 import type {
@@ -102,7 +103,12 @@ export async function convertMarkdownToHtmlWithObsidianRenderer(
     options.markdownRenderer
   );
 
-  const annotatedBodyHtml = annotateObsidianLinkHtml(bodyHtml, sourceFacts.facts);
+  const linkAnnotatedBodyHtml = annotateObsidianLinkHtml(bodyHtml, sourceFacts.facts);
+
+  const annotatedBodyHtml = annotateStructuredMarkdownHtml(
+    linkAnnotatedBodyHtml,
+    sourceFacts.facts
+  );
 
   const frontmatterTemplate = createFrontmatterTemplate(frontmatterSplitResult.frontmatter);
   const sourceFactsTemplate = createProtectedJsonTemplate('markdown-source-facts', sourceFacts);
