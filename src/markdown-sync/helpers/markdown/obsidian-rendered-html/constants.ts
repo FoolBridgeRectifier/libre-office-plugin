@@ -13,10 +13,5 @@ export const GENERATED_UI_SELECTORS = [
   '.copy-code-button',
 ];
 
-export const MEANINGFUL_DATA_ATTRIBUTES = [
-  'data-callout',
-  'data-callout-fold',
-  'data-callout-metadata',
-  'data-heading',
-  'data-task',
-];
+export const HIDDEN_GENERATED_UI_SELECTORS =
+  '[hidden], [aria-hidden="true"], [style*="display: none"]';

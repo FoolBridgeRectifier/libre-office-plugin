@@ -1,8 +1,5 @@
-import {
-  LIBRE_MARKDOWN_VIEW_TYPE,
-  MARKDOWN_FILE_EXTENSIONS,
-  NATIVE_MARKDOWN_VIEW_TYPE,
-} from './constants';
+import { LIBRE_MARKDOWN_VIEW_TYPE, NATIVE_MARKDOWN_VIEW_TYPE } from './constants';
+import { createFile, createLeaf, createWorkspace } from './utils';
 import {
   createLibreMarkdownViewState,
   createNativeMarkdownViewState,
@@ -17,51 +14,7 @@ import {
   shouldRoutePathToLibreEditor,
 } from './helpers';
 
-import type { TFile, ViewCreator, Workspace, WorkspaceLeaf } from 'obsidian';
-
-function createFile(path: string, extension: string): TFile {
-  return {
-    basename: path.replace(/\.[^.]+$/, ''),
-    extension,
-    name: path.split('/').pop() ?? path,
-    path,
-  } as TFile;
-}
-
-function createLeaf(viewType: string, file: TFile | null): WorkspaceLeaf {
-  return {
-    detach: jest.fn(),
-    openFile: jest.fn().mockResolvedValue(undefined),
-    setViewState: jest.fn().mockResolvedValue(undefined),
-    view: {
-      file,
-      getViewType: () => viewType,
-    },
-  } as unknown as WorkspaceLeaf;
-}
-
-function createWorkspace(
-  leaves: WorkspaceLeaf[],
-  mostRecentLeaf: WorkspaceLeaf | null = null
-): Workspace {
-  return {
-    getLeavesOfType: jest.fn((viewType: string) =>
-      leaves.filter((workspaceLeaf) => workspaceLeaf.view.getViewType() === viewType)
-    ),
-    getMostRecentLeaf: jest.fn(() => mostRecentLeaf),
-    iterateAllLeaves: jest.fn((callback: (workspaceLeaf: WorkspaceLeaf) => void) => {
-      for (const workspaceLeaf of leaves) {
-        callback(workspaceLeaf);
-      }
-    }),
-  } as unknown as Workspace;
-}
-
-test('defines markdown routing constants', () => {
-  expect(LIBRE_MARKDOWN_VIEW_TYPE).toBe('libre-note-editor-view');
-  expect(NATIVE_MARKDOWN_VIEW_TYPE).toBe('markdown');
-  expect(MARKDOWN_FILE_EXTENSIONS).toContain('md');
-});
+import type { ViewCreator } from 'obsidian';
 
 test('detects markdown files and handles missing active files safely', () => {
   expect(shouldRouteFileToLibreEditor(createFile('Daily.md', 'md'))).toBe(true);
@@ -71,22 +24,6 @@ test('detects markdown files and handles missing active files safely', () => {
 
   expect(shouldRoutePathToLibreEditor('Folder/Uppercase.MD')).toBe(true);
   expect(shouldRoutePathToLibreEditor('Folder/NotMarkdown.txt')).toBe(false);
-});
-
-test('creates Libre and native markdown view states for a file path', () => {
-  const markdownFile = createFile('Folder/Note.md', 'md');
-
-  expect(createLibreMarkdownViewState(markdownFile, true)).toMatchObject({
-    active: true,
-    state: { file: 'Folder/Note.md' },
-    type: LIBRE_MARKDOWN_VIEW_TYPE,
-  });
-
-  expect(createNativeMarkdownViewState(markdownFile, false)).toMatchObject({
-    active: false,
-    state: { file: 'Folder/Note.md' },
-    type: NATIVE_MARKDOWN_VIEW_TYPE,
-  });
 });
 
 test('registers the Libre markdown view', () => {

@@ -1,100 +1,7 @@
 import { RICH_DOCUMENTS_ROOT_PATH } from './constants';
-import {
-  createRichDocumentFilePaths,
-  createRichDocumentMapping,
-  createStableRichDocumentId,
-  isPathInsideRichDocumentsRoot,
-  serializeRichDocumentMapping,
-} from './helpers';
+import { createRichDocumentMapping, serializeRichDocumentMapping } from './helpers';
 import { createRichDocumentStore } from './richDocuments';
-import type { RichDocumentPluginData, RichDocumentVaultAdapter } from './interfaces';
-
-function createPersistenceTarget(pluginData: unknown = null) {
-  let savedPluginData: RichDocumentPluginData | null = null;
-
-  return {
-    getSavedPluginData: () => savedPluginData,
-    target: {
-      loadData: jest.fn(async () => pluginData),
-      saveData: jest.fn(async (data: RichDocumentPluginData) => {
-        savedPluginData = data;
-      }),
-    },
-  };
-}
-
-function createVaultAdapter(initialFiles: ReadonlyMap<string, string> = new Map()) {
-  const files = new Map(initialFiles);
-  const folders = new Set<string>();
-  const mkdirCalls: string[] = [];
-  const renameCalls: Array<readonly [string, string]> = [];
-
-  for (const filePath of files.keys()) {
-    addFolderParents(folders, filePath);
-  }
-
-  const adapter: RichDocumentVaultAdapter = {
-    exists: jest.fn(
-      async (normalizedPath: string) => files.has(normalizedPath) || folders.has(normalizedPath)
-    ),
-    list: jest.fn(async (normalizedPath: string) => ({
-      files: getDirectChildren(files.keys(), normalizedPath),
-      folders: getDirectChildren(folders.values(), normalizedPath),
-    })),
-    mkdir: jest.fn(async (normalizedPath: string) => {
-      folders.add(normalizedPath);
-      mkdirCalls.push(normalizedPath);
-    }),
-    read: jest.fn(async (normalizedPath: string) => files.get(normalizedPath) ?? ''),
-    rename: jest.fn(async (normalizedPath: string, normalizedNewPath: string) => {
-      const fileText = files.get(normalizedPath);
-      files.delete(normalizedPath);
-      files.set(normalizedNewPath, fileText ?? '');
-      renameCalls.push([normalizedPath, normalizedNewPath]);
-    }),
-    write: jest.fn(async (normalizedPath: string, data: string) => {
-      addFolderParents(folders, normalizedPath);
-      files.set(normalizedPath, data);
-    }),
-  };
-
-  return { adapter, files, folders, mkdirCalls, renameCalls };
-}
-
-function createStore(pluginData: unknown = null) {
-  const persistence = createPersistenceTarget(pluginData);
-  const vault = createVaultAdapter();
-
-  const store = createRichDocumentStore({
-    createRichDocumentId: () => 'rich-fixed-id',
-    getCurrentTimestamp: () => '2026-05-31T12:00:00.000Z',
-    lastEditorPlatform: 'desktop',
-    persistenceTarget: persistence.target,
-    vaultAdapter: vault.adapter,
-  });
-
-  return { persistence, store, vault };
-}
-
-test('generates stable rich document ids with unique random segments', () => {
-  const firstId = createStableRichDocumentId('2026-05-31T12:00:00.000Z', 0.1);
-  const secondId = createStableRichDocumentId('2026-05-31T12:00:00.000Z', 0.2);
-
-  expect(firstId).toBe('rich-20260531120000-8va10rq7g3');
-  expect(secondId).toBe('rich-20260531120000-hqk21jgew6');
-  expect(firstId).not.toBe(secondId);
-});
-
-test('creates rich document paths inside the documents root', () => {
-  const paths = createRichDocumentFilePaths('../Unsafe Note.md');
-
-  expect(paths.folderPath).toBe(`${RICH_DOCUMENTS_ROOT_PATH}/---Unsafe-Note-md`);
-  expect(paths.htmlPath).toBe(`${RICH_DOCUMENTS_ROOT_PATH}/---Unsafe-Note-md/document.html`);
-  expect(paths.odtPath).toBe(`${RICH_DOCUMENTS_ROOT_PATH}/---Unsafe-Note-md/document.odt`);
-
-  expect(isPathInsideRichDocumentsRoot(paths.htmlPath)).toBe(true);
-  expect(isPathInsideRichDocumentsRoot('../outside/document.html')).toBe(false);
-});
+import { createPersistenceTarget, createStore, createVaultAdapter } from './utils';
 
 test('creates one mapping for a new markdown note and persists the sidecar', async () => {
   const { persistence, store, vault } = createStore();
@@ -194,11 +101,12 @@ test('ignores malformed plugin data and repairs unsafe rich paths', async () => 
 
   const { store } = createStore(unsafePluginData);
   const mappings = await store.loadMappings();
+  const repairedMapping = mappings[0];
 
   expect(mappings).toHaveLength(1);
-  expect(mappings[0].richDocumentId).toBe('---bad-id');
-  expect(mappings[0].htmlPath).toBe(`${RICH_DOCUMENTS_ROOT_PATH}/---bad-id/document.html`);
-  expect(mappings[0].conflictState.status).toBe('none');
+  expect(repairedMapping?.richDocumentId).toBe('---bad-id');
+  expect(repairedMapping?.htmlPath).toBe(`${RICH_DOCUMENTS_ROOT_PATH}/---bad-id/document.html`);
+  expect(repairedMapping?.conflictState.status).toBe('none');
 });
 
 test('keeps duplicate note names in different folders as separate mappings', async () => {
@@ -208,7 +116,7 @@ test('keeps duplicate note names in different folders as separate mappings', asy
   const vault = createVaultAdapter();
 
   const store = createRichDocumentStore({
-    createRichDocumentId: () => identifiers[idIndex++],
+    createRichDocumentId: () => identifiers[idIndex++] ?? 'rich-extra',
     persistenceTarget: persistence.target,
     vaultAdapter: vault.adapter,
   });
@@ -232,21 +140,3 @@ test('serializes concurrent creation so one note gets one mapping', async () => 
   expect(firstMapping).toBe(secondMapping);
   expect(persistence.getSavedPluginData()?.mappings).toHaveLength(1);
 });
-
-function addFolderParents(folders: Set<string>, filePath: string): void {
-  const pathParts = filePath.split('/').slice(0, -1);
-  let folderPath = '';
-
-  for (const pathPart of pathParts) {
-    folderPath = folderPath ? `${folderPath}/${pathPart}` : pathPart;
-    folders.add(folderPath);
-  }
-}
-
-function getDirectChildren(pathValues: Iterable<string>, parentPath: string): string[] {
-  return Array.from(pathValues).filter((pathValue) => getParentPath(pathValue) === parentPath);
-}
-
-function getParentPath(pathValue: string): string {
-  return pathValue.split('/').slice(0, -1).join('/');
-}

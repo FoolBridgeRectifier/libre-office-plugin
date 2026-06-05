@@ -1,4 +1,4 @@
-import { prepareHtmlForEditor, readHtmlFromEditor } from './helpers';
+import { isInsideProtectedContent, prepareHtmlForEditor, readHtmlFromEditor } from './helpers';
 
 test('marks protected raw blocks read-only in the editor', () => {
   const htmlSource = '<pre data-libre-protected="raw-markdown"># Raw</pre>';
@@ -20,6 +20,17 @@ test('removes editor-only protected markers when reading html source', () => {
   );
 });
 
+test('keeps existing protected classes when reading html source', () => {
+  const editorElement = document.createElement('div');
+
+  editorElement.innerHTML =
+    '<pre data-libre-protected="raw-markdown" data-libre-editor-protected="true" contenteditable="false" class="language-md libre-protected-html-block"># Raw</pre>';
+
+  expect(readHtmlFromEditor(editorElement)).toBe(
+    '<pre data-libre-protected="raw-markdown" class="language-md"># Raw</pre>'
+  );
+});
+
 test('does not keep remote loading elements or remote asset sources', () => {
   const preparedHtmlSource = prepareHtmlForEditor(
     [
@@ -37,4 +48,15 @@ test('does not keep remote loading elements or remote asset sources', () => {
 
   expect(preparedHtmlSource).toContain('<img alt="remote">');
   expect(preparedHtmlSource).toContain('<img src="app://local/image.png" alt="local">');
+});
+
+test('detects whether an event target is inside protected content', () => {
+  const wrapperElement = document.createElement('div');
+
+  wrapperElement.innerHTML =
+    '<pre data-libre-protected="raw-markdown"><code><span># Raw</span></code></pre>';
+
+  expect(isInsideProtectedContent(wrapperElement.querySelector('span'))).toBe(true);
+  expect(isInsideProtectedContent(wrapperElement)).toBe(false);
+  expect(isInsideProtectedContent(null)).toBe(false);
 });

@@ -1,10 +1,9 @@
-import type { Plugin } from 'obsidian';
-
 import { shouldRoutePathToLibreEditor } from './editor-view/helpers';
+import type { RichDocumentMappingEventPlugin } from './interfaces';
 import type { RichDocumentStore } from './rich-documents/interfaces';
 
 export function registerRichDocumentMappingEvents(
-  plugin: Plugin,
+  plugin: RichDocumentMappingEventPlugin,
   richDocumentStore: RichDocumentStore
 ): void {
   plugin.registerEvent(

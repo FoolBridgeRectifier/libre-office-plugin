@@ -58,3 +58,20 @@ test('renders protected raw blocks as read-only editor content', () => {
   expect(protectedElement).toHaveAttribute('contenteditable', 'false');
   expect(protectedElement).toHaveAttribute('data-libre-editor-protected', 'true');
 });
+
+test('prevents direct input inside protected raw blocks', () => {
+  render(
+    <HtmlEditor htmlSource='<article><pre data-libre-protected="raw-markdown"># Raw</pre></article>' />
+  );
+
+  const editorElement = screen.getByRole('textbox', { name: 'Local HTML editor' });
+  const protectedElement = screen.getByText('# Raw');
+
+  const beforeInputEvent = new InputEvent('beforeinput', {
+    bubbles: true,
+    cancelable: true,
+  });
+
+  expect(editorElement).toContainElement(protectedElement);
+  expect(fireEvent(protectedElement, beforeInputEvent)).toBe(false);
+});

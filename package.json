@@ -22,8 +22,7 @@
     "gray-matter": "^4.0.3",
     "obsidian": "latest",
     "react": "^18.3.0",
-    "react-dom": "^18.3.0",
-    "util": "^0.12.5"
+    "react-dom": "^18.3.0"
   },
   "devDependencies": {
     "@babel/plugin-transform-modules-commonjs": "^7.29.7",

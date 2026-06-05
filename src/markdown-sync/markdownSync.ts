@@ -2,7 +2,11 @@ import { HTML_FALLBACK_ACTIVE_SOURCE } from './constants';
 import { convertMarkdownToHtmlWithObsidianRenderer } from './helpers';
 import { ensureVaultFolder } from '../rich-documents/helpers/vault/vault';
 import { createRichDocumentFilePaths } from '../rich-documents/helpers';
-import type { FirstMarkdownImportResult, MarkdownImportOptions } from './interfaces';
+import type {
+  FirstMarkdownImportResult,
+  MarkdownImportOptions,
+  RenderedMarkdownToHtmlOptions,
+} from './interfaces';
 
 export async function ensureFirstMarkdownImport(
   options: MarkdownImportOptions
@@ -19,10 +23,15 @@ export async function ensureFirstMarkdownImport(
   // Obsidian's vault reader owns note contents; the converter only sees plain markdown text.
   const markdownSource = await options.vaultReader.read(options.markdownFile);
 
-  const markdownToHtmlResult = await convertMarkdownToHtmlWithObsidianRenderer(markdownSource, {
-    markdownRenderer: options.markdownRenderer,
+  const renderedMarkdownOptions: RenderedMarkdownToHtmlOptions = {
+    ...(options.markdownRenderer ? { markdownRenderer: options.markdownRenderer } : {}),
     sourcePath: options.markdownFile.path,
-  });
+  };
+
+  const markdownToHtmlResult = await convertMarkdownToHtmlWithObsidianRenderer(
+    markdownSource,
+    renderedMarkdownOptions
+  );
 
   // A single timestamp keeps the first HTML sync and overall sync markers aligned.
   const currentTimestamp = options.getCurrentTimestamp?.() ?? new Date().toISOString();

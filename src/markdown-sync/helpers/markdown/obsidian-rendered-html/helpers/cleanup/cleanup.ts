@@ -1,4 +1,8 @@
-import { CONTENT_ROOT_SELECTORS, GENERATED_UI_SELECTORS } from '../../constants';
+import {
+  CONTENT_ROOT_SELECTORS,
+  GENERATED_UI_SELECTORS,
+  HIDDEN_GENERATED_UI_SELECTORS,
+} from '../../constants';
 
 function findContentRoot(containerElement: HTMLElement): HTMLElement {
   for (const rootSelector of CONTENT_ROOT_SELECTORS) {
@@ -25,20 +29,12 @@ function shouldKeepHiddenElement(element: Element): boolean {
 }
 
 function removeHiddenElements(rootElement: HTMLElement): void {
-  for (const hiddenElement of rootElement.querySelectorAll('[hidden], [aria-hidden="true"]')) {
+  for (const hiddenElement of rootElement.querySelectorAll(HIDDEN_GENERATED_UI_SELECTORS)) {
     if (shouldKeepHiddenElement(hiddenElement)) {
       continue;
     }
 
     hiddenElement.remove();
-  }
-
-  for (const element of rootElement.querySelectorAll<HTMLElement>('[style*="display: none"]')) {
-    if (shouldKeepHiddenElement(element)) {
-      continue;
-    }
-
-    element.remove();
   }
 }
 

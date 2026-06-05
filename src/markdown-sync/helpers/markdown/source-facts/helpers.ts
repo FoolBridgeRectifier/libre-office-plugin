@@ -1,12 +1,30 @@
 import {
   BLOCK_ID_SOURCE_PATTERN,
   COMMENT_SOURCE_PATTERN,
+  FENCE_SOURCE_PATTERN,
   HARD_BREAK_SOURCE_PATTERN,
   RAW_HTML_SOURCE_PATTERN,
   WIKI_LINK_SOURCE_PATTERN,
 } from './constants';
-import { readFenceState } from '../obsidian-syntax/utils';
 import type { MarkdownSourceFact, MarkdownSourceFacts, MarkdownSourceFactType } from './interfaces';
+
+function readFenceCharacter(line: string): '`' | '~' | null {
+  const fenceMatch = FENCE_SOURCE_PATTERN.exec(line);
+
+  if (!fenceMatch) {
+    return null;
+  }
+
+  const typedFenceMatch = fenceMatch as RegExpMatchArray & { 1: string; 2: string };
+  const fenceCharacter = typedFenceMatch[1].charAt(0);
+  const fenceInfo = typedFenceMatch[2];
+
+  if (fenceCharacter === '`' && fenceInfo.includes('`')) {
+    return null;
+  }
+
+  return fenceCharacter === '`' ? '`' : '~';
+}
 
 function collectPatternFacts(
   markdownSource: string,
@@ -29,23 +47,23 @@ function collectWikiLinkFacts(markdownSource: string): MarkdownSourceFact[] {
 function collectCodeFenceFacts(markdownSource: string): MarkdownSourceFact[] {
   const facts: MarkdownSourceFact[] = [];
   const lines = markdownSource.split('\n');
-  let activeFenceCharacter: string | null = null;
+  let activeFenceCharacter: '`' | '~' | null = null;
   let openingLineIndex: number | null = null;
 
   for (const [lineIndex, line] of lines.entries()) {
-    const fenceState = readFenceState(line);
+    const fenceCharacter = readFenceCharacter(line);
 
-    if (!fenceState) {
+    if (!fenceCharacter) {
       continue;
     }
 
     if (openingLineIndex === null) {
-      activeFenceCharacter = fenceState.character;
+      activeFenceCharacter = fenceCharacter;
       openingLineIndex = lineIndex;
       continue;
     }
 
-    if (activeFenceCharacter !== fenceState.character) {
+    if (activeFenceCharacter !== fenceCharacter) {
       continue;
     }
 

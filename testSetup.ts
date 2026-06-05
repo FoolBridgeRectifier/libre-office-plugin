@@ -15,6 +15,10 @@ jest.mock(
       constructor(leaf: unknown) {
         void leaf;
       }
+
+      async setState(_state: unknown, _result: unknown): Promise<void> {
+        return undefined;
+      }
     },
     MarkdownRenderer: {
       render: jest.fn(async () => undefined),

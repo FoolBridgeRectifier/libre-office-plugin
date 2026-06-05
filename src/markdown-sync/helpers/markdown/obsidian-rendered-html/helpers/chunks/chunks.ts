@@ -5,10 +5,12 @@ export function splitMarkdownIntoRenderedChunks(bodyMarkdown: string): ReadonlyA
 
   for (const line of bodyMarkdown.split(/\r?\n/)) {
     const fenceMatch = line.match(/^\s*(`{3,}|~{3,})/);
+    const matchedFenceMarker = fenceMatch?.[1] ?? null;
+    const matchedFenceCharacter = matchedFenceMarker?.[0] ?? null;
 
-    if (fenceMatch && !fenceMarker) {
-      fenceMarker = fenceMatch[1][0];
-    } else if (fenceMatch && fenceMarker === fenceMatch[1][0]) {
+    if (matchedFenceCharacter && !fenceMarker) {
+      fenceMarker = matchedFenceCharacter;
+    } else if (matchedFenceCharacter && fenceMarker === matchedFenceCharacter) {
       fenceMarker = null;
     }
 

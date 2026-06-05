@@ -35,6 +35,26 @@ export function HtmlEditor({
     onDirtyStateChange?.(false);
   }, [htmlSource, initializationError, onDirtyStateChange]);
 
+  useEffect(() => {
+    const editorElement = editorElementRef.current;
+
+    if (!editorElement) {
+      return;
+    }
+
+    const handleBeforeInput = (event: InputEvent) => {
+      if (isInsideProtectedContent(event.target)) {
+        event.preventDefault();
+      }
+    };
+
+    editorElement.addEventListener('beforeinput', handleBeforeInput);
+
+    return () => {
+      editorElement.removeEventListener('beforeinput', handleBeforeInput);
+    };
+  }, []);
+
   if (initializationError) {
     return (
       <div aria-label="HTML editor error" className={errorClassName} role="alert">
@@ -63,18 +83,11 @@ export function HtmlEditor({
     onDirtyStateChange?.(isDirty);
   };
 
-  const handleEditorBeforeInput = (event: React.FormEvent<HTMLDivElement>) => {
-    if (isInsideProtectedContent(event.nativeEvent.target)) {
-      event.preventDefault();
-    }
-  };
-
   return (
     <div
       aria-label="Local HTML editor"
       className={editorClassName}
       contentEditable
-      onBeforeInput={handleEditorBeforeInput}
       onInput={handleEditorInput}
       ref={editorElementRef}
       role="textbox"
