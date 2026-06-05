@@ -6,11 +6,12 @@ test('renders the OneNote-style ribbon editor shell', () => {
   const { container } = render(<App />);
 
   expect(screen.getByRole('navigation', { name: 'Ribbon tabs' })).toHaveTextContent('Home');
-  expect(screen.getByRole('heading', { name: 'Untitled rich note' })).toBeInTheDocument();
+  expect(screen.getByLabelText('Empty HTML editor')).toHaveTextContent(
+    'No rich HTML source loaded.'
+  );
 
-  expect(
-    screen.getByText('Markdown mirror stays synchronized beside the LibreOffice-backed editor.')
-  ).toBeInTheDocument();
+  expect(screen.getByLabelText('HTML source status')).toHaveTextContent('No HTML source loaded');
+
   expect(container).toMatchSnapshot();
 });
 

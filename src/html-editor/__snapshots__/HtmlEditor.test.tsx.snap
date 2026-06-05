@@ -1,0 +1,12 @@
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
+
+exports[`shows an empty editor state without html source 1`] = `
+<div>
+  <div
+    aria-label="Empty HTML editor"
+    class="min-h-64 rounded-ribbon-sm border border-dashed border-ribbon-border px-4 py-3 font-sans text-sm text-text-secondary"
+  >
+    No rich HTML source loaded.
+  </div>
+</div>
+`;

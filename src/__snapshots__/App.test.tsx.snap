@@ -108,23 +108,21 @@ exports[`renders the OneNote-style ribbon editor shell 1`] = `
         aria-label="Editor surface"
         class="min-h-72 rounded-ribbon-sm border border-ribbon-border bg-ribbon-bg p-6 shadow-ribbon-raised"
       >
-        <h1
-          class="m-0 font-sans text-xl font-semibold text-text-primary"
+        <div
+          aria-label="Empty HTML editor"
+          class="min-h-64 rounded-ribbon-sm border border-dashed border-ribbon-border px-4 py-3 font-sans text-sm text-text-secondary"
         >
-          Untitled rich note
-        </h1>
-        <p
-          class="mt-4 max-w-2xl font-sans text-sm leading-6 text-text-secondary"
-        >
-          Start from this visual shell while document loading, conversion, and persistence arrive in later implementation plans.
-        </p>
+          No rich HTML source loaded.
+        </div>
       </article>
     </main>
     <footer
       class="flex flex-wrap justify-between gap-2 border-t border-ribbon-border px-4 py-2 font-sans text-[11px] text-text-muted"
     >
-      <span>
-        Markdown mirror stays synchronized beside the LibreOffice-backed editor.
+      <span
+        aria-label="HTML source status"
+      >
+        No HTML source loaded
       </span>
       <span
         aria-label="Active markdown file"

@@ -40,3 +40,19 @@ test('shows future insert commands as disabled controls', () => {
     screen.getByRole('button', { name: 'Add a table once structured blocks are available.' })
   ).toBeDisabled();
 });
+
+test('marks html source dirty when the local editor changes', () => {
+  render(
+    <RibbonEditor
+      activeFilePath="Dirty.md"
+      importedHtmlSource="<article><p>Original body</p></article>"
+    />
+  );
+
+  const editorElement = screen.getByRole('textbox', { name: 'Local HTML editor' });
+
+  editorElement.innerHTML = '<article><p>Changed body</p></article>';
+  fireEvent.input(editorElement);
+
+  expect(screen.getByLabelText('HTML source status')).toHaveTextContent('Unsaved HTML changes');
+});

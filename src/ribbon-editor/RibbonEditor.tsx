@@ -1,5 +1,6 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
+import { HtmlEditor } from '../html-editor/HtmlEditor';
 import { DEFAULT_RIBBON_TAB_ID, RIBBON_TABS } from './constants';
 import {
   findRibbonTab,
@@ -14,9 +15,22 @@ export function RibbonEditor({
   importedHtmlSource = null,
 }: RibbonEditorProps) {
   const [activeRibbonTabId, setActiveRibbonTabId] = useState(DEFAULT_RIBBON_TAB_ID);
+  const [editableHtmlSource, setEditableHtmlSource] = useState(importedHtmlSource);
+  const [isHtmlSourceDirty, setIsHtmlSourceDirty] = useState(false);
 
   const activeRibbonTabDefinition = findRibbonTab(RIBBON_TABS, activeRibbonTabId);
   const activeFileStatusText = activeFilePath ?? 'No markdown file loaded yet.';
+
+  const htmlSourceStatusText = isHtmlSourceDirty
+    ? 'Unsaved HTML changes'
+    : editableHtmlSource === null
+      ? 'No HTML source loaded'
+      : 'HTML source saved';
+
+  useEffect(() => {
+    setEditableHtmlSource(importedHtmlSource);
+    setIsHtmlSourceDirty(false);
+  }, [importedHtmlSource]);
 
   const shellClassName =
     'flex h-full min-h-[480px] flex-col overflow-hidden bg-ribbon-bg font-sans text-text-primary';
@@ -36,11 +50,6 @@ export function RibbonEditor({
 
   const pageClassName =
     'min-h-72 rounded-ribbon-sm border border-ribbon-border bg-ribbon-bg p-6 shadow-ribbon-raised';
-
-  const importedContentClassName = 'libre-imported-markdown markdown-preview-view w-full !p-0';
-
-  const titleClassName = 'm-0 font-sans text-xl font-semibold text-text-primary';
-  const placeholderClassName = 'mt-4 max-w-2xl font-sans text-sm leading-6 text-text-secondary';
 
   const statusClassName =
     'flex flex-wrap justify-between gap-2 border-t border-ribbon-border px-4 py-2 font-sans text-[11px] text-text-muted';
@@ -108,26 +117,16 @@ export function RibbonEditor({
 
       <main className={editorSurfaceClassName}>
         <article aria-label="Editor surface" className={pageClassName}>
-          {importedHtmlSource ? (
-            <div
-              aria-label="Imported rich document"
-              className={importedContentClassName}
-              dangerouslySetInnerHTML={{ __html: importedHtmlSource }}
-            />
-          ) : (
-            <>
-              <h1 className={titleClassName}>Untitled rich note</h1>
-              <p className={placeholderClassName}>
-                Start from this visual shell while document loading, conversion, and persistence
-                arrive in later implementation plans.
-              </p>
-            </>
-          )}
+          <HtmlEditor
+            htmlSource={importedHtmlSource}
+            onDirtyStateChange={setIsHtmlSourceDirty}
+            onHtmlSourceChange={setEditableHtmlSource}
+          />
         </article>
       </main>
 
       <footer className={statusClassName}>
-        <span>Markdown mirror stays synchronized beside the LibreOffice-backed editor.</span>
+        <span aria-label="HTML source status">{htmlSourceStatusText}</span>
         <span aria-label="Active markdown file" className={filePathClassName}>
           {activeFileStatusText}
         </span>
