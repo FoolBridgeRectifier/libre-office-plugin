@@ -78,6 +78,17 @@ test('does not collect inline code inside fenced code blocks', () => {
   });
 });
 
+test('collects standard markdown image sources', () => {
+  const sourceFacts = collectMarkdownSourceFacts(
+    'Before ![Remote caption](https://example.com/image.png) after'
+  );
+
+  expect(sourceFacts.facts).toContainEqual({
+    text: '![Remote caption](https://example.com/image.png)',
+    type: 'markdown-image',
+  });
+});
+
 test('keeps source facts in markdown source order', () => {
   const sourceFacts = collectMarkdownSourceFacts('#tag before [[Note]] and ^block');
 

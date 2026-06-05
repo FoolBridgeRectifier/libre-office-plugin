@@ -2,7 +2,9 @@ import {
   getObsidianBlockMarkdown,
   getObsidianInlineMarkdown,
 } from '../../../obsidian-links/helpers';
+import { getAttachmentMarkdown, getTableMarkdown } from '../../../attachments/helpers';
 import { getStructuredMarkdownSource } from '../../../markdown-sync/helpers/markdown/structured-blocks/structuredBlocks';
+import { getCodeBlockMarkdown, getListMarkdown } from './helpers';
 
 function getInlineMarkdown(node: Node): string {
   if (node.nodeType === Node.TEXT_NODE) {
@@ -13,8 +15,13 @@ function getInlineMarkdown(node: Node): string {
     return '';
   }
 
+  const attachmentMarkdown = getAttachmentMarkdown(node);
   const obsidianMarkdown = getObsidianInlineMarkdown(node);
   const structuredMarkdownSource = getStructuredMarkdownSource(node);
+
+  if (attachmentMarkdown !== null) {
+    return attachmentMarkdown;
+  }
 
   if (obsidianMarkdown !== null) {
     return obsidianMarkdown;
@@ -49,32 +56,19 @@ function getInlineMarkdown(node: Node): string {
   return childMarkdown;
 }
 
-function getCodeBlockMarkdown(element: HTMLElement): string {
-  const codeElement = element.querySelector('code');
-  const languageClassName = Array.from(codeElement?.classList ?? []).find((className) =>
-    className.startsWith('language-')
-  );
-
-  const languageName = languageClassName?.replace(/^language-/, '') ?? '';
-
-  return `\`\`\`${languageName}\n${(codeElement ?? element).textContent ?? ''}\n\`\`\``;
-}
-
-function getListMarkdown(element: HTMLElement, isOrdered: boolean): string {
-  return Array.from(element.children)
-    .filter((childElement): childElement is HTMLElement => childElement instanceof HTMLElement)
-    .map((childElement, index) => {
-      const marker = isOrdered ? `${index + 1}.` : '-';
-      const checkboxPrefix = childElement.matches('[data-task="x"]') ? '[x] ' : '';
-
-      return `${marker} ${checkboxPrefix}${getInlineMarkdown(childElement).trim()}`;
-    })
-    .join('\n');
-}
-
 function getBlockMarkdown(element: HTMLElement): string {
+  const attachmentMarkdown = getAttachmentMarkdown(element);
+  const tableMarkdown = getTableMarkdown(element, getInlineMarkdown);
   const obsidianMarkdown = getObsidianBlockMarkdown(element);
   const structuredMarkdownSource = getStructuredMarkdownSource(element);
+
+  if (attachmentMarkdown !== null) {
+    return attachmentMarkdown;
+  }
+
+  if (tableMarkdown !== null) {
+    return tableMarkdown;
+  }
 
   if (obsidianMarkdown !== null) {
     return obsidianMarkdown;
@@ -104,7 +98,7 @@ function getBlockMarkdown(element: HTMLElement): string {
   }
 
   if (tagName === 'ul' || tagName === 'ol') {
-    return getListMarkdown(element, tagName === 'ol');
+    return getListMarkdown(element, tagName === 'ol', getInlineMarkdown);
   }
 
   if (tagName === 'blockquote') {

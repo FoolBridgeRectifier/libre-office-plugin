@@ -5,6 +5,7 @@ import {
   MARKDOWN_IMPORT_ARTICLE_ATTRIBUTE,
   MARKDOWN_IMPORT_ARTICLE_CLASS,
 } from '../../../constants';
+import { annotateAttachmentHtml, annotateTableHtml } from '../../../../attachments/helpers';
 import { annotateObsidianLinkHtml } from '../../../../obsidian-links/helpers';
 import { createFrontmatterTemplate, createProtectedJsonTemplate, escapeHtml } from '../helpers';
 import { splitFrontmatter } from '../markdown';
@@ -105,8 +106,15 @@ export async function convertMarkdownToHtmlWithObsidianRenderer(
 
   const linkAnnotatedBodyHtml = annotateObsidianLinkHtml(bodyHtml, sourceFacts.facts);
 
-  const annotatedBodyHtml = annotateStructuredMarkdownHtml(
+  const attachmentAnnotatedBodyHtml = annotateAttachmentHtml(
     linkAnnotatedBodyHtml,
+    sourceFacts.facts
+  );
+
+  const tableAnnotatedBodyHtml = annotateTableHtml(attachmentAnnotatedBodyHtml);
+
+  const annotatedBodyHtml = annotateStructuredMarkdownHtml(
+    tableAnnotatedBodyHtml,
     sourceFacts.facts
   );
 

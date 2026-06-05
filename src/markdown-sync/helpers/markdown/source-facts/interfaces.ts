@@ -15,6 +15,7 @@ export type MarkdownSourceFactType =
   | 'embed'
   | 'hard-break'
   | 'inline-code'
+  | 'markdown-image'
   | 'raw-html'
   | 'tag'
   | 'wikilink';

@@ -53,3 +53,28 @@ test('keeps unsupported comment markdown in protected raw blocks', async () => {
   expect(result.htmlSource).toContain('data-libre-protected="raw-markdown"');
   expect(result.htmlSource).toContain('data-libre-structured-markdown-source="%%secret%%"');
 });
+
+test('annotates rendered image attachments and tables', async () => {
+  const markdownRenderer: jest.MockedFunction<MarkdownBodyRenderer> = jest.fn(
+    async (_bodyMarkdown, containerElement, _sourcePath) => {
+      containerElement.innerHTML = [
+        '<span class="internal-embed image-embed"><img src="app://vault/image.png"></span>',
+        '<table><tr><th>Name</th></tr><tr><td>Alpha</td></tr></table>',
+        '<table><tr><td colspan="2">Merged</td></tr></table>',
+      ].join('');
+    }
+  );
+
+  const result = await convertMarkdownToHtmlWithObsidianRenderer(
+    ['![[image.png]]', '', '| Name |', '| --- |', '| Alpha |'].join('\n'),
+    { markdownRenderer, sourcePath: 'Attachments.md' }
+  );
+
+  expect(result.htmlSource).toContain('data-libre-attachment-source="![[image.png]]"');
+  expect(result.htmlSource).toContain('data-libre-attachment-path="image.png"');
+  expect(result.htmlSource).toContain('libre-table-scroll overflow-x-auto max-w-full');
+
+  expect(result.htmlSource).toContain('data-libre-table-kind="simple"');
+  expect(result.htmlSource).toContain('data-libre-table-kind="complex"');
+  expect(result.htmlSource).toContain('data-libre-protected="complex-table"');
+});

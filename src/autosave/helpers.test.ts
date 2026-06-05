@@ -125,6 +125,61 @@ test('exports untouched fallback link tokens as exact source markdown', () => {
   expect(convertHtmlToMarkdownMirror(htmlSource)).toBe('![[File.png]]');
 });
 
+test('exports annotated image attachments as Obsidian embeds', () => {
+  const htmlSource = [
+    '<article>',
+    '<span data-libre-attachment-source="![[image.png]]" data-libre-attachment-path="image.png">',
+    '<img alt="" src="app://vault/image.png">',
+    '</span>',
+    '</article>',
+  ].join('');
+
+  expect(convertHtmlToMarkdownMirror(htmlSource)).toBe('![[image.png]]');
+});
+
+test('exports renamed image attachment paths from rendered metadata', () => {
+  const htmlSource = [
+    '<article>',
+    '<span data-libre-attachment-source="![[Old image.png]]" data-href="Attachments/Renamed image.png">',
+    '<img alt="Preview caption" src="app://vault/Renamed%20image.png">',
+    '</span>',
+    '</article>',
+  ].join('');
+
+  expect(convertHtmlToMarkdownMirror(htmlSource)).toBe(
+    '![[Attachments/Renamed image.png|Preview caption]]'
+  );
+});
+
+test('exports simple html tables as markdown tables', () => {
+  const htmlSource = [
+    '<article>',
+    '<table>',
+    '<thead><tr><th>Name</th><th align="center">Value</th></tr></thead>',
+    '<tbody><tr><td>Alpha</td><td>A|B</td></tr></tbody>',
+    '</table>',
+    '</article>',
+  ].join('');
+
+  expect(convertHtmlToMarkdownMirror(htmlSource)).toBe(
+    ['| Name | Value |', '| --- | :---: |', '| Alpha | A\\|B |'].join('\n')
+  );
+});
+
+test('exports complex html tables as sanitized html fallback', () => {
+  const htmlSource = [
+    '<article>',
+    '<table data-libre-table-html-source="<table><tr><td rowspan=&quot;2&quot;>Merged</td></tr></table>">',
+    '<tr><td rowspan="2">Merged</td></tr>',
+    '</table>',
+    '</article>',
+  ].join('');
+
+  expect(convertHtmlToMarkdownMirror(htmlSource)).toBe(
+    '<table><tr><td rowspan="2">Merged</td></tr></table>'
+  );
+});
+
 test('does not emit empty markdown headings', () => {
   expect(convertHtmlToMarkdownMirror('<article><h2></h2><p>Body</p></article>')).toBe('Body');
 });

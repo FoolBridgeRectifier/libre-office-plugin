@@ -2,6 +2,7 @@ import {
   BLOCK_ID_SOURCE_PATTERN,
   COMMENT_SOURCE_PATTERN,
   HARD_BREAK_SOURCE_PATTERN,
+  MARKDOWN_IMAGE_SOURCE_PATTERN,
   RAW_HTML_SOURCE_PATTERN,
   TAG_SOURCE_PATTERN,
   WIKI_LINK_SOURCE_PATTERN,
@@ -78,6 +79,7 @@ export function collectMarkdownSourceFacts(markdownSource: string): MarkdownSour
 
   const facts = [
     ...collectPatternFacts(markdownSource, COMMENT_SOURCE_PATTERN, 'comment'),
+    ...collectPatternFacts(markdownSource, MARKDOWN_IMAGE_SOURCE_PATTERN, 'markdown-image'),
     ...collectWikiLinkFacts(markdownSource),
     ...calloutFacts,
     ...codeFenceFacts,
