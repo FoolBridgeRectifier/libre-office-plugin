@@ -22,6 +22,10 @@ export function getAutosaveTiming(options: AutosaveControllerOptions) {
   };
 }
 
+export function isAutosaveConflictError(error: unknown): boolean {
+  return error instanceof Error && error.message.includes('Libre Note Editor conflict');
+}
+
 export { convertHtmlToMarkdownMirror };
 
 export function createMarkdownMirrorSource(

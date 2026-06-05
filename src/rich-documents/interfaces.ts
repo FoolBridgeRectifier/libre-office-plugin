@@ -1,10 +1,26 @@
 export type RichDocumentActiveSource = 'markdown' | 'html' | 'odt';
 
+export interface RichDocumentConflictCopy {
+  readonly createdAt: string;
+  readonly path: string;
+  readonly source: RichDocumentConflictCopySource;
+}
+
+export type RichDocumentConflictCopySource = 'desktop' | 'html' | 'markdown' | 'mobile' | 'odt';
+
+export type RichDocumentConflictReason =
+  | 'manual-recovery'
+  | 'missing-rich-file'
+  | 'multi-source-change'
+  | 'timestamp-drift';
+
 export type RichDocumentConflictState =
   | { readonly status: 'none' }
   | {
+      readonly changedSources: ReadonlyArray<RichDocumentSourceKind>;
+      readonly conflictCopies: ReadonlyArray<RichDocumentConflictCopy>;
       readonly detectedAt: string;
-      readonly reason: 'timestamp-drift' | 'missing-rich-file' | 'manual-recovery';
+      readonly reason: RichDocumentConflictReason;
       readonly status: 'conflicted';
     };
 
@@ -29,6 +45,7 @@ export interface RichDocumentMapping {
   readonly markdownPath: string;
   readonly odtPath: string;
   readonly richDocumentId: string;
+  readonly sourceStates: RichDocumentSourceStates;
   readonly syncTimestamps: RichDocumentSyncTimestamps;
 }
 
@@ -69,7 +86,22 @@ export interface RichDocumentStorePatch {
   readonly activeSource?: RichDocumentActiveSource;
   readonly conflictState?: RichDocumentConflictState;
   readonly lastEditorPlatform?: RichDocumentEditorPlatform;
+  readonly sourceStates?: RichDocumentSourceStates;
   readonly syncTimestamps?: RichDocumentSyncTimestamps;
+}
+
+export type RichDocumentSourceKind = 'html' | 'markdown' | 'odt';
+
+export interface RichDocumentSourceState {
+  readonly contentHash: string | null;
+  readonly exists: boolean;
+  readonly modifiedTime: number | null;
+}
+
+export interface RichDocumentSourceStates {
+  readonly html: RichDocumentSourceState | null;
+  readonly markdown: RichDocumentSourceState | null;
+  readonly odt: RichDocumentSourceState | null;
 }
 
 export interface RichDocumentSyncTimestamps {
@@ -85,5 +117,8 @@ export interface RichDocumentVaultAdapter {
   mkdir(normalizedPath: string): Promise<void>;
   read(normalizedPath: string): Promise<string>;
   rename(normalizedPath: string, normalizedNewPath: string): Promise<void>;
+  stat?(
+    normalizedPath: string
+  ): Promise<{ readonly ctime?: number; readonly mtime?: number; readonly size?: number } | null>;
   write(normalizedPath: string, data: string): Promise<void>;
 }

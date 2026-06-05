@@ -4,8 +4,9 @@ import {
   isPathInsideRichDocumentsRoot,
   sanitizeRichDocumentId,
 } from '../paths/paths';
+import { normalizeConflictState } from './helpers/conflict/conflict';
+import { normalizeSourceStates } from './helpers/source-states/sourceStates';
 import type {
-  RichDocumentConflictState,
   RichDocumentMapping,
   RichDocumentPluginData,
   RichDocumentSyncTimestamps,
@@ -73,26 +74,10 @@ function normalizeRichDocumentMapping(value: unknown): RichDocumentMapping[] {
       markdownPath: value.markdownPath,
       odtPath: getSafePath(value.odtPath, richDocumentFilePaths.odtPath),
       richDocumentId,
+      sourceStates: normalizeSourceStates(value.sourceStates),
       syncTimestamps: normalizeSyncTimestamps(value.syncTimestamps),
     },
   ];
-}
-
-function normalizeConflictState(value: unknown): RichDocumentConflictState {
-  // Unknown conflict shapes are safer as non-conflicted than partially trusted data.
-  if (!isRecord(value) || value.status !== 'conflicted') {
-    return { status: 'none' };
-  }
-
-  return {
-    detectedAt: typeof value.detectedAt === 'string' ? value.detectedAt : '',
-    reason: getLiteral(
-      value.reason,
-      ['timestamp-drift', 'missing-rich-file', 'manual-recovery'],
-      'manual-recovery'
-    ),
-    status: 'conflicted',
-  };
 }
 
 function normalizeSyncTimestamps(value: unknown): RichDocumentSyncTimestamps {

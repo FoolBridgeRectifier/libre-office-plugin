@@ -1,8 +1,10 @@
 import type { TFile, ViewCreator } from 'obsidian';
 
+import type { AutosaveStatus } from '../autosave/interfaces';
 import type { ObsidianLinkWarning } from '../obsidian-links/interfaces';
 
 export interface EditorViewOptions {
+  getInitialAutosaveStatus?(file: TFile): Promise<AutosaveStatus>;
   getLinkWarnings(markdownPath: string, htmlSource: string): ReadonlyArray<ObsidianLinkWarning>;
   loadImportedHtmlSource(file: TFile): Promise<string | null>;
   saveHtmlSource(
@@ -14,8 +16,15 @@ export interface EditorViewOptions {
 }
 
 export interface EditorViewLoadedState {
+  readonly autosaveStatus: AutosaveStatus;
   readonly htmlSource: string | null;
   readonly linkWarningCount: number;
+}
+
+export interface EditorViewLoadedStateTarget {
+  autosaveStatus: AutosaveStatus;
+  importedHtmlSource: string | null;
+  linkWarningCount: number;
 }
 
 export interface FileTrackingView {

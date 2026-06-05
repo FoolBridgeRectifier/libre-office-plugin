@@ -23,7 +23,10 @@ import {
   saveRichDocumentHtml,
   syncMarkdownMirror,
 } from './helpers';
-import { loadRichDocumentHtmlForStore } from './helpers/rich-html/richHtml';
+import {
+  getInitialRichDocumentAutosaveStatus,
+  loadRichDocumentHtmlForStore,
+} from './helpers/rich-html/richHtml';
 import { collectObsidianLinkWarningsForApp } from './obsidian-links/helpers/resolver/resolver';
 import { createRichDocumentStore } from './rich-documents/richDocuments';
 import type { RichDocumentStore } from './rich-documents/interfaces';
@@ -46,6 +49,8 @@ export default class LibreNoteEditorPlugin extends Plugin {
       this,
       (workspaceLeaf) =>
         new EditorView(workspaceLeaf, {
+          getInitialAutosaveStatus: (file) =>
+            getInitialRichDocumentAutosaveStatus(file, richDocumentStore),
           getLinkWarnings: (markdownPath, htmlSource) =>
             collectObsidianLinkWarningsForApp(this.app, markdownPath, htmlSource),
           loadImportedHtmlSource: (file) => this.ensureRichDocumentHtml(file),
@@ -101,7 +106,6 @@ export default class LibreNoteEditorPlugin extends Plugin {
       name: OPEN_NATIVE_MARKDOWN_COMMAND_NAME,
     });
   }
-
   private registerMarkdownRoutingEvents() {
     this.registerEvent(
       this.app.workspace.on('file-open', (file) => {
@@ -130,7 +134,6 @@ export default class LibreNoteEditorPlugin extends Plugin {
       })
     );
   }
-
   private ensureMappingsForOpenMarkdownLeaves() {
     this.app.workspace.iterateAllLeaves((workspaceLeaf) => {
       void this.ensureRichDocumentHtml(getWorkspaceLeafFile(workspaceLeaf));

@@ -3,6 +3,7 @@ import { createRichDocumentFilePaths, sanitizeRichDocumentId } from '../paths/pa
 import type {
   RichDocumentEditorPlatform,
   RichDocumentMapping,
+  RichDocumentSourceStates,
   RichDocumentSyncTimestamps,
 } from '../../interfaces';
 
@@ -25,6 +26,7 @@ export function createRichDocumentMapping(
     markdownPath,
     odtPath: richDocumentFilePaths.odtPath,
     richDocumentId: sanitizeRichDocumentId(richDocumentId),
+    sourceStates: createEmptySourceStates(),
     syncTimestamps: createSyncTimestamps(timestamp),
   };
 }
@@ -60,5 +62,13 @@ function createSyncTimestamps(timestamp: string): RichDocumentSyncTimestamps {
     lastSyncedAt: timestamp,
     markdownSyncedAt: timestamp,
     odtSyncedAt: null,
+  };
+}
+
+function createEmptySourceStates(): RichDocumentSourceStates {
+  return {
+    html: null,
+    markdown: null,
+    odt: null,
   };
 }

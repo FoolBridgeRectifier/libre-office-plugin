@@ -18,11 +18,14 @@ export function createPersistenceTarget(pluginData: unknown = null) {
 export function createVaultAdapter(initialFiles: ReadonlyMap<string, string> = new Map()) {
   const files = new Map(initialFiles);
   const folders = new Set<string>();
+  const modifiedTimes = new Map<string, number>();
+
   const mkdirCalls: string[] = [];
   const renameCalls: Array<readonly [string, string]> = [];
 
   for (const filePath of files.keys()) {
     addFolderParents(folders, filePath);
+    modifiedTimes.set(filePath, 1);
   }
 
   const adapter: RichDocumentVaultAdapter = {
@@ -40,17 +43,28 @@ export function createVaultAdapter(initialFiles: ReadonlyMap<string, string> = n
     read: jest.fn(async (normalizedPath: string) => files.get(normalizedPath) ?? ''),
     rename: jest.fn(async (normalizedPath: string, normalizedNewPath: string) => {
       const fileText = files.get(normalizedPath);
+
       files.delete(normalizedPath);
       files.set(normalizedNewPath, fileText ?? '');
+
+      modifiedTimes.set(normalizedNewPath, modifiedTimes.get(normalizedPath) ?? 1);
+      modifiedTimes.delete(normalizedPath);
+
       renameCalls.push([normalizedPath, normalizedNewPath]);
+    }),
+    stat: jest.fn(async (normalizedPath: string) => {
+      const modifiedTime = modifiedTimes.get(normalizedPath);
+
+      return modifiedTime === undefined ? null : { mtime: modifiedTime };
     }),
     write: jest.fn(async (normalizedPath: string, data: string) => {
       addFolderParents(folders, normalizedPath);
       files.set(normalizedPath, data);
+      modifiedTimes.set(normalizedPath, (modifiedTimes.get(normalizedPath) ?? 1) + 1);
     }),
   };
 
-  return { adapter, files, folders, mkdirCalls, renameCalls };
+  return { adapter, files, folders, mkdirCalls, modifiedTimes, renameCalls };
 }
 
 export function createStore(pluginData: unknown = null) {

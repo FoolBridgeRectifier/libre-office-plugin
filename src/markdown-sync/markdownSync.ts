@@ -1,4 +1,5 @@
 import { HTML_FALLBACK_ACTIVE_SOURCE } from './constants';
+import { createSourceStates } from '../conflicts/helpers';
 import { convertMarkdownToHtmlWithObsidianRenderer } from './helpers';
 import { ensureVaultFolder } from '../rich-documents/helpers/vault/vault';
 import { createRichDocumentFilePaths } from '../rich-documents/helpers';
@@ -42,12 +43,15 @@ export async function ensureFirstMarkdownImport(
   // The hidden rich-document folder is created lazily on the first markdown import.
   await ensureVaultFolder(options.vaultAdapter, richDocumentFilePaths.folderPath);
   await options.vaultAdapter.write(options.mapping.htmlPath, markdownToHtmlResult.htmlSource);
+  const sourceStates = await createSourceStates(options.mapping, options.vaultAdapter);
 
   // After import, the rich HTML file becomes the active editable source for this note.
   const importedMapping = await options.richDocumentStore.updateMapping(
     options.mapping.markdownPath,
     {
       activeSource: HTML_FALLBACK_ACTIVE_SOURCE,
+      conflictState: { status: 'none' },
+      sourceStates,
       syncTimestamps: {
         ...options.mapping.syncTimestamps,
         htmlSyncedAt: currentTimestamp,

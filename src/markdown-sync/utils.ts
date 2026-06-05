@@ -51,6 +51,11 @@ export function createVaultReader(markdownSource: string) {
 export function createVaultAdapter(initialFiles: ReadonlyMap<string, string> = new Map()) {
   const files = new Map(initialFiles);
   const folders = new Set<string>();
+  const modifiedTimes = new Map<string, number>();
+
+  for (const filePath of files.keys()) {
+    modifiedTimes.set(filePath, 1);
+  }
 
   const adapter: RichDocumentVaultAdapter = {
     exists: jest.fn(
@@ -62,10 +67,16 @@ export function createVaultAdapter(initialFiles: ReadonlyMap<string, string> = n
     }),
     read: jest.fn(async (normalizedPath: string) => files.get(normalizedPath) ?? ''),
     rename: jest.fn(),
+    stat: jest.fn(async (normalizedPath: string) => {
+      const modifiedTime = modifiedTimes.get(normalizedPath);
+
+      return modifiedTime === undefined ? null : { mtime: modifiedTime };
+    }),
     write: jest.fn(async (normalizedPath: string, data: string) => {
       files.set(normalizedPath, data);
+      modifiedTimes.set(normalizedPath, (modifiedTimes.get(normalizedPath) ?? 1) + 1);
     }),
   };
 
-  return { adapter, files, folders };
+  return { adapter, files, folders, modifiedTimes };
 }

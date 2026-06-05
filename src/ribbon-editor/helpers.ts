@@ -71,6 +71,8 @@ export function getCommandIcon(commandIconName: string) {
 
 export function getAutosaveStatusText(autosaveStatus: AutosaveStatus): string {
   switch (autosaveStatus) {
+    case 'conflicted':
+      return 'Conflict detected';
     case 'dirty':
       return 'Unsaved HTML changes';
     case 'error':

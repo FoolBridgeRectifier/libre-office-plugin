@@ -1,4 +1,10 @@
-export type AutosaveStatus = 'dirty' | 'error' | 'saved' | 'saving' | 'syncing-markdown';
+export type AutosaveStatus =
+  | 'conflicted'
+  | 'dirty'
+  | 'error'
+  | 'saved'
+  | 'saving'
+  | 'syncing-markdown';
 
 export type AutosaveTimerHandle = ReturnType<typeof setTimeout>;
 

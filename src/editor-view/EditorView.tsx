@@ -7,6 +7,7 @@ import { LIBRE_MARKDOWN_VIEW_TYPE } from './constants';
 import { createEditorViewAutosaveController } from './helpers';
 import { createEditorViewAppElement } from './helpers/app-element/appElement';
 import {
+  applyEditorViewLoadedState,
   getEditorViewLinkWarningCount,
   loadEditorViewLoadedState,
   setEditorViewAutosaveDocument,
@@ -16,11 +17,11 @@ import type { EditorViewOptions } from './interfaces';
 
 export class EditorView extends FileView {
   allowNoFile = true;
+  autosaveStatus: AutosaveStatus = 'saved';
+  importedHtmlSource: string | null = null;
+  linkWarningCount = 0;
   private activeMarkdownFile: TFile | null = null;
-  private autosaveStatus: AutosaveStatus = 'saved';
   private readonly autosaveController: AutosaveController;
-  private importedHtmlSource: string | null = null;
-  private linkWarningCount = 0;
   private reactRoot: Root | null = null;
   private readonly editorViewOptions: EditorViewOptions;
 
@@ -59,10 +60,11 @@ export class EditorView extends FileView {
     this.activeMarkdownFile = file;
 
     const loadedState = await loadEditorViewLoadedState(this.editorViewOptions, file);
-    this.importedHtmlSource = loadedState.htmlSource;
-    this.linkWarningCount = loadedState.linkWarningCount;
+
+    applyEditorViewLoadedState(this, loadedState);
 
     setEditorViewAutosaveDocument(this.autosaveController, file, this.importedHtmlSource);
+    this.autosaveStatus = loadedState.autosaveStatus;
     this.renderReactApp();
   }
   async onRename(file: TFile): Promise<void> {
@@ -70,10 +72,10 @@ export class EditorView extends FileView {
       const loadedState = await loadEditorViewLoadedState(this.editorViewOptions, file);
 
       this.activeMarkdownFile = file;
-      this.importedHtmlSource = loadedState.htmlSource;
-      this.linkWarningCount = loadedState.linkWarningCount;
+      applyEditorViewLoadedState(this, loadedState);
 
       setEditorViewAutosaveDocument(this.autosaveController, file, this.importedHtmlSource);
+      this.autosaveStatus = loadedState.autosaveStatus;
       this.renderReactApp();
     }
   }
@@ -133,7 +135,6 @@ export class EditorView extends FileView {
 
     this.autosaveController.handleHtmlSourceChange(htmlSource);
   };
-
   private renderReactApp() {
     this.reactRoot?.render(
       createEditorViewAppElement(

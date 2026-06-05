@@ -49,7 +49,8 @@ beforeEach(() => {
 
 function createEditorView(
   loadImportedHtmlSource = jest.fn(async () => '<article>Loaded</article>'),
-  getLinkWarnings: EditorViewOptions['getLinkWarnings'] = jest.fn(() => [])
+  getLinkWarnings: EditorViewOptions['getLinkWarnings'] = jest.fn(() => []),
+  getInitialAutosaveStatus?: EditorViewOptions['getInitialAutosaveStatus']
 ) {
   const options: EditorViewOptions = {
     getLinkWarnings,
@@ -57,6 +58,10 @@ function createEditorView(
     saveHtmlSource: jest.fn(),
     syncMarkdownMirror: jest.fn(),
   };
+
+  if (getInitialAutosaveStatus) {
+    options.getInitialAutosaveStatus = getInitialAutosaveStatus;
+  }
 
   return new EditorView({} as WorkspaceLeaf, options);
 }
@@ -103,6 +108,23 @@ test('passes unresolved link warning count to the React app', async () => {
   expect(mockReactRoot.render).toHaveBeenLastCalledWith(
     expect.objectContaining({
       props: expect.objectContaining({ linkWarningCount: 1 }),
+    })
+  );
+});
+
+test('shows persisted conflict status when loading a conflicted markdown file', async () => {
+  const editorView = createEditorView(
+    undefined,
+    undefined,
+    jest.fn(async () => 'conflicted')
+  );
+
+  await (editorView as EditorView & { onOpen(): Promise<void> }).onOpen();
+  await editorView.onLoadFile(createFile('Conflicted.md', 'md'));
+
+  expect(mockReactRoot.render).toHaveBeenLastCalledWith(
+    expect.objectContaining({
+      props: expect.objectContaining({ autosaveStatus: 'conflicted' }),
     })
   );
 });

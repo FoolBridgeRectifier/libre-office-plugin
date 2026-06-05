@@ -1,4 +1,4 @@
-import { clearAutosaveTimer, getAutosaveTiming } from './helpers';
+import { clearAutosaveTimer, getAutosaveTiming, isAutosaveConflictError } from './helpers';
 import type {
   AutosaveController,
   AutosaveControllerOptions,
@@ -84,8 +84,8 @@ export function createAutosaveController(options: AutosaveControllerOptions): Au
       if (pendingHtmlSource !== null) {
         scheduleAutosave();
       }
-    } catch {
-      setStatus('error');
+    } catch (error) {
+      setStatus(isAutosaveConflictError(error) ? 'conflicted' : 'error');
       scheduleRetry();
     } finally {
       saveInFlight = null;
@@ -108,8 +108,8 @@ export function createAutosaveController(options: AutosaveControllerOptions): Au
       });
 
       setStatus(pendingHtmlSource === null ? 'saved' : 'dirty');
-    } catch {
-      setStatus('error');
+    } catch (error) {
+      setStatus(isAutosaveConflictError(error) ? 'conflicted' : 'error');
       scheduleRetry();
     }
   };
