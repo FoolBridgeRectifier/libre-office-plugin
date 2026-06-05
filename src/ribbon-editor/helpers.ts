@@ -10,6 +10,7 @@ import {
 } from '@fluentui/react-icons';
 import classNames from 'classnames';
 
+import type { AutosaveStatus } from '../autosave/interfaces';
 import type { RibbonTabDefinition } from './interfaces';
 
 export function findRibbonTab(
@@ -65,6 +66,21 @@ export function getCommandIcon(commandIconName: string) {
       return Table24Regular;
     default:
       return Eye24Regular;
+  }
+}
+
+export function getAutosaveStatusText(autosaveStatus: AutosaveStatus): string {
+  switch (autosaveStatus) {
+    case 'dirty':
+      return 'Unsaved HTML changes';
+    case 'error':
+      return 'Autosave error';
+    case 'saving':
+      return 'Saving HTML';
+    case 'syncing-markdown':
+      return 'Syncing markdown';
+    case 'saved':
+      return 'HTML source saved';
   }
 }
 

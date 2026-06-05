@@ -1,6 +1,11 @@
 import { Eye24Regular, TextBold24Regular } from '@fluentui/react-icons';
 
-import { findRibbonTab, getCommandButtonClassName, getCommandIcon } from './helpers';
+import {
+  findRibbonTab,
+  getAutosaveStatusText,
+  getCommandButtonClassName,
+  getCommandIcon,
+} from './helpers';
 import type { RibbonTabDefinition } from './interfaces';
 
 const ribbonTabs: ReadonlyArray<RibbonTabDefinition> = [
@@ -33,4 +38,13 @@ test('uses known command icons and preview as the unknown fallback', () => {
 test('marks disabled command buttons with disabled text styling', () => {
   expect(getCommandButtonClassName(true)).toContain('text-text-disabled');
   expect(getCommandButtonClassName(false)).toContain('hover:bg-button-hover-bg');
+});
+
+test('maps autosave statuses to footer text', () => {
+  expect(getAutosaveStatusText('dirty')).toBe('Unsaved HTML changes');
+  expect(getAutosaveStatusText('error')).toBe('Autosave error');
+  expect(getAutosaveStatusText('saved')).toBe('HTML source saved');
+
+  expect(getAutosaveStatusText('saving')).toBe('Saving HTML');
+  expect(getAutosaveStatusText('syncing-markdown')).toBe('Syncing markdown');
 });

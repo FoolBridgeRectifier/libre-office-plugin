@@ -6,6 +6,7 @@ import type { HtmlEditorProps } from './interfaces';
 export function HtmlEditor({
   htmlSource,
   initializationError = null,
+  onEditorBlur,
   onDirtyStateChange,
   onHtmlSourceChange,
 }: HtmlEditorProps) {
@@ -88,6 +89,7 @@ export function HtmlEditor({
       aria-label="Local HTML editor"
       className={editorClassName}
       contentEditable
+      onBlur={onEditorBlur}
       onInput={handleEditorInput}
       ref={editorElementRef}
       role="textbox"

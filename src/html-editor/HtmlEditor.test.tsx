@@ -48,6 +48,18 @@ test('emits changed html source and dirty state on editor input', () => {
   expect(handleDirtyStateChange).toHaveBeenLastCalledWith(true);
 });
 
+test('emits editor blur for immediate autosave', () => {
+  const handleEditorBlur = jest.fn();
+
+  render(
+    <HtmlEditor htmlSource="<article><p>Blur</p></article>" onEditorBlur={handleEditorBlur} />
+  );
+
+  fireEvent.blur(screen.getByRole('textbox', { name: 'Local HTML editor' }));
+
+  expect(handleEditorBlur).toHaveBeenCalledTimes(1);
+});
+
 test('renders protected raw blocks as read-only editor content', () => {
   render(
     <HtmlEditor htmlSource='<article><pre data-libre-protected="raw-markdown"># Raw</pre></article>' />

@@ -128,7 +128,7 @@ test('detaches Libre leaves on plugin unload', async () => {
   const plugin = new LibreNoteEditorPlugin(...createPluginMockArguments(vault, workspace));
 
   await plugin.onload();
-  plugin.onunload();
+  await plugin.onunload();
 
   expect(libreLeaf.detach).toHaveBeenCalledTimes(1);
 });

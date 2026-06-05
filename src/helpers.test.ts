@@ -1,4 +1,10 @@
-import { registerRichDocumentMappingEvents } from './helpers';
+import {
+  registerRichDocumentMappingEvents,
+  saveRichDocumentHtml,
+  syncMarkdownMirror,
+} from './helpers';
+import { createRichDocumentMapping } from './rich-documents/helpers';
+import { createStore, createVaultAdapter } from './markdown-sync/utils';
 import type { RichDocumentStore } from './rich-documents/interfaces';
 
 function createStoreMock(): RichDocumentStore {
@@ -69,4 +75,40 @@ test('deletes rich document mappings only for deleted markdown files', () => {
 
   expect(richDocumentStore.deleteMapping).toHaveBeenCalledTimes(1);
   expect(richDocumentStore.deleteMapping).toHaveBeenCalledWith('Folder/Deleted.md');
+});
+
+test('does not blindly overwrite externally changed html source', async () => {
+  const mapping = createRichDocumentMapping('Note.md', 'rich-note', '2026-06-04', 'desktop');
+  const richDocumentStore = createStore(mapping);
+  const vault = createVaultAdapter(new Map([[mapping.htmlPath, '<article>External</article>']]));
+
+  await expect(
+    saveRichDocumentHtml({
+      htmlSource: '<article>Local</article>',
+      markdownPath: 'Note.md',
+      previousHtmlSource: '<article>Previous</article>',
+      richDocumentStore,
+      vaultAdapter: vault.adapter,
+    })
+  ).rejects.toThrow('HTML source changed outside Libre Note Editor.');
+
+  expect(vault.files.get(mapping.htmlPath)).toBe('<article>External</article>');
+});
+
+test('syncs markdown mirror while preserving frontmatter', async () => {
+  const mapping = createRichDocumentMapping('Note.md', 'rich-note', '2026-06-04', 'desktop');
+  const richDocumentStore = createStore(mapping);
+
+  const vault = createVaultAdapter(new Map([['Note.md', '---\ntags: [libre]\n---\n\nOld body']]));
+
+  await syncMarkdownMirror({
+    htmlSource: '<article><h1>Title</h1><p>Body with <strong>bold</strong>.</p></article>',
+    markdownPath: 'Note.md',
+    richDocumentStore,
+    vaultAdapter: vault.adapter,
+  });
+
+  expect(vault.files.get('Note.md')).toBe(
+    '---\ntags: [libre]\n---\n\n# Title\n\nBody with **bold**.'
+  );
 });

@@ -41,11 +41,26 @@ test('shows future insert commands as disabled controls', () => {
   ).toBeDisabled();
 });
 
-test('marks html source dirty when the local editor changes', () => {
+test('shows dirty autosave status from the editor view', () => {
+  render(
+    <RibbonEditor
+      activeFilePath="Dirty.md"
+      autosaveStatus="dirty"
+      importedHtmlSource="<article><p>Original body</p></article>"
+    />
+  );
+
+  expect(screen.getByLabelText('HTML source status')).toHaveTextContent('Unsaved HTML changes');
+});
+
+test('emits changed html source from the local editor', () => {
+  const handleHtmlSourceChange = jest.fn();
+
   render(
     <RibbonEditor
       activeFilePath="Dirty.md"
       importedHtmlSource="<article><p>Original body</p></article>"
+      onHtmlSourceChange={handleHtmlSourceChange}
     />
   );
 
@@ -54,5 +69,5 @@ test('marks html source dirty when the local editor changes', () => {
   editorElement.innerHTML = '<article><p>Changed body</p></article>';
   fireEvent.input(editorElement);
 
-  expect(screen.getByLabelText('HTML source status')).toHaveTextContent('Unsaved HTML changes');
+  expect(handleHtmlSourceChange).toHaveBeenCalledWith('<article><p>Changed body</p></article>');
 });

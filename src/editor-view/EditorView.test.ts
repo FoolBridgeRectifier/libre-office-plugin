@@ -3,8 +3,9 @@ import { createRoot } from 'react-dom/client';
 import { App } from '../App';
 import { LIBRE_MARKDOWN_VIEW_TYPE } from './constants';
 import { EditorView } from './EditorView';
+import { createFile } from './utils';
 import type { EditorViewOptions } from './interfaces';
-import type { TFile, ViewStateResult, WorkspaceLeaf } from 'obsidian';
+import type { ViewStateResult, WorkspaceLeaf } from 'obsidian';
 
 const mockReactRoot = {
   render: jest.fn(),
@@ -46,19 +47,14 @@ beforeEach(() => {
   jest.clearAllMocks();
 });
 
-function createMarkdownFile(path: string): TFile {
-  return {
-    basename: path.replace(/\.md$/i, ''),
-    extension: 'md',
-    name: path.split('/').pop() ?? path,
-    path,
-  } as TFile;
-}
-
 function createEditorView(
   loadImportedHtmlSource = jest.fn(async () => '<article>Loaded</article>')
 ) {
-  const options: EditorViewOptions = { loadImportedHtmlSource };
+  const options: EditorViewOptions = {
+    loadImportedHtmlSource,
+    saveHtmlSource: jest.fn(),
+    syncMarkdownMirror: jest.fn(),
+  };
 
   return new EditorView({} as WorkspaceLeaf, options);
 }
@@ -77,7 +73,7 @@ test('exposes Obsidian FileView metadata for markdown panes', () => {
 });
 
 test('renders imported html for loaded markdown files', async () => {
-  const markdownFile = createMarkdownFile('Folder/Loaded.md');
+  const markdownFile = createFile('Folder/Loaded.md', 'md');
   const loadImportedHtmlSource = jest.fn(async () => '<article>Loaded</article>');
   const editorView = createEditorView(loadImportedHtmlSource);
 
@@ -92,13 +88,16 @@ test('opens and closes the React root inside the Obsidian content element', asyn
   const editorView = createEditorView();
 
   await (editorView as EditorView & { onOpen(): Promise<void> }).onOpen();
-  await editorView.onLoadFile(createMarkdownFile('Open.md'));
+  await editorView.onLoadFile(createFile('Open.md', 'md'));
 
   expect(createRoot).toHaveBeenCalledWith(editorView.contentEl);
 
   expect(mockReactRoot.render).toHaveBeenLastCalledWith(
     expect.objectContaining({
-      props: { activeFilePath: 'Open.md', importedHtmlSource: '<article>Loaded</article>' },
+      props: expect.objectContaining({
+        activeFilePath: 'Open.md',
+        importedHtmlSource: '<article>Loaded</article>',
+      }),
       type: App,
     })
   );
@@ -112,14 +111,17 @@ test('opens and closes the React root inside the Obsidian content element', asyn
 test('ignores unsupported files and clears state on unload', async () => {
   const loadImportedHtmlSource = jest.fn();
   const editorView = createEditorView(loadImportedHtmlSource);
-  const textFile = { ...createMarkdownFile('Unsupported.txt'), extension: 'txt' } as TFile;
+  const textFile = createFile('Unsupported.txt', 'txt');
 
   await (editorView as EditorView & { onOpen(): Promise<void> }).onOpen();
   await editorView.onLoadFile(textFile);
 
   expect(loadImportedHtmlSource).not.toHaveBeenCalled();
+
   expect(mockReactRoot.render).toHaveBeenLastCalledWith(
-    expect.objectContaining({ props: { activeFilePath: null, importedHtmlSource: null } })
+    expect.objectContaining({
+      props: expect.objectContaining({ activeFilePath: null, importedHtmlSource: null }),
+    })
   );
 
   await editorView.onUnloadFile(textFile);
@@ -140,9 +142,9 @@ test('reloads html only for the active renamed markdown file', async () => {
   const loadImportedHtmlSource = jest.fn(async () => '<article>Loaded</article>');
   const editorView = createEditorView(loadImportedHtmlSource);
 
-  await editorView.onLoadFile(createMarkdownFile('Same.md'));
-  await editorView.onRename(createMarkdownFile('Other.md'));
-  await editorView.onRename(createMarkdownFile('Same.md'));
+  await editorView.onLoadFile(createFile('Same.md', 'md'));
+  await editorView.onRename(createFile('Other.md', 'md'));
+  await editorView.onRename(createFile('Same.md', 'md'));
 
   expect(loadImportedHtmlSource).toHaveBeenCalledTimes(2);
 });

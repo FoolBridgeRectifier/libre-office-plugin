@@ -1,3 +1,5 @@
+import type { AutosaveStatus } from '../autosave/interfaces';
+
 export interface RibbonCommandDefinition {
   readonly description: string;
   readonly disabled?: boolean;
@@ -21,5 +23,8 @@ export interface RibbonTabDefinition {
 
 export interface RibbonEditorProps {
   readonly activeFilePath?: string | null;
+  readonly autosaveStatus?: AutosaveStatus;
   readonly importedHtmlSource?: string | null;
+  readonly onEditorBlur?: () => void;
+  readonly onHtmlSourceChange?: (htmlSource: string) => void;
 }

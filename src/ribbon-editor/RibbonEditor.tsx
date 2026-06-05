@@ -4,6 +4,7 @@ import { HtmlEditor } from '../html-editor/HtmlEditor';
 import { DEFAULT_RIBBON_TAB_ID, RIBBON_TABS } from './constants';
 import {
   findRibbonTab,
+  getAutosaveStatusText,
   getCommandButtonClassName,
   getCommandIcon,
   getTabButtonClassName,
@@ -12,25 +13,28 @@ import type { RibbonEditorProps } from './interfaces';
 
 export function RibbonEditor({
   activeFilePath = null,
+  autosaveStatus = 'saved',
   importedHtmlSource = null,
+  onEditorBlur,
+  onHtmlSourceChange,
 }: RibbonEditorProps) {
   const [activeRibbonTabId, setActiveRibbonTabId] = useState(DEFAULT_RIBBON_TAB_ID);
   const [editableHtmlSource, setEditableHtmlSource] = useState(importedHtmlSource);
-  const [isHtmlSourceDirty, setIsHtmlSourceDirty] = useState(false);
 
   const activeRibbonTabDefinition = findRibbonTab(RIBBON_TABS, activeRibbonTabId);
   const activeFileStatusText = activeFilePath ?? 'No markdown file loaded yet.';
 
-  const htmlSourceStatusText = isHtmlSourceDirty
-    ? 'Unsaved HTML changes'
-    : editableHtmlSource === null
-      ? 'No HTML source loaded'
-      : 'HTML source saved';
+  const htmlSourceStatusText =
+    editableHtmlSource === null ? 'No HTML source loaded' : getAutosaveStatusText(autosaveStatus);
 
   useEffect(() => {
     setEditableHtmlSource(importedHtmlSource);
-    setIsHtmlSourceDirty(false);
   }, [importedHtmlSource]);
+
+  const handleHtmlSourceChange = (htmlSource: string) => {
+    setEditableHtmlSource(htmlSource);
+    onHtmlSourceChange?.(htmlSource);
+  };
 
   const shellClassName =
     'flex h-full min-h-[480px] flex-col overflow-hidden bg-ribbon-bg font-sans text-text-primary';
@@ -119,8 +123,8 @@ export function RibbonEditor({
         <article aria-label="Editor surface" className={pageClassName}>
           <HtmlEditor
             htmlSource={importedHtmlSource}
-            onDirtyStateChange={setIsHtmlSourceDirty}
-            onHtmlSourceChange={setEditableHtmlSource}
+            onHtmlSourceChange={handleHtmlSourceChange}
+            {...(onEditorBlur ? { onEditorBlur } : {})}
           />
         </article>
       </main>
