@@ -2,14 +2,16 @@ import { useState } from 'react';
 
 import { ConflictRecoveryPanel } from '../conflict-recovery/ConflictRecovery';
 import { HtmlEditor } from '../html-editor/HtmlEditor';
+import { createSkippedMobileRuntimeSetupState } from '../office-runtime/helpers/setup-state/setupState';
 import { DEFAULT_RIBBON_TAB_ID, RIBBON_TABS } from './constants';
+import { StatusFooter } from './helpers/status-footer/StatusFooter';
+import { RibbonTabBar } from './helpers/tab-bar/TabBar';
 import {
   findRibbonTab,
   getAutosaveStatusText,
   getCommandButtonClassName,
   getCommandIcon,
   getLinkWarningStatusText,
-  getTabButtonClassName,
 } from './helpers';
 import type { RibbonEditorProps } from './interfaces';
 
@@ -19,6 +21,7 @@ export function RibbonEditor({
   importedHtmlSource = null,
   isResolvingConflict = false,
   linkWarningCount = 0,
+  officeRuntimeSetupState = createSkippedMobileRuntimeSetupState(),
   onEditorBlur,
   onHtmlSourceChange,
   onResolveConflict,
@@ -26,20 +29,15 @@ export function RibbonEditor({
   const [activeRibbonTabId, setActiveRibbonTabId] = useState(DEFAULT_RIBBON_TAB_ID);
 
   const activeRibbonTabDefinition = findRibbonTab(RIBBON_TABS, activeRibbonTabId);
-  const activeFileStatusText = activeFilePath ?? 'No markdown file loaded yet.';
 
   const htmlSourceStatusText =
     importedHtmlSource === null ? 'No HTML source loaded' : getAutosaveStatusText(autosaveStatus);
-  const linkWarningStatusText = getLinkWarningStatusText(linkWarningCount);
 
   const shouldShowConflictRecovery =
     autosaveStatus === 'conflicted' && onResolveConflict !== undefined;
 
-  const handleHtmlSourceChange = (htmlSource: string) => onHtmlSourceChange?.(htmlSource);
-
   const shellClassName =
     'flex h-full min-h-[480px] flex-col overflow-hidden bg-ribbon-bg font-sans text-text-primary';
-  const tabBarClassName = 'flex overflow-x-auto bg-ribbon-purple shadow-ribbon-raised';
 
   const ribbonBodyClassName =
     'flex flex-wrap gap-0 border-b border-ribbon-border bg-ribbon-bg px-2 py-2 shadow-ribbon-raised';
@@ -62,25 +60,10 @@ export function RibbonEditor({
 
   return (
     <section aria-label="Libre Note Editor" className={shellClassName}>
-      <nav aria-label="Ribbon tabs" className={tabBarClassName}>
-        {RIBBON_TABS.map((ribbonTabDefinition) => {
-          const isActiveRibbonTab = ribbonTabDefinition.id === activeRibbonTabId;
-          const tabButtonClassName = getTabButtonClassName(isActiveRibbonTab);
-          const handleTabClick = () => setActiveRibbonTabId(ribbonTabDefinition.id);
-
-          return (
-            <button
-              aria-pressed={isActiveRibbonTab}
-              className={tabButtonClassName}
-              key={ribbonTabDefinition.id}
-              onClick={handleTabClick}
-              type="button"
-            >
-              {ribbonTabDefinition.label}
-            </button>
-          );
-        })}
-      </nav>
+      <RibbonTabBar
+        activeRibbonTabId={activeRibbonTabId}
+        onActiveRibbonTabChange={setActiveRibbonTabId}
+      />
 
       <div
         aria-label={`${activeRibbonTabDefinition.label} commands`}
@@ -131,19 +114,20 @@ export function RibbonEditor({
         <article aria-label="Editor surface" className={pageClassName}>
           <HtmlEditor
             htmlSource={importedHtmlSource}
-            onHtmlSourceChange={handleHtmlSourceChange}
             {...(onEditorBlur ? { onEditorBlur } : {})}
+            {...(onHtmlSourceChange ? { onHtmlSourceChange } : {})}
           />
         </article>
       </main>
 
-      <footer className={statusClassName}>
-        <span aria-label="HTML source status">{htmlSourceStatusText}</span>
-        <span aria-label="Obsidian link warnings">{linkWarningStatusText}</span>
-        <span aria-label="Active markdown file" className={filePathClassName}>
-          {activeFileStatusText}
-        </span>
-      </footer>
+      <StatusFooter
+        activeFilePath={activeFilePath}
+        filePathClassName={filePathClassName}
+        htmlSourceStatusText={htmlSourceStatusText}
+        linkWarningStatusText={getLinkWarningStatusText(linkWarningCount)}
+        officeRuntimeSetupState={officeRuntimeSetupState}
+        statusClassName={statusClassName}
+      />
     </section>
   );
 }

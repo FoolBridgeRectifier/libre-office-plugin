@@ -1,4 +1,5 @@
 import { RibbonEditor } from './ribbon-editor/RibbonEditor';
+import { createSkippedMobileRuntimeSetupState } from './office-runtime/helpers/setup-state/setupState';
 import type { AppProps } from './interfaces';
 
 export function App({
@@ -7,6 +8,7 @@ export function App({
   importedHtmlSource = null,
   isResolvingConflict = false,
   linkWarningCount = 0,
+  officeRuntimeSetupState = createSkippedMobileRuntimeSetupState(),
   onEditorBlur,
   onHtmlSourceChange,
   onResolveConflict,
@@ -18,6 +20,7 @@ export function App({
       importedHtmlSource={importedHtmlSource}
       isResolvingConflict={isResolvingConflict}
       linkWarningCount={linkWarningCount}
+      officeRuntimeSetupState={officeRuntimeSetupState}
       {...(onEditorBlur ? { onEditorBlur } : {})}
       {...(onHtmlSourceChange ? { onHtmlSourceChange } : {})}
       {...(onResolveConflict ? { onResolveConflict } : {})}

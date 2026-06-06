@@ -1,4 +1,4 @@
-import { Plugin, type TFile, type WorkspaceLeaf } from 'obsidian';
+import { Platform, Plugin, type TFile, type WorkspaceLeaf } from 'obsidian';
 
 import { EditorView } from './editor-view/EditorView';
 import {
@@ -20,14 +20,33 @@ import { registerEditorViewLinkWarningRefresh } from './editor-view/helpers/link
 import { createRichDocumentEditorViewOptions } from './editor-view/helpers/options/options';
 import { flushOpenLibreEditors, registerRichDocumentMappingEvents } from './helpers';
 import { loadRichDocumentHtmlForStore } from './helpers/rich-html/richHtml';
+import { getConfiguredOfficeRuntimePath } from './office-runtime/helpers';
+import {
+  getBundledOfficeRuntimeRootPath,
+  getCurrentOfficeRuntimeOperatingSystem,
+  getPluginManifestDirectory,
+} from './office-runtime/helpers/platform/platform';
+import { createSkippedMobileRuntimeSetupState } from './office-runtime/helpers/setup-state/setupState';
+import { detectOfficeRuntime } from './office-runtime/officeRuntime';
+import type { OfficeRuntimeSetupState } from './office-runtime/interfaces';
 import { createRichDocumentStore } from './rich-documents/richDocuments';
 import type { RichDocumentStore } from './rich-documents/interfaces';
 import '../styles.css';
 export default class LibreNoteEditorPlugin extends Plugin {
   private nativeFallbackLeaves = new WeakSet<WorkspaceLeaf>();
+  private officeRuntimeSetupState: OfficeRuntimeSetupState = createSkippedMobileRuntimeSetupState();
   private richDocumentStore: RichDocumentStore | null = null;
 
   async onload(): Promise<void> {
+    const pluginData = await this.loadData();
+
+    this.officeRuntimeSetupState = await detectOfficeRuntime({
+      bundledRootPath: getBundledOfficeRuntimeRootPath(getPluginManifestDirectory(this)),
+      configuredPath: getConfiguredOfficeRuntimePath(pluginData),
+      operatingSystem: getCurrentOfficeRuntimeOperatingSystem(Platform),
+      platform: Platform.isMobile ? 'mobile' : 'desktop',
+    });
+
     this.richDocumentStore = createRichDocumentStore({
       lastEditorPlatform: 'desktop',
       persistenceTarget: this,
@@ -42,7 +61,11 @@ export default class LibreNoteEditorPlugin extends Plugin {
       (workspaceLeaf) =>
         new EditorView(
           workspaceLeaf,
-          createRichDocumentEditorViewOptions(this.app, richDocumentStore)
+          createRichDocumentEditorViewOptions(
+            this.app,
+            richDocumentStore,
+            () => this.officeRuntimeSetupState
+          )
         )
     );
 

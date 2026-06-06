@@ -1,5 +1,6 @@
 import type { AutosaveStatus } from '../autosave/interfaces';
 import type { ConflictResolutionChoice } from '../conflicts/interfaces';
+import type { OfficeRuntimeSetupState } from '../office-runtime/interfaces';
 
 export interface RibbonCommandDefinition {
   readonly description: string;
@@ -28,6 +29,7 @@ export interface RibbonEditorProps {
   readonly importedHtmlSource?: string | null;
   readonly isResolvingConflict?: boolean;
   readonly linkWarningCount?: number;
+  readonly officeRuntimeSetupState?: OfficeRuntimeSetupState;
   readonly onEditorBlur?: () => void;
   readonly onHtmlSourceChange?: (htmlSource: string) => void;
   readonly onResolveConflict?: (choice: ConflictResolutionChoice) => void;

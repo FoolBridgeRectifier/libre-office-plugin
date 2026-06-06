@@ -2,9 +2,11 @@ import type { TFile, ViewCreator } from 'obsidian';
 
 import type { AutosaveController, AutosaveStatus } from '../autosave/interfaces';
 import type { ConflictResolutionChoice } from '../conflicts/interfaces';
+import type { OfficeRuntimeSetupState } from '../office-runtime/interfaces';
 import type { ObsidianLinkWarning } from '../obsidian-links/interfaces';
 
 export interface EditorViewOptions {
+  getOfficeRuntimeSetupState?(): OfficeRuntimeSetupState;
   getInitialAutosaveStatus?(file: TFile): Promise<AutosaveStatus>;
   getLinkWarnings(markdownPath: string, htmlSource: string): ReadonlyArray<ObsidianLinkWarning>;
   loadImportedHtmlSource(file: TFile): Promise<string | null>;
@@ -49,6 +51,7 @@ export interface EditorViewRenderTarget {
   readonly importedHtmlSource: string | null;
   readonly isResolvingConflict: boolean;
   readonly linkWarningCount: number;
+  readonly officeRuntimeSetupState: OfficeRuntimeSetupState;
   handleEditorBlur(): void;
   handleHtmlSourceChange(htmlSource: string): void;
   handleResolveConflict(choice: ConflictResolutionChoice): void;

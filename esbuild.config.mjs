@@ -59,6 +59,8 @@ const ctx = await esbuild.context({
     'os',
     'path',
     'fs',
+    'fs/promises',
+    'child_process',
   ],
   format: 'cjs',
   target: 'es2020',

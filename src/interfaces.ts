@@ -2,6 +2,7 @@ import type { App as ObsidianApp, EventRef, TAbstractFile, TFile } from 'obsidia
 
 import type { AutosaveStatus } from './autosave/interfaces';
 import type { ConflictResolutionChoice } from './conflicts/interfaces';
+import type { OfficeRuntimeSetupState } from './office-runtime/interfaces';
 import type { RichDocumentStore, RichDocumentVaultAdapter } from './rich-documents/interfaces';
 
 export interface AppProps {
@@ -10,6 +11,7 @@ export interface AppProps {
   readonly importedHtmlSource?: string | null;
   readonly isResolvingConflict?: boolean;
   readonly linkWarningCount?: number;
+  readonly officeRuntimeSetupState?: OfficeRuntimeSetupState;
   readonly onEditorBlur?: () => void;
   readonly onHtmlSourceChange?: (htmlSource: string) => void;
   readonly onResolveConflict?: (choice: ConflictResolutionChoice) => void;

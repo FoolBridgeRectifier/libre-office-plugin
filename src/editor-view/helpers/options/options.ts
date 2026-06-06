@@ -18,9 +18,11 @@ import type { RichDocumentStore } from '../../../rich-documents/interfaces';
 
 export function createRichDocumentEditorViewOptions(
   app: App,
-  richDocumentStore: RichDocumentStore
+  richDocumentStore: RichDocumentStore,
+  getOfficeRuntimeSetupState: NonNullable<EditorViewOptions['getOfficeRuntimeSetupState']>
 ): EditorViewOptions {
   return {
+    getOfficeRuntimeSetupState,
     getInitialAutosaveStatus: (file) =>
       getInitialRichDocumentAutosaveStatus(file, richDocumentStore),
     getLinkWarnings: (markdownPath, htmlSource) =>

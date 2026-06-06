@@ -13,9 +13,11 @@ import {
   loadEditorViewLoadedState,
   setEditorViewAutosaveDocument,
 } from './helpers/state/state';
+import { createSkippedMobileRuntimeSetupState } from '../office-runtime/helpers/setup-state/setupState';
 import type { AutosaveController, AutosaveStatus } from '../autosave/interfaces';
 import type { ConflictResolutionChoice } from '../conflicts/interfaces';
 import type { EditorViewOptions } from './interfaces';
+import type { OfficeRuntimeSetupState } from '../office-runtime/interfaces';
 
 export class EditorView extends FileView {
   allowNoFile = true;
@@ -23,6 +25,7 @@ export class EditorView extends FileView {
   importedHtmlSource: string | null = null;
   isResolvingConflict = false;
   linkWarningCount = 0;
+  officeRuntimeSetupState: OfficeRuntimeSetupState;
   activeMarkdownFile: TFile | null = null;
   readonly autosaveController: AutosaveController;
   private reactRoot: Root | null = null;
@@ -30,8 +33,11 @@ export class EditorView extends FileView {
 
   constructor(workspaceLeaf: WorkspaceLeaf, editorViewOptions: EditorViewOptions) {
     super(workspaceLeaf);
+
     this.navigation = true;
     this.editorViewOptions = editorViewOptions;
+    this.officeRuntimeSetupState =
+      editorViewOptions.getOfficeRuntimeSetupState?.() ?? createSkippedMobileRuntimeSetupState();
 
     this.autosaveController = createEditorViewAutosaveController(
       editorViewOptions,

@@ -24,6 +24,12 @@ jest.mock(
       render: jest.fn(async () => undefined),
       renderMarkdown: jest.fn(async () => undefined),
     },
+    Platform: {
+      isLinux: false,
+      isMacOS: false,
+      isMobile: false,
+      isWin: true,
+    },
     Plugin: class MockPlugin {
       addCommand = jest.fn();
       app: unknown;

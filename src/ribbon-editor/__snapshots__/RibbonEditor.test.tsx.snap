@@ -125,6 +125,11 @@ exports[`sets the Home ribbon tab active by default 1`] = `
         No HTML source loaded
       </span>
       <span
+        aria-label="LibreOffice runtime status"
+      >
+        Mobile HTML editing does not require LibreOffice.
+      </span>
+      <span
         aria-label="Obsidian link warnings"
       >
         No unresolved link targets
