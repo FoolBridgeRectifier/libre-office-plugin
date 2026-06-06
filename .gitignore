@@ -10,3 +10,9 @@ Data/
 runtime/*
 !runtime/README.md
 !runtime/.gitkeep
+!runtime/LibreOffice/
+!runtime/LibreOffice/**
+!runtime/LibreOffice.app/
+!runtime/LibreOffice.app/**
+!runtime/libreoffice/
+!runtime/libreoffice/**
