@@ -4,9 +4,19 @@ import type { AutosaveController, AutosaveStatus } from '../autosave/interfaces'
 import type { ConflictResolutionChoice } from '../conflicts/interfaces';
 import type { OfficeRuntimeSetupState } from '../office-runtime/interfaces';
 import type { ObsidianLinkWarning } from '../obsidian-links/interfaces';
+import type {
+  LibreNoteEditorActiveSource,
+  LibreNoteEditorMode,
+  LibreNoteEditorPageLayout,
+} from '../settings/interfaces';
 
 export interface EditorViewOptions {
+  readonly htmlAutosaveIntervalMs?: number;
+  readonly markdownSyncIntervalMs?: number;
+  getActiveEditorSource?(): LibreNoteEditorActiveSource;
+  getEditorMode?(): LibreNoteEditorMode;
   getOfficeRuntimeSetupState?(): OfficeRuntimeSetupState;
+  getPageLayout?(): LibreNoteEditorPageLayout;
   getInitialAutosaveStatus?(file: TFile): Promise<AutosaveStatus>;
   getLinkWarnings(markdownPath: string, htmlSource: string): ReadonlyArray<ObsidianLinkWarning>;
   loadImportedHtmlSource(file: TFile): Promise<string | null>;
@@ -57,13 +67,16 @@ export interface EditorViewHtmlSourceChangeTarget extends EditorViewLoadedStateT
 }
 
 export interface EditorViewRenderTarget {
+  activeEditorSource: LibreNoteEditorActiveSource;
   readonly activeMarkdownFile: TFile | null;
   readonly autosaveStatus: AutosaveStatus;
   readonly desktopSourceStatus: 'idle' | 'loading' | 'error';
+  editorMode: LibreNoteEditorMode;
   readonly importedHtmlSource: string | null;
   readonly isResolvingConflict: boolean;
   readonly linkWarningCount: number;
   readonly officeRuntimeSetupState: OfficeRuntimeSetupState;
+  pageLayout: LibreNoteEditorPageLayout;
   readonly showHtmlEmptyState: boolean;
   handleEditorBlur(): void;
   handleHtmlSourceChange(htmlSource: string): void;
@@ -72,6 +85,7 @@ export interface EditorViewRenderTarget {
 
 export interface EditorViewDesktopSourceTarget {
   activeMarkdownFile: TFile | null;
+  activeEditorSource: LibreNoteEditorActiveSource;
   autosaveStatus: AutosaveStatus;
   desktopSourceStatus: 'idle' | 'loading' | 'error';
   importedHtmlSource: string | null;

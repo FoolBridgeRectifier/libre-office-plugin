@@ -5,6 +5,7 @@ import type {
   EditorViewLoadedStateTarget,
   EditorViewHtmlSourceChangeTarget,
   EditorViewOptions,
+  EditorViewRenderTarget,
 } from '../../interfaces';
 import type { TFile } from 'obsidian';
 
@@ -84,6 +85,14 @@ export function applyEditorViewHtmlSourceChange(
   }
 
   target.autosaveController.handleHtmlSourceChange(htmlSource);
+}
+
+export function refreshEditorViewSettingsState(
+  target: EditorViewRenderTarget & { readonly editorViewOptions: EditorViewOptions }
+): void {
+  target.activeEditorSource = target.editorViewOptions.getActiveEditorSource?.() ?? 'desktop-odt';
+  target.editorMode = target.editorViewOptions.getEditorMode?.() ?? 'automatic';
+  target.pageLayout = target.editorViewOptions.getPageLayout?.() ?? 'pageless';
 }
 
 export function setEditorViewAutosaveDocument(

@@ -13,7 +13,8 @@ export function registerNativeMarkdownFallbackCommand(options: NativeMarkdownCom
     checkCallback: (checking) => {
       const activeFile = options.target.app.workspace.getActiveFile();
       const navigationLeaf = options.target.app.workspace.getLeaf(false);
-      const canOpenNativeMarkdown = shouldRouteFileToLibreEditor(activeFile);
+      const canOpenNativeMarkdown =
+        (options.getIsFallbackVisible?.() ?? true) && shouldRouteFileToLibreEditor(activeFile);
 
       if (checking || !canOpenNativeMarkdown) {
         return canOpenNativeMarkdown;

@@ -1,0 +1,125 @@
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
+
+exports[`renders settings UI with persisted defaults 1`] = `
+<div>
+  <h2>
+    Libre Note Editor
+  </h2>
+  <div>
+    <span>
+      LibreOffice path
+    </span>
+    <p>
+      Optional local executable path retained for setup visibility.
+    </p>
+    <input
+      aria-label="LibreOffice path"
+      placeholder="Bundled runtime is used by default"
+    />
+  </div>
+  <div>
+    <span>
+      Autosave interval
+    </span>
+    <p>
+      Measured in seconds.
+    </p>
+    <input
+      aria-label="Autosave interval"
+    />
+  </div>
+  <div>
+    <span>
+      Markdown sync interval
+    </span>
+    <p>
+      Measured in seconds.
+    </p>
+    <input
+      aria-label="Markdown sync interval"
+    />
+  </div>
+  <div>
+    <span>
+      Conflict behavior
+    </span>
+    <p>
+      Choose the default conflict recovery preference.
+    </p>
+    <select
+      aria-label="Conflict behavior"
+    >
+      <option
+        value="manual"
+      >
+        Manual resolution
+      </option>
+      <option
+        value="keep-html"
+      >
+        Keep rich HTML
+      </option>
+      <option
+        value="keep-markdown"
+      >
+        Keep markdown mirror
+      </option>
+    </select>
+  </div>
+  <div>
+    <span>
+      Editor mode
+    </span>
+    <select
+      aria-label="Editor mode"
+    >
+      <option
+        value="automatic"
+      >
+        Automatic
+      </option>
+      <option
+        value="desktop-odt"
+      >
+        Desktop ODT
+      </option>
+      <option
+        value="html-fallback"
+      >
+        HTML fallback
+      </option>
+    </select>
+  </div>
+  <div>
+    <span>
+      Editor layout
+    </span>
+    <select
+      aria-label="Editor layout"
+    >
+      <option
+        value="pageless"
+      >
+        Pageless
+      </option>
+      <option
+        value="page-width"
+      >
+        Page width
+      </option>
+    </select>
+  </div>
+  <div>
+    <span>
+      Show markdown source fallback
+    </span>
+    <p>
+      Expose the command that opens the active note in Obsidian markdown.
+    </p>
+    <input
+      aria-label="Show markdown source fallback"
+      type="checkbox"
+    />
+  </div>
+</div>
+`;

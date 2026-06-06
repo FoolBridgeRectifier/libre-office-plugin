@@ -18,12 +18,15 @@ import type { RibbonEditorProps } from './interfaces';
 
 export function RibbonEditor({
   activeFilePath = null,
+  activeEditorSource = 'html-fallback',
   autosaveStatus = 'saved',
   desktopSourceStatus = 'idle',
+  editorMode = 'automatic',
   importedHtmlSource = null,
   isResolvingConflict = false,
   linkWarningCount = 0,
   officeRuntimeSetupState = createSkippedMobileRuntimeSetupState(),
+  pageLayout = 'pageless',
   showHtmlEmptyState = activeFilePath === null,
   onEditorBlur,
   onHtmlSourceChange,
@@ -125,10 +128,13 @@ export function RibbonEditor({
 
       <StatusFooter
         activeFilePath={activeFilePath}
+        activeEditorSource={activeEditorSource}
+        editorMode={editorMode}
         filePathClassName={filePathClassName}
         htmlSourceStatusText={getAutosaveStatusText(autosaveStatus)}
         linkWarningStatusText={getLinkWarningStatusText(linkWarningCount)}
         officeRuntimeSetupState={officeRuntimeSetupState}
+        pageLayout={pageLayout}
         statusClassName={statusClassName}
       />
     </section>

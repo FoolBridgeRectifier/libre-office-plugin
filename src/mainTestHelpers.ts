@@ -1,4 +1,5 @@
 import { createRichDocumentMapping } from './rich-documents/helpers';
+import { mockObsidianSettingExports } from './mainObsidianSettingTestHelpers';
 import type { OfficeRuntimeSetupState } from './office-runtime/interfaces';
 
 export { createMetadataCacheMock } from './mainMetadataCacheTestHelpers';
@@ -60,6 +61,7 @@ jest.mock(
         void leaf;
       }
     },
+    ...mockObsidianSettingExports,
     Platform: {
       isLinux: false,
       isMacOS: false,
@@ -68,6 +70,7 @@ jest.mock(
     },
     Plugin: class MockPlugin {
       addCommand = jest.fn();
+      addSettingTab = jest.fn();
       app: unknown;
       loadData = jest.fn(async () => null);
       manifest = { dir: 'libre-note-editor' };

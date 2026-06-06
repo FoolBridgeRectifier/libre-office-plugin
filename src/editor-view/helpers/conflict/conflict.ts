@@ -44,3 +44,17 @@ export async function resolveEditorViewConflict(
     target.isResolvingConflict = false;
   }
 }
+
+export function applyEditorViewConflictResolutionResult(
+  target: EditorViewConflictResolutionTarget,
+  result: EditorViewConflictResolutionResult | null
+): void {
+  if (result === null) {
+    return;
+  }
+
+  target.autosaveStatus = result.autosaveStatus;
+  target.importedHtmlSource = result.htmlSource;
+  target.linkWarningCount = result.linkWarningCount;
+  target.renderReactApp();
+}

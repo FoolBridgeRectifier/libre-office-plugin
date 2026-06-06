@@ -17,17 +17,31 @@ import {
   renderMarkdownWithObsidian,
 } from '../../../markdown-sync/helpers';
 import { collectObsidianLinkWarningsForApp } from '../../../obsidian-links/helpers/resolver/resolver';
+import { secondsToMilliseconds } from '../../../settings/helpers';
 import type { EditorViewOptions } from '../../interfaces';
 import type { App } from 'obsidian';
 import type { RichDocumentStore } from '../../../rich-documents/interfaces';
+import type {
+  LibreNoteEditorActiveSource,
+  LibreNoteEditorSettings,
+} from '../../../settings/interfaces';
 
 export function createRichDocumentEditorViewOptions(
   app: App,
   richDocumentStore: RichDocumentStore,
-  getOfficeRuntimeSetupState: NonNullable<EditorViewOptions['getOfficeRuntimeSetupState']>
+  getOfficeRuntimeSetupState: NonNullable<EditorViewOptions['getOfficeRuntimeSetupState']>,
+  getSettings: () => LibreNoteEditorSettings,
+  getActiveEditorSource: () => LibreNoteEditorActiveSource
 ): EditorViewOptions {
+  const settings = getSettings();
+
   return {
+    getActiveEditorSource,
+    getEditorMode: () => getSettings().editorMode,
     getOfficeRuntimeSetupState,
+    getPageLayout: () => getSettings().pageLayout,
+    htmlAutosaveIntervalMs: secondsToMilliseconds(settings.autosaveIntervalSeconds),
+    markdownSyncIntervalMs: secondsToMilliseconds(settings.markdownSyncIntervalSeconds),
     getInitialAutosaveStatus: (file) =>
       getInitialRichDocumentAutosaveStatus(file, richDocumentStore),
     getLinkWarnings: (markdownPath, htmlSource) =>

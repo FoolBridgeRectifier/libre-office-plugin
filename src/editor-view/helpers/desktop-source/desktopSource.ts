@@ -6,6 +6,10 @@ export async function syncEditorViewDesktopSource(
 ): Promise<void> {
   await target.autosaveController.flushAll();
 
+  if (target.activeEditorSource !== 'desktop-odt') {
+    return;
+  }
+
   if (target.autosaveStatus !== 'saved') {
     return;
   }
@@ -31,6 +35,12 @@ export async function refreshEditorViewDesktopSourceAfterLoad(
   target: EditorViewDesktopSourceTarget,
   loadedMarkdownFile: NonNullable<EditorViewDesktopSourceTarget['activeMarkdownFile']>
 ): Promise<void> {
+  if (target.activeEditorSource !== 'desktop-odt') {
+    target.desktopSourceStatus = 'idle';
+    target.renderReactApp();
+    return;
+  }
+
   target.desktopSourceStatus = 'loading';
   target.renderReactApp();
 

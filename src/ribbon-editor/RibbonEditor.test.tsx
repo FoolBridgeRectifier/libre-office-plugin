@@ -53,6 +53,32 @@ test('shows dirty autosave status from the editor view', () => {
   expect(screen.getByLabelText('HTML source status')).toHaveTextContent('Unsaved HTML changes');
 });
 
+test.each([
+  ['saved', 'HTML source saved'],
+  ['saving', 'Saving HTML'],
+  ['syncing-markdown', 'Syncing markdown'],
+  ['conflicted', 'Conflict detected'],
+  ['error', 'Autosave error'],
+] as const)('shows %s status label', (autosaveStatus, expectedLabel) => {
+  render(<RibbonEditor autosaveStatus={autosaveStatus} />);
+
+  expect(screen.getByLabelText('HTML source status')).toHaveTextContent(expectedLabel);
+});
+
+test('shows active source, mode, and layout status labels', () => {
+  render(
+    <RibbonEditor
+      activeEditorSource="desktop-odt"
+      editorMode="desktop-odt"
+      pageLayout="page-width"
+    />
+  );
+
+  expect(screen.getByLabelText('Active editor source')).toHaveTextContent('Desktop ODT source');
+  expect(screen.getByLabelText('Editor mode')).toHaveTextContent('Desktop ODT mode');
+  expect(screen.getByLabelText('Editor layout')).toHaveTextContent('Page width layout');
+});
+
 test('shows only the top corner ODT loader while desktop source work is running', () => {
   render(
     <RibbonEditor

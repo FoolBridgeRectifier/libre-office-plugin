@@ -17,32 +17,32 @@ import { flushOpenLibreEditors, registerRichDocumentMappingEvents } from './help
 import { registerOpenDesktopOdtCommand } from './helpers/desktop-odt-command/desktopOdtCommand';
 import { registerNativeMarkdownFallbackCommand } from './helpers/native-markdown-command/nativeMarkdownCommand';
 import { loadRichDocumentHtmlForStore } from './helpers/rich-html/richHtml';
-import {
-  getBundledOfficeRuntimeRootPath,
-  getCurrentOfficeRuntimeOperatingSystem,
-  getPluginManifestDirectory,
-} from './office-runtime/helpers/platform/platform';
 import { createSkippedMobileRuntimeSetupState } from './office-runtime/helpers/setup-state/setupState';
-import { detectOfficeRuntime } from './office-runtime/officeRuntime';
 import type { OfficeRuntimeSetupState } from './office-runtime/interfaces';
 import { createRichDocumentStore } from './rich-documents/richDocuments';
 import type { RichDocumentStore } from './rich-documents/interfaces';
+import { DEFAULT_LIBRE_NOTE_EDITOR_SETTINGS } from './settings/constants';
+import { LibreNoteEditorSettingsTab } from './settings/Settings';
+import {
+  getLibreNoteEditorActiveSource,
+  loadLibreNoteEditorSettings,
+  refreshOpenLibreNoteEditorViews,
+  saveLibreNoteEditorSettings,
+} from './settings/helpers';
+import { detectLibreNoteEditorOfficeRuntime } from './settings/helpers/runtime/runtime';
+import type { LibreNoteEditorSettings } from './settings/interfaces';
 import '../styles.css';
 export default class LibreNoteEditorPlugin extends Plugin {
   private nativeFallbackLeaves = new WeakSet<WorkspaceLeaf>();
   private officeRuntimeSetupState: OfficeRuntimeSetupState = createSkippedMobileRuntimeSetupState();
   private richDocumentStore: RichDocumentStore | null = null;
+  settings: LibreNoteEditorSettings = DEFAULT_LIBRE_NOTE_EDITOR_SETTINGS;
 
   async onload(): Promise<void> {
-    this.officeRuntimeSetupState = await detectOfficeRuntime({
-      bundledRootPath: getBundledOfficeRuntimeRootPath(
-        getPluginManifestDirectory(this),
-        this.app.vault.adapter
-      ),
-      configuredPath: null,
-      operatingSystem: getCurrentOfficeRuntimeOperatingSystem(Platform),
-      platform: Platform.isMobile ? 'mobile' : 'desktop',
-    });
+    this.settings = await loadLibreNoteEditorSettings(this);
+    this.officeRuntimeSetupState = await detectLibreNoteEditorOfficeRuntime(this);
+
+    this.addSettingTab(new LibreNoteEditorSettingsTab(this));
 
     this.richDocumentStore = createRichDocumentStore({
       lastEditorPlatform: 'desktop',
@@ -61,12 +61,20 @@ export default class LibreNoteEditorPlugin extends Plugin {
           createRichDocumentEditorViewOptions(
             this.app,
             richDocumentStore,
-            () => this.officeRuntimeSetupState
+            () => this.officeRuntimeSetupState,
+            () => this.settings,
+            () =>
+              getLibreNoteEditorActiveSource(
+                this.settings,
+                this.officeRuntimeSetupState,
+                Platform.isMobile
+              )
           )
         )
     );
 
     registerNativeMarkdownFallbackCommand({
+      getIsFallbackVisible: () => this.settings.showMarkdownSourceFallback,
       nativeFallbackLeaves: this.nativeFallbackLeaves,
       target: this,
     });
@@ -90,6 +98,11 @@ export default class LibreNoteEditorPlugin extends Plugin {
   async onunload(): Promise<void> {
     await flushOpenLibreEditors(this.app.workspace);
     detachLibreMarkdownLeaves(this.app.workspace);
+  }
+  async saveSettings(settings: LibreNoteEditorSettings): Promise<void> {
+    this.settings = settings;
+    await saveLibreNoteEditorSettings(this, settings);
+    refreshOpenLibreNoteEditorViews(this.app.workspace);
   }
   private registerMarkdownRoutingEvents() {
     this.registerEvent(

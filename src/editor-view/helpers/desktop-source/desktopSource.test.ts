@@ -32,6 +32,16 @@ test('applies synced desktop HTML when flush leaves the editor saved', async () 
   expect(target.renderReactApp).toHaveBeenCalledTimes(1);
 });
 
+test('skips desktop source refresh when HTML fallback mode is active', async () => {
+  const target = createDesktopSourceTarget('saved');
+  target.activeEditorSource = 'html-fallback';
+
+  await refreshEditorViewDesktopSourceAfterLoad(target, target.activeMarkdownFile!);
+
+  expect(target.editorViewOptions.syncDesktopSource).not.toHaveBeenCalled();
+  expect(target.desktopSourceStatus).toBe('idle');
+});
+
 test('shows an error status when desktop refresh fails for the active note', async () => {
   const target = createDesktopSourceTarget('saved');
 
@@ -69,6 +79,7 @@ function createDesktopSourceTarget(
 ): EditorViewDesktopSourceTarget {
   const target = {
     activeMarkdownFile: { path: 'Note.md' },
+    activeEditorSource: 'desktop-odt',
     autosaveController: {
       clearActiveDocument: jest.fn(),
       flushAll: jest.fn(async () => {

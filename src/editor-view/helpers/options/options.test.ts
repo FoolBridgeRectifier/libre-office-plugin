@@ -50,7 +50,17 @@ test('prepares desktop ODT source headlessly without opening LibreOffice on note
   const options = createRichDocumentEditorViewOptions(
     { vault: { adapter: vaultAdapter } } as never,
     richDocumentStore as never,
-    () => createReadyRuntimeState()
+    () => createReadyRuntimeState(),
+    () => ({
+      autosaveIntervalSeconds: 5,
+      conflictBehavior: 'manual',
+      editorMode: 'automatic',
+      libreOfficePath: '',
+      markdownSyncIntervalSeconds: 30,
+      pageLayout: 'pageless',
+      showMarkdownSourceFallback: true,
+    }),
+    () => 'desktop-odt'
   );
 
   await options.prepareDesktopSource?.({ path: 'Note.md' } as TFile);

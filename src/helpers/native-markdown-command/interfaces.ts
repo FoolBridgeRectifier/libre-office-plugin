@@ -11,6 +11,7 @@ export interface NativeMarkdownCommandTarget {
 }
 
 export interface NativeMarkdownCommandOptions {
+  readonly getIsFallbackVisible?: () => boolean;
   readonly nativeFallbackLeaves: WeakSet<WorkspaceLeaf>;
   readonly target: NativeMarkdownCommandTarget;
 }

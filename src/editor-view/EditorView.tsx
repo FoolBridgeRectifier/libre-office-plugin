@@ -4,36 +4,43 @@ import { createRoot, type Root } from 'react-dom/client';
 import type { TFile, ViewStateResult, WorkspaceLeaf } from 'obsidian';
 
 import { LIBRE_MARKDOWN_VIEW_TYPE } from './constants';
-import { createEditorViewAutosaveController } from './helpers';
+import { createEditorViewAutosaveController } from './helpers/autosave-controller/autosaveController';
 import { renderEditorViewAppElement } from './helpers/app-element/appElement';
 import {
   refreshEditorViewDesktopSourceAfterLoad,
   syncEditorViewDesktopSource,
 } from './helpers/desktop-source/desktopSource';
-import { resolveEditorViewConflict } from './helpers/conflict/conflict';
+import {
+  applyEditorViewConflictResolutionResult,
+  resolveEditorViewConflict,
+} from './helpers/conflict/conflict';
 import {
   applyEditorViewLoadedState,
   applyEditorViewUnloadedState,
   applyEditorViewHtmlSourceChange,
   getEditorViewLinkWarningCount,
   loadEditorViewLoadedState,
+  refreshEditorViewSettingsState,
   setEditorViewAutosaveDocument,
   startEditorViewHtmlLoad,
 } from './helpers/state/state';
 import { createSkippedMobileRuntimeSetupState } from '../office-runtime/helpers/setup-state/setupState';
 import type { AutosaveController, AutosaveStatus } from '../autosave/interfaces';
 import type { ConflictResolutionChoice } from '../conflicts/interfaces';
-import type { EditorViewOptions } from './interfaces';
+import type { EditorViewOptions, EditorViewRenderTarget } from './interfaces';
 import type { OfficeRuntimeSetupState } from '../office-runtime/interfaces';
 
 export class EditorView extends FileView {
   allowNoFile = true;
+  activeEditorSource: EditorViewRenderTarget['activeEditorSource'] = 'desktop-odt';
   autosaveStatus: AutosaveStatus = 'saved';
   desktopSourceStatus: 'idle' | 'loading' | 'error' = 'idle';
+  editorMode: EditorViewRenderTarget['editorMode'] = 'automatic';
   importedHtmlSource: string | null = null;
   isResolvingConflict = false;
   linkWarningCount = 0;
   officeRuntimeSetupState: OfficeRuntimeSetupState;
+  pageLayout: EditorViewRenderTarget['pageLayout'] = 'pageless';
   activeMarkdownFile: TFile | null = null;
   showHtmlEmptyState = false;
   readonly autosaveController: AutosaveController;
@@ -47,6 +54,8 @@ export class EditorView extends FileView {
     this.editorViewOptions = editorViewOptions;
     this.officeRuntimeSetupState =
       editorViewOptions.getOfficeRuntimeSetupState?.() ?? createSkippedMobileRuntimeSetupState();
+
+    refreshEditorViewSettingsState(this);
 
     this.autosaveController = createEditorViewAutosaveController(
       editorViewOptions,
@@ -132,14 +141,10 @@ export class EditorView extends FileView {
   handleResolveConflict = async (choice: ConflictResolutionChoice) => {
     const result = await resolveEditorViewConflict(this, choice);
 
-    if (result === null) {
-      return;
-    }
-
-    this.autosaveStatus = result.autosaveStatus;
-    this.importedHtmlSource = result.htmlSource;
-    this.linkWarningCount = result.linkWarningCount;
-    this.renderReactApp();
+    applyEditorViewConflictResolutionResult(this, result);
   };
-  renderReactApp = () => renderEditorViewAppElement(this.reactRoot, this);
+  renderReactApp = () => {
+    refreshEditorViewSettingsState(this);
+    renderEditorViewAppElement(this.reactRoot, this);
+  };
 }

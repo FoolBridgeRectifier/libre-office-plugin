@@ -1,13 +1,10 @@
 import type { TFile, ViewCreator, ViewState, Workspace, WorkspaceLeaf } from 'obsidian';
 
-import { createAutosaveController } from '../autosave/autosave';
 import {
   LIBRE_MARKDOWN_VIEW_TYPE,
   MARKDOWN_FILE_EXTENSIONS,
   NATIVE_MARKDOWN_VIEW_TYPE,
 } from './constants';
-import type { AutosaveController, AutosaveStatus } from '../autosave/interfaces';
-import type { EditorViewOptions } from './interfaces';
 import type { FileTrackingView, LibreMarkdownRegistrationTarget } from './interfaces';
 
 export function createLibreMarkdownViewState(file: TFile, active: boolean): ViewState {
@@ -28,19 +25,6 @@ export function createNativeMarkdownViewState(file: TFile, active: boolean): Vie
     },
     type: NATIVE_MARKDOWN_VIEW_TYPE,
   };
-}
-
-export function createEditorViewAutosaveController(
-  editorViewOptions: EditorViewOptions,
-  onStatusChange: (autosaveStatus: AutosaveStatus) => void
-): AutosaveController {
-  return createAutosaveController({
-    onStatusChange,
-    saveHtmlSource: ({ htmlSource, markdownPath, previousHtmlSource }) =>
-      editorViewOptions.saveHtmlSource(markdownPath, htmlSource, previousHtmlSource),
-    syncMarkdownMirror: ({ htmlSource, markdownPath }) =>
-      editorViewOptions.syncMarkdownMirror(markdownPath, htmlSource),
-  });
 }
 
 export function detachLibreMarkdownLeaves(workspace: Workspace) {
