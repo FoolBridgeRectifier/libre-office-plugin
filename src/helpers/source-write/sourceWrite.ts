@@ -3,13 +3,13 @@ import {
   collectChangedSourceStates,
   createConflictState,
   createSourceStates,
-  hasSourceStateChanged,
 } from '../../conflicts/helpers';
 import {
-  getChangedSources,
+  getHtmlSaveConflictSources,
   getMarkdownMirrorConflictSources,
   hasExternalHtmlChange,
   hasIndependentMarkdownAndHtmlChanges,
+  hasRichSourceChange,
   updateMarkdownSyncTimestamp,
 } from './helpers';
 import type { RichDocumentHtmlSaveOptions, RichDocumentSourceWriteOptions } from '../../interfaces';
@@ -17,11 +17,8 @@ import type { RichDocumentHtmlSaveOptions, RichDocumentSourceWriteOptions } from
 export async function saveRichDocumentHtml(options: RichDocumentHtmlSaveOptions): Promise<void> {
   const mapping = await options.richDocumentStore.getOrCreateMapping(options.markdownPath);
   const currentSourceStates = await createSourceStates(mapping, options.vaultAdapter);
-
-  const markdownChanged = hasSourceStateChanged(
-    mapping.sourceStates.markdown,
-    currentSourceStates.markdown
-  );
+  const sourceChanges = collectChangedSourceStates(mapping.sourceStates, currentSourceStates);
+  const markdownChanged = sourceChanges.some((sourceChange) => sourceChange.source === 'markdown');
 
   const htmlChanged = await hasExternalHtmlChange(
     options.vaultAdapter,
@@ -29,8 +26,13 @@ export async function saveRichDocumentHtml(options: RichDocumentHtmlSaveOptions)
     options.previousHtmlSource
   );
 
-  const richFileDeleted =
-    mapping.sourceStates.html?.exists === true && currentSourceStates.html?.exists === false;
+  const richSourceChanged = hasRichSourceChange(sourceChanges);
+  const localHtmlChanged = options.htmlSource !== options.previousHtmlSource;
+
+  const richFileDeleted = sourceChanges.some(
+    (sourceChange) =>
+      sourceChange.source !== 'markdown' && sourceChange.currentState?.exists === false
+  );
 
   if (mapping.conflictState.status === 'conflicted') {
     throw new Error('Libre Note Editor conflict is unresolved.');
@@ -38,11 +40,11 @@ export async function saveRichDocumentHtml(options: RichDocumentHtmlSaveOptions)
 
   if (
     htmlChanged ||
-    richFileDeleted ||
+    richSourceChanged ||
     hasIndependentMarkdownAndHtmlChanges(markdownChanged, options)
   ) {
     const conflictState = await createConflictState({
-      changedSources: getChangedSources(markdownChanged, htmlChanged || richFileDeleted),
+      changedSources: getHtmlSaveConflictSources(sourceChanges, htmlChanged, localHtmlChanged),
       desktopHtmlSource: options.htmlSource,
       detectedAt: new Date().toISOString(),
       mapping,
@@ -81,6 +83,8 @@ export async function syncMarkdownMirror(options: RichDocumentSourceWriteOptions
   const sourceChanges = collectChangedSourceStates(mapping.sourceStates, currentSourceStates);
   const markdownChanged = sourceChanges.some((sourceChange) => sourceChange.source === 'markdown');
 
+  const richSourceChanged = hasRichSourceChange(sourceChanges);
+
   const richFileDeleted = sourceChanges.some(
     (sourceChange) =>
       sourceChange.source !== 'markdown' && sourceChange.currentState?.exists === false
@@ -90,7 +94,7 @@ export async function syncMarkdownMirror(options: RichDocumentSourceWriteOptions
     throw new Error('Libre Note Editor conflict is unresolved.');
   }
 
-  if (markdownChanged || richFileDeleted) {
+  if (markdownChanged || richSourceChanged) {
     const conflictState = await createConflictState({
       changedSources: getMarkdownMirrorConflictSources(sourceChanges),
       desktopHtmlSource: options.htmlSource,

@@ -7,11 +7,22 @@ import type {
   RichDocumentVaultAdapter,
 } from '../../rich-documents/interfaces';
 
-export function getChangedSources(markdownChanged: boolean, htmlChanged: boolean) {
-  return [
-    ...(markdownChanged ? (['markdown'] as const) : []),
-    ...(htmlChanged ? (['html'] as const) : []),
-  ];
+export function getHtmlSaveConflictSources(
+  sourceChanges: ReadonlyArray<SourceStateChange>,
+  htmlChanged: boolean,
+  localHtmlChanged: boolean
+): ReadonlyArray<RichDocumentSourceKind> {
+  const changedSources = new Set<RichDocumentSourceKind>();
+
+  for (const sourceChange of sourceChanges) {
+    changedSources.add(sourceChange.source);
+  }
+
+  if (htmlChanged || localHtmlChanged) {
+    changedSources.add('html');
+  }
+
+  return Array.from(changedSources);
 }
 
 export function getMarkdownMirrorConflictSources(
@@ -31,6 +42,10 @@ export function hasIndependentMarkdownAndHtmlChanges(
   options: RichDocumentHtmlSaveOptions
 ): boolean {
   return markdownChanged && options.htmlSource !== options.previousHtmlSource;
+}
+
+export function hasRichSourceChange(sourceChanges: ReadonlyArray<SourceStateChange>): boolean {
+  return sourceChanges.some((sourceChange) => sourceChange.source !== 'markdown');
 }
 
 export async function updateMarkdownSyncTimestamp(
