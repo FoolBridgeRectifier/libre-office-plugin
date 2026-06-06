@@ -4,7 +4,6 @@ import { EditorView } from './editor-view/EditorView';
 import {
   detachLibreMarkdownLeaves,
   getWorkspaceLeafFile,
-  openFileInNativeMarkdownView,
   registerLibreMarkdownRouting,
   routeMostRecentMarkdownLeafToLibreEditor,
   routeOpenMarkdownLeavesToLibreEditor,
@@ -12,15 +11,12 @@ import {
   shouldRouteFileToLibreEditor,
   shouldSkipNativeFallbackRouting,
 } from './editor-view/helpers';
-import {
-  OPEN_NATIVE_MARKDOWN_COMMAND_ID,
-  OPEN_NATIVE_MARKDOWN_COMMAND_NAME,
-} from './editor-view/constants';
 import { registerEditorViewLinkWarningRefresh } from './editor-view/helpers/link-warnings/linkWarnings';
 import { createRichDocumentEditorViewOptions } from './editor-view/helpers/options/options';
 import { flushOpenLibreEditors, registerRichDocumentMappingEvents } from './helpers';
+import { registerOpenDesktopOdtCommand } from './helpers/desktop-odt-command/desktopOdtCommand';
+import { registerNativeMarkdownFallbackCommand } from './helpers/native-markdown-command/nativeMarkdownCommand';
 import { loadRichDocumentHtmlForStore } from './helpers/rich-html/richHtml';
-import { getConfiguredOfficeRuntimePath } from './office-runtime/helpers';
 import {
   getBundledOfficeRuntimeRootPath,
   getCurrentOfficeRuntimeOperatingSystem,
@@ -38,11 +34,12 @@ export default class LibreNoteEditorPlugin extends Plugin {
   private richDocumentStore: RichDocumentStore | null = null;
 
   async onload(): Promise<void> {
-    const pluginData = await this.loadData();
-
     this.officeRuntimeSetupState = await detectOfficeRuntime({
-      bundledRootPath: getBundledOfficeRuntimeRootPath(getPluginManifestDirectory(this)),
-      configuredPath: getConfiguredOfficeRuntimePath(pluginData),
+      bundledRootPath: getBundledOfficeRuntimeRootPath(
+        getPluginManifestDirectory(this),
+        this.app.vault.adapter
+      ),
+      configuredPath: null,
       operatingSystem: getCurrentOfficeRuntimeOperatingSystem(Platform),
       platform: Platform.isMobile ? 'mobile' : 'desktop',
     });
@@ -69,8 +66,19 @@ export default class LibreNoteEditorPlugin extends Plugin {
         )
     );
 
-    this.registerNativeMarkdownFallbackCommand();
+    registerNativeMarkdownFallbackCommand({
+      nativeFallbackLeaves: this.nativeFallbackLeaves,
+      target: this,
+    });
+
+    registerOpenDesktopOdtCommand({
+      getOfficeRuntimeSetupState: () => this.officeRuntimeSetupState,
+      getRichDocumentStore: () => this.richDocumentStore,
+      target: this,
+    });
+
     this.registerMarkdownRoutingEvents();
+
     registerRichDocumentMappingEvents(this, this.richDocumentStore);
     registerEditorViewLinkWarningRefresh(this);
 
@@ -82,26 +90,6 @@ export default class LibreNoteEditorPlugin extends Plugin {
   async onunload(): Promise<void> {
     await flushOpenLibreEditors(this.app.workspace);
     detachLibreMarkdownLeaves(this.app.workspace);
-  }
-  private registerNativeMarkdownFallbackCommand() {
-    this.addCommand({
-      checkCallback: (checking) => {
-        const activeFile = this.app.workspace.getActiveFile();
-        const navigationLeaf = this.app.workspace.getLeaf(false);
-        const canOpenNativeMarkdown = shouldRouteFileToLibreEditor(activeFile);
-
-        if (checking || !canOpenNativeMarkdown) {
-          return canOpenNativeMarkdown;
-        }
-
-        this.nativeFallbackLeaves.add(navigationLeaf);
-        void openFileInNativeMarkdownView(navigationLeaf, activeFile);
-
-        return true;
-      },
-      id: OPEN_NATIVE_MARKDOWN_COMMAND_ID,
-      name: OPEN_NATIVE_MARKDOWN_COMMAND_NAME,
-    });
   }
   private registerMarkdownRoutingEvents() {
     this.registerEvent(

@@ -12,10 +12,12 @@ import type { TFile } from 'obsidian';
 export function createEditorViewAppElement(
   activeMarkdownFile: TFile | null,
   autosaveStatus: AutosaveStatus,
+  desktopSourceStatus: 'idle' | 'loading' | 'error',
   importedHtmlSource: string | null,
   isResolvingConflict: boolean,
   linkWarningCount: number,
   officeRuntimeSetupState: OfficeRuntimeSetupState,
+  showHtmlEmptyState: boolean,
   onEditorBlur: () => void,
   onHtmlSourceChange: (htmlSource: string) => void,
   onResolveConflict: (choice: ConflictResolutionChoice) => void
@@ -27,10 +29,12 @@ export function createEditorViewAppElement(
   return createElement(App, {
     activeFilePath,
     autosaveStatus,
+    desktopSourceStatus,
     importedHtmlSource,
     isResolvingConflict,
     linkWarningCount,
     officeRuntimeSetupState,
+    showHtmlEmptyState,
     onEditorBlur,
     onHtmlSourceChange,
     onResolveConflict,
@@ -45,10 +49,12 @@ export function renderEditorViewAppElement(
     createEditorViewAppElement(
       target.activeMarkdownFile,
       target.autosaveStatus,
+      target.desktopSourceStatus,
       target.importedHtmlSource,
       target.isResolvingConflict,
       target.linkWarningCount,
       target.officeRuntimeSetupState,
+      target.showHtmlEmptyState,
       target.handleEditorBlur,
       target.handleHtmlSourceChange,
       target.handleResolveConflict

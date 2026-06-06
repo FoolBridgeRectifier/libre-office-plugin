@@ -28,5 +28,9 @@ export const OFFICE_RUNTIME_BUNDLED_PATHS: Record<
   linux: ['libreoffice/program/soffice'],
   macos: ['LibreOffice.app/Contents/MacOS/soffice'],
   unsupported: [],
-  windows: ['LibreOffice/program/soffice.exe', 'LibreOffice/program/libreoffice.exe'],
+  windows: [
+    'LibreOffice/program/soffice.com',
+    'LibreOffice/program/soffice.exe',
+    'LibreOffice/program/libreoffice.exe',
+  ],
 };

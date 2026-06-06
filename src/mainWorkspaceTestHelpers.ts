@@ -60,6 +60,7 @@ export function createVaultMock() {
   return {
     adapter: {
       exists: jest.fn(async () => false),
+      getFullPath: jest.fn((normalizedPath: string) => `C:\\Vault\\${normalizedPath}`),
       list: jest.fn(async () => ({ files: [], folders: [] })),
       mkdir: jest.fn(),
       read: jest.fn(),

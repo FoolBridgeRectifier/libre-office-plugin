@@ -6,6 +6,7 @@ import type { HtmlEditorProps } from './interfaces';
 export function HtmlEditor({
   htmlSource,
   initializationError = null,
+  showEmptyState = true,
   onEditorBlur,
   onDirtyStateChange,
   onHtmlSourceChange,
@@ -18,6 +19,8 @@ export function HtmlEditor({
 
   const stateClassName =
     'min-h-64 rounded-ribbon-sm border border-dashed border-ribbon-border px-4 py-3 font-sans text-sm text-text-secondary';
+
+  const blankStateClassName = 'min-h-64 w-full';
 
   const errorClassName =
     'min-h-64 rounded-ribbon-sm border border-icon-red px-4 py-3 font-sans text-sm text-text-primary';
@@ -66,9 +69,10 @@ export function HtmlEditor({
 
   if (htmlSource === null) {
     return (
-      <div aria-label="Empty HTML editor" className={stateClassName}>
-        No rich HTML source loaded.
-      </div>
+      <div
+        aria-label={showEmptyState ? 'Empty HTML editor' : 'Blank HTML editor'}
+        className={showEmptyState ? stateClassName : blankStateClassName}
+      />
     );
   }
 

@@ -7,9 +7,8 @@ Detect a local LibreOffice runtime on desktop and expose setup state without req
 ## Implement
 
 - Add `src/office-runtime/`.
-- Detect configured LibreOffice path first.
-- Detect bundled path if available.
-- Fall back to system LibreOffice path.
+- Detect the bundled LibreOffice runtime inside the plugin `runtime/` folder.
+- Do not use configured, system, or user-installed LibreOffice paths for desktop conversion.
 - Validate the runtime can be executed for version or conversion checks.
 - Store setup state for the UI.
 - Keep mobile HTML editing functional when LibreOffice is missing.
@@ -28,18 +27,18 @@ Detect a local LibreOffice runtime on desktop and expose setup state without req
 - Reload the plugin on desktop.
 - Verify in MCP:
   - Runtime state is visible in settings or status UI.
-  - Missing LibreOffice shows setup state and does not break HTML editing.
-  - Configured path updates state after reload.
+- Missing bundled LibreOffice shows setup state and does not break HTML editing.
+- Adding the bundled runtime payload updates state after reload.
   - Mobile or HTML fallback mode never prompts as blocking.
   - No remote service is contacted.
 
 ## Edge Cases
 
-- LibreOffice path contains spaces.
-- Path points to a directory instead of executable.
+- Bundled LibreOffice path contains spaces.
+- Bundled path points to a directory instead of executable.
 - Executable exists but fails to launch.
-- Portable LibreOffice installation.
-- Multiple LibreOffice versions.
+- Portable LibreOffice payload inside the plugin folder.
+- Multiple bundled executable candidates.
 - Unsupported operating system.
 - Permission denied.
 - Detection timeout.

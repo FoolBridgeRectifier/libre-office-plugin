@@ -1,13 +1,7 @@
 import { DEFAULT_OFFICE_RUNTIME_TIMEOUT_MS } from './constants';
-import {
-  createBundledRuntimeCandidates,
-  createConfiguredRuntimeCandidate,
-  createSystemRuntimeCandidates,
-  getSystemRuntimeCommandNames,
-} from './helpers';
+import { createBundledRuntimeCandidates } from './helpers';
 import { createDefaultOfficeRuntimeDependencies } from './helpers/node-runtime/nodeRuntime';
 import {
-  createInvalidRuntimeSetupState,
   createMissingRuntimeSetupState,
   createReadyRuntimeSetupState,
   createSkippedMobileRuntimeSetupState,
@@ -46,19 +40,6 @@ async function detectOfficeRuntimeSafely(
 
   const dependencies = options.dependencies ?? (await createDefaultOfficeRuntimeDependencies());
   const timeoutMs = options.timeoutMs ?? DEFAULT_OFFICE_RUNTIME_TIMEOUT_MS;
-  const configuredCandidate = createConfiguredRuntimeCandidate(options.configuredPath);
-
-  if (configuredCandidate) {
-    const configuredValidation = await validateOfficeRuntimePath(
-      configuredCandidate.executablePath,
-      dependencies,
-      timeoutMs
-    );
-
-    return configuredValidation.status === 'valid'
-      ? createReadyRuntimeSetupState(configuredCandidate, configuredValidation)
-      : createInvalidRuntimeSetupState(configuredValidation.diagnostic);
-  }
 
   const bundledCandidates = createBundledRuntimeCandidates(
     options.bundledRootPath,
@@ -75,30 +56,8 @@ async function detectOfficeRuntimeSafely(
     return bundledResult;
   }
 
-  const systemCandidates = await createSystemCandidates(options, dependencies, timeoutMs);
-
-  const systemResult = await findFirstValidRuntimeCandidate(
-    systemCandidates,
-    dependencies,
-    timeoutMs
-  );
-
-  return systemResult ?? createMissingRuntimeSetupState();
-}
-
-async function createSystemCandidates(
-  options: OfficeRuntimeDetectionOptions,
-  dependencies: OfficeRuntimeDependencies,
-  timeoutMs: number
-): Promise<ReadonlyArray<OfficeRuntimeCandidate>> {
-  const executablePaths = await Promise.all(
-    getSystemRuntimeCommandNames(options.operatingSystem).map((commandName) =>
-      dependencies.process.findExecutable(commandName, timeoutMs)
-    )
-  );
-
-  return createSystemRuntimeCandidates(
-    executablePaths.filter((path): path is string => path !== null)
+  return createMissingRuntimeSetupState(
+    'Bundled LibreOffice runtime was not found inside the plugin runtime folder.'
   );
 }
 

@@ -56,6 +56,11 @@ export interface OfficeRuntimeProcess {
     timeoutMs: number
   ): Promise<OfficeRuntimeExecutionResult>;
   findExecutable(executableName: string, timeoutMs: number): Promise<string | null>;
+  launchFile?(
+    executablePath: string,
+    argumentsList: ReadonlyArray<string>,
+    timeoutMs: number
+  ): Promise<void>;
 }
 
 export type OfficeRuntimeSetupState =

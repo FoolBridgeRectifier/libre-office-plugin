@@ -6,11 +6,10 @@ test('renders the OneNote-style ribbon editor shell', () => {
   const { container } = render(<App />);
 
   expect(screen.getByRole('navigation', { name: 'Ribbon tabs' })).toHaveTextContent('Home');
-  expect(screen.getByLabelText('Empty HTML editor')).toHaveTextContent(
-    'No rich HTML source loaded.'
-  );
+  expect(screen.getByLabelText('Empty HTML editor')).toHaveTextContent('');
+  expect(screen.queryByText('No rich HTML source loaded.')).toBeNull();
 
-  expect(screen.getByLabelText('HTML source status')).toHaveTextContent('No HTML source loaded');
+  expect(screen.getByLabelText('HTML source status')).toHaveTextContent('HTML source saved');
 
   expect(container).toMatchSnapshot();
 });

@@ -388,6 +388,8 @@ const strictStructurePlugin = {
           'coverage',
           'dist',
           'node_modules',
+          'output',
+          'runtime',
         ]);
 
         const getRelativePath = (filePath) =>
@@ -1145,6 +1147,8 @@ export default [
       '**/test-utils/**',
       '**/tests/**',
       '**/e2e/**',
+      'output/**',
+      'runtime/**',
       // The ESLint config itself is a single structured file; splitting it would reduce clarity
       'eslint.config.mjs',
     ],
@@ -1168,6 +1172,8 @@ export default [
       'dist/**',
       'coverage/**',
       'main.js',
+      'output/**',
+      'runtime/**',
       '.e2e-vault/**',
       '.worktrees/**',
     ],

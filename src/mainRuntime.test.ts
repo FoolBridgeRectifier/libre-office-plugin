@@ -9,7 +9,7 @@ import {
 import { detectOfficeRuntime } from './office-runtime/officeRuntime';
 import type { WorkspaceLeaf } from 'obsidian';
 
-test('detects LibreOffice runtime from persisted configuration on load', async () => {
+test('detects LibreOffice runtime only from the plugin bundled runtime on load', async () => {
   const { default: LibreNoteEditorPlugin } = await import('./main');
   const workspace = createWorkspaceMock();
   const vault = createVaultMock();
@@ -24,7 +24,8 @@ test('detects LibreOffice runtime from persisted configuration on load', async (
 
   expect(detectOfficeRuntime).toHaveBeenCalledWith(
     expect.objectContaining({
-      configuredPath: 'C:\\Configured LibreOffice\\program\\soffice.exe',
+      bundledRootPath: 'C:\\Vault\\libre-note-editor/runtime',
+      configuredPath: null,
       operatingSystem: 'windows',
       platform: 'desktop',
     })

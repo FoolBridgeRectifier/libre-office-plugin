@@ -27,8 +27,41 @@ export async function createDefaultOfficeRuntimeDependencies(): Promise<OfficeRu
         executeNodeFile(childProcess.execFile, executablePath, argumentsList, timeoutMs),
       findExecutable: (executableName, timeoutMs) =>
         findNodeExecutable(childProcess.execFile, executableName, timeoutMs),
+      launchFile: (executablePath, argumentsList, timeoutMs) =>
+        launchNodeFile(childProcess.spawn, executablePath, argumentsList, timeoutMs),
     },
   };
+}
+
+function launchNodeFile(
+  spawn: typeof ChildProcess.spawn,
+  executablePath: string,
+  argumentsList: ReadonlyArray<string>,
+  timeoutMs: number
+): Promise<void> {
+  return new Promise((resolve, reject) => {
+    const childProcess = spawn(executablePath, [...argumentsList], {
+      detached: true,
+      stdio: 'ignore',
+      windowsHide: false,
+    });
+
+    const timeoutId = setTimeout(
+      () => reject(new Error('LibreOffice launch timed out.')),
+      timeoutMs
+    );
+
+    childProcess.once('error', (error) => {
+      clearTimeout(timeoutId);
+      reject(error);
+    });
+
+    childProcess.once('spawn', () => {
+      clearTimeout(timeoutId);
+      childProcess.unref();
+      resolve();
+    });
+  });
 }
 
 function executeNodeFile(

@@ -8,10 +8,12 @@ import type { RichDocumentStore, RichDocumentVaultAdapter } from './rich-documen
 export interface AppProps {
   readonly activeFilePath?: string | null;
   readonly autosaveStatus?: AutosaveStatus;
+  readonly desktopSourceStatus?: 'idle' | 'loading' | 'error';
   readonly importedHtmlSource?: string | null;
   readonly isResolvingConflict?: boolean;
   readonly linkWarningCount?: number;
   readonly officeRuntimeSetupState?: OfficeRuntimeSetupState;
+  readonly showHtmlEmptyState?: boolean;
   readonly onEditorBlur?: () => void;
   readonly onHtmlSourceChange?: (htmlSource: string) => void;
   readonly onResolveConflict?: (choice: ConflictResolutionChoice) => void;

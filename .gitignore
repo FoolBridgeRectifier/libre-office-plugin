@@ -5,4 +5,8 @@ output/
 *playwright-*/
 main.js
 data.json
+Data/
 *.log
+runtime/*
+!runtime/README.md
+!runtime/.gitkeep

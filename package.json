@@ -11,6 +11,7 @@
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "obsidian:dev": "start \"\" \"obsidian://open?vault=Obsidian%20Vault\"",
+    "runtime:prepare": "node scripts/prepare-runtime.mjs",
     "test": "jest --passWithNoTests",
     "test:markdown-sync:coverage": "jest --runInBand --coverage --collectCoverageFrom=src/markdown-sync/**/*.ts --coverageDirectory=coverage/markdown-sync",
     "typecheck": "tsc --noEmit"

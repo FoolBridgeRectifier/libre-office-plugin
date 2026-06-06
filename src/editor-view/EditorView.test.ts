@@ -53,7 +53,8 @@ function createEditorView(
   getInitialAutosaveStatus?: EditorViewOptions['getInitialAutosaveStatus'],
   resolveConflict: EditorViewOptions['resolveConflict'] = jest.fn(
     async () => '<article>Resolved</article>'
-  )
+  ),
+  extraOptions: Partial<EditorViewOptions> = {}
 ) {
   const options: EditorViewOptions = {
     getLinkWarnings,
@@ -61,6 +62,7 @@ function createEditorView(
     resolveConflict,
     saveHtmlSource: jest.fn(),
     syncMarkdownMirror: jest.fn(),
+    ...extraOptions,
   };
 
   if (getInitialAutosaveStatus) {
@@ -83,6 +85,33 @@ test('exposes Obsidian FileView metadata for markdown panes', () => {
   expect(editorView.getViewType()).toBe(LIBRE_MARKDOWN_VIEW_TYPE);
 });
 
+test('does not wait for desktop source refresh before rendering imported html', async () => {
+  const syncDesktopSource = jest.fn(() => new Promise<string | null>(() => undefined));
+
+  const editorView = createEditorView(
+    jest.fn(async () => '<article>Immediate</article>'),
+    jest.fn(() => []),
+    undefined,
+    undefined,
+    { syncDesktopSource }
+  );
+
+  await (editorView as EditorView & { onOpen(): Promise<void> }).onOpen();
+  await editorView.onLoadFile(createFile('Immediate.md', 'md'));
+
+  expect(syncDesktopSource).toHaveBeenCalledWith(createFile('Immediate.md', 'md'));
+
+  expect(mockReactRoot.render).toHaveBeenLastCalledWith(
+    expect.objectContaining({
+      props: expect.objectContaining({
+        activeFilePath: 'Immediate.md',
+        desktopSourceStatus: 'loading',
+        importedHtmlSource: '<article>Immediate</article>',
+      }),
+    })
+  );
+});
+
 test('renders imported html for loaded markdown files', async () => {
   const markdownFile = createFile('Folder/Loaded.md', 'md');
   const loadImportedHtmlSource = jest.fn(async () => '<article>Loaded</article>');
@@ -93,6 +122,47 @@ test('renders imported html for loaded markdown files', async () => {
   expect(loadImportedHtmlSource).toHaveBeenCalledWith(markdownFile);
   expect(editorView.getDisplayText()).toBe('Folder/Loaded');
   expect(editorView.getState()).toEqual({ file: 'Folder/Loaded.md' });
+});
+
+test('renders a loading state before async html import finishes', async () => {
+  const markdownFile = createFile('Slow.md', 'md');
+  let finishLoad: (htmlSource: string) => void = () => undefined;
+
+  const loadImportedHtmlSource = jest.fn(
+    () =>
+      new Promise<string>((resolve) => {
+        finishLoad = resolve;
+      })
+  );
+
+  const editorView = createEditorView(loadImportedHtmlSource);
+
+  await (editorView as EditorView & { onOpen(): Promise<void> }).onOpen();
+  const loadPromise = editorView.onLoadFile(markdownFile);
+
+  expect(mockReactRoot.render).toHaveBeenLastCalledWith(
+    expect.objectContaining({
+      props: expect.objectContaining({
+        activeFilePath: 'Slow.md',
+        importedHtmlSource: null,
+      }),
+    })
+  );
+
+  while (loadImportedHtmlSource.mock.calls.length === 0) {
+    await Promise.resolve();
+  }
+
+  finishLoad('<article>Slow loaded</article>');
+  await loadPromise;
+
+  expect(mockReactRoot.render).toHaveBeenLastCalledWith(
+    expect.objectContaining({
+      props: expect.objectContaining({
+        importedHtmlSource: '<article>Slow loaded</article>',
+      }),
+    })
+  );
 });
 
 test('passes unresolved link warning count to the React app', async () => {
@@ -138,6 +208,22 @@ test('opens and closes the React root inside the Obsidian content element', asyn
 
   expect(mockReactRoot.unmount).toHaveBeenCalledTimes(1);
   expect(editorView.contentEl.empty).toHaveBeenCalledTimes(2);
+});
+
+test('hides empty html message during the initial Obsidian view render', async () => {
+  const editorView = createEditorView();
+
+  await (editorView as EditorView & { onOpen(): Promise<void> }).onOpen();
+
+  expect(mockReactRoot.render).toHaveBeenLastCalledWith(
+    expect.objectContaining({
+      props: expect.objectContaining({
+        activeFilePath: null,
+        importedHtmlSource: null,
+        showHtmlEmptyState: false,
+      }),
+    })
+  );
 });
 
 test('ignores unsupported files and clears state on unload', async () => {

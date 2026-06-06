@@ -106,14 +106,12 @@ exports[`sets the Home ribbon tab active by default 1`] = `
     >
       <article
         aria-label="Editor surface"
-        class="min-h-72 rounded-ribbon-sm border border-ribbon-border bg-ribbon-bg p-6 shadow-ribbon-raised"
+        class="relative min-h-72 rounded-ribbon-sm border border-ribbon-border bg-ribbon-bg p-6 shadow-ribbon-raised"
       >
         <div
           aria-label="Empty HTML editor"
           class="min-h-64 rounded-ribbon-sm border border-dashed border-ribbon-border px-4 py-3 font-sans text-sm text-text-secondary"
-        >
-          No rich HTML source loaded.
-        </div>
+        />
       </article>
     </main>
     <footer
@@ -122,7 +120,7 @@ exports[`sets the Home ribbon tab active by default 1`] = `
       <span
         aria-label="HTML source status"
       >
-        No HTML source loaded
+        HTML source saved
       </span>
       <span
         aria-label="LibreOffice runtime status"

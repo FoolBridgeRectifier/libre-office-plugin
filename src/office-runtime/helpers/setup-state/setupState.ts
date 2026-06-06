@@ -9,7 +9,7 @@ export function createMissingRuntimeSetupState(diagnostic?: string): OfficeRunti
   return {
     ...(diagnostic ? { diagnostic } : {}),
     isBlocking: true,
-    message: 'LibreOffice was not found. HTML editing remains available.',
+    message: 'Bundled LibreOffice runtime was not found. HTML editing remains available.',
     status: 'missing',
   };
 }

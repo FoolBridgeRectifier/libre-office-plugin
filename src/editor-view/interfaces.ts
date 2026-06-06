@@ -10,12 +10,14 @@ export interface EditorViewOptions {
   getInitialAutosaveStatus?(file: TFile): Promise<AutosaveStatus>;
   getLinkWarnings(markdownPath: string, htmlSource: string): ReadonlyArray<ObsidianLinkWarning>;
   loadImportedHtmlSource(file: TFile): Promise<string | null>;
+  prepareDesktopSource?(file: TFile): Promise<void>;
   saveHtmlSource(
     markdownPath: string,
     htmlSource: string,
     previousHtmlSource: string
   ): Promise<void>;
   resolveConflict(markdownPath: string, choice: ConflictResolutionChoice): Promise<string | null>;
+  syncDesktopSource?(file: TFile): Promise<string | null>;
   syncMarkdownMirror(markdownPath: string, htmlSource: string): Promise<void>;
 }
 
@@ -27,9 +29,13 @@ export interface EditorViewLoadedState {
 
 export interface EditorViewLoadedStateTarget {
   autosaveStatus: AutosaveStatus;
+  activeMarkdownFile: TFile | null;
+  desktopSourceStatus: 'idle' | 'loading' | 'error';
   importedHtmlSource: string | null;
   isResolvingConflict: boolean;
   linkWarningCount: number;
+  showHtmlEmptyState: boolean;
+  renderReactApp(): void;
 }
 
 export interface EditorViewConflictResolutionResult {
@@ -45,16 +51,34 @@ export interface EditorViewConflictResolutionTarget extends EditorViewLoadedStat
   renderReactApp(): void;
 }
 
+export interface EditorViewHtmlSourceChangeTarget extends EditorViewLoadedStateTarget {
+  readonly autosaveController: AutosaveController;
+  readonly editorViewOptions: EditorViewOptions;
+}
+
 export interface EditorViewRenderTarget {
   readonly activeMarkdownFile: TFile | null;
   readonly autosaveStatus: AutosaveStatus;
+  readonly desktopSourceStatus: 'idle' | 'loading' | 'error';
   readonly importedHtmlSource: string | null;
   readonly isResolvingConflict: boolean;
   readonly linkWarningCount: number;
   readonly officeRuntimeSetupState: OfficeRuntimeSetupState;
+  readonly showHtmlEmptyState: boolean;
   handleEditorBlur(): void;
   handleHtmlSourceChange(htmlSource: string): void;
   handleResolveConflict(choice: ConflictResolutionChoice): void;
+}
+
+export interface EditorViewDesktopSourceTarget {
+  activeMarkdownFile: TFile | null;
+  autosaveStatus: AutosaveStatus;
+  desktopSourceStatus: 'idle' | 'loading' | 'error';
+  importedHtmlSource: string | null;
+  linkWarningCount: number;
+  readonly autosaveController: AutosaveController;
+  readonly editorViewOptions: EditorViewOptions;
+  renderReactApp(): void;
 }
 
 export interface FileTrackingView {

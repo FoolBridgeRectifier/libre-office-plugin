@@ -4,6 +4,11 @@ import {
   syncMarkdownMirror,
 } from '../../../helpers';
 import {
+  createDefaultDesktopConversionRuntime,
+  ensureDesktopOdtSource,
+  syncDesktopOdtSave,
+} from '../../../conversion/conversion';
+import {
   getInitialRichDocumentAutosaveStatus,
   loadRichDocumentHtmlForStore,
 } from '../../../helpers/rich-html/richHtml';
@@ -28,6 +33,21 @@ export function createRichDocumentEditorViewOptions(
     getLinkWarnings: (markdownPath, htmlSource) =>
       collectObsidianLinkWarningsForApp(app, markdownPath, htmlSource),
     loadImportedHtmlSource: (file) => loadRichDocumentHtmlForStore(app, file, richDocumentStore),
+    prepareDesktopSource: async (file) => {
+      const mapping = await richDocumentStore.getMappingByMarkdownPath(file.path);
+      const runtime = await createDefaultDesktopConversionRuntime(getOfficeRuntimeSetupState());
+
+      if (!mapping || !runtime) {
+        return;
+      }
+
+      await ensureDesktopOdtSource({
+        mapping,
+        richDocumentStore,
+        runtime,
+        vaultAdapter: app.vault.adapter,
+      });
+    },
     resolveConflict: async (markdownPath, choice) => {
       const result = await resolveRichDocumentConflict({
         choice,
@@ -48,6 +68,21 @@ export function createRichDocumentEditorViewOptions(
         richDocumentStore,
         vaultAdapter: app.vault.adapter,
       }),
+    syncDesktopSource: async (file) => {
+      const mapping = await richDocumentStore.getMappingByMarkdownPath(file.path);
+      const runtime = await createDefaultDesktopConversionRuntime(getOfficeRuntimeSetupState());
+
+      if (!mapping || !runtime) {
+        return null;
+      }
+
+      return syncDesktopOdtSave({
+        mapping,
+        richDocumentStore,
+        runtime,
+        vaultAdapter: app.vault.adapter,
+      });
+    },
     syncMarkdownMirror: (markdownPath, htmlSource) =>
       syncMarkdownMirror({
         htmlSource,

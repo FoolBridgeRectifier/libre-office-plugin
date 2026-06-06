@@ -2,8 +2,20 @@ import type { Plugin } from 'obsidian';
 
 import type { OfficeRuntimeOperatingSystem, OfficeRuntimePlatformFlags } from '../../interfaces';
 
-export function getBundledOfficeRuntimeRootPath(pluginDirectory: string | null): string | null {
-  return pluginDirectory ? `${pluginDirectory}/runtime` : null;
+export function getBundledOfficeRuntimeRootPath(
+  pluginDirectory: string | null,
+  vaultAdapter?: unknown
+): string | null {
+  if (!pluginDirectory) {
+    return null;
+  }
+
+  const runtimeVaultPath = `${pluginDirectory}/runtime`;
+  const runtimePathAdapter = vaultAdapter as {
+    readonly getFullPath?: (normalizedPath: string) => string;
+  };
+
+  return runtimePathAdapter.getFullPath?.(runtimeVaultPath) ?? runtimeVaultPath;
 }
 
 export function getCurrentOfficeRuntimeOperatingSystem(

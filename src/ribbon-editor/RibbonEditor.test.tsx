@@ -53,6 +53,34 @@ test('shows dirty autosave status from the editor view', () => {
   expect(screen.getByLabelText('HTML source status')).toHaveTextContent('Unsaved HTML changes');
 });
 
+test('shows only the top corner ODT loader while desktop source work is running', () => {
+  render(
+    <RibbonEditor
+      activeFilePath="Loaded.md"
+      desktopSourceStatus="loading"
+      importedHtmlSource={null}
+    />
+  );
+
+  expect(screen.getByLabelText('ODT source loading')).toHaveTextContent('ODT');
+  expect(screen.getByLabelText('HTML source status')).toHaveTextContent('HTML source saved');
+  expect(screen.queryByText('No rich HTML source loaded.')).toBeNull();
+});
+
+test('shows a top corner ODT error when desktop source conversion fails', () => {
+  render(
+    <RibbonEditor
+      activeFilePath="Loaded.md"
+      autosaveStatus="error"
+      desktopSourceStatus="error"
+      importedHtmlSource="<article><p>Previous body</p></article>"
+    />
+  );
+
+  expect(screen.getByLabelText('ODT source error')).toHaveTextContent('ODT error');
+  expect(screen.getByLabelText('HTML source status')).toHaveTextContent('Autosave error');
+});
+
 test('shows conflict recovery choices when a resolver is available', () => {
   const handleResolveConflict = jest.fn();
 

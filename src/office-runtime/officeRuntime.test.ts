@@ -2,36 +2,12 @@ import { getConfiguredOfficeRuntimePath, isUnsafeOfficeRuntimePath } from './hel
 import { createRuntimeDependencies } from './helpers/test-runtime/testRuntime';
 import { detectOfficeRuntime, validateOfficeRuntimePath } from './officeRuntime';
 
-test('detects configured LibreOffice path before bundled or system paths', async () => {
-  const configuredPath = 'C:\\Program Files\\LibreOffice\\program\\soffice.exe';
-
-  const dependencies = createRuntimeDependencies({
-    files: [
-      configuredPath,
-      'C:\\Vault\\.obsidian\\plugins\\libre-note-editor\\runtime\\LibreOffice\\program\\soffice.exe',
-      'C:\\System\\soffice.exe',
-    ],
-    systemExecutables: { 'soffice.exe': 'C:\\System\\soffice.exe' },
-  });
-
-  const state = await detectOfficeRuntime({
-    bundledRootPath: 'C:\\Vault\\.obsidian\\plugins\\libre-note-editor\\runtime',
-    configuredPath,
-    dependencies,
-    operatingSystem: 'windows',
-    platform: 'desktop',
-  });
-
-  expect(state).toEqual(expect.objectContaining({ source: 'configured', status: 'ready' }));
-  expect(dependencies.process.findExecutable).not.toHaveBeenCalled();
-});
-
-test('detects bundled runtime before falling back to system LibreOffice', async () => {
+test('detects bundled runtime from the plugin runtime folder', async () => {
   const bundledPath =
-    'C:\\Vault\\.obsidian\\plugins\\libre-note-editor\\runtime\\LibreOffice\\program\\soffice.exe';
+    'C:\\Vault\\.obsidian\\plugins\\libre-note-editor\\runtime\\LibreOffice\\program\\soffice.com';
 
   const dependencies = createRuntimeDependencies({
-    files: [bundledPath, 'C:\\System\\soffice.exe'],
+    files: [bundledPath],
     systemExecutables: { 'soffice.exe': 'C:\\System\\soffice.exe' },
   });
 
@@ -46,40 +22,50 @@ test('detects bundled runtime before falling back to system LibreOffice', async 
   expect(dependencies.process.findExecutable).not.toHaveBeenCalled();
 });
 
-test('falls back to system LibreOffice when no configured or bundled runtime exists', async () => {
+test('ignores configured and system LibreOffice paths on desktop', async () => {
+  const bundledPath = '/vault/plugin/runtime/libreoffice/program/soffice';
+
+  const dependencies = createRuntimeDependencies({
+    files: ['/configured/soffice', '/usr/bin/soffice', bundledPath],
+    systemExecutables: { soffice: '/usr/bin/soffice' },
+  });
+
+  const state = await detectOfficeRuntime({
+    bundledRootPath: '/vault/plugin/runtime',
+    configuredPath: '/configured/soffice',
+    dependencies,
+    operatingSystem: 'linux',
+    platform: 'desktop',
+  });
+
+  expect(state).toEqual(expect.objectContaining({ executablePath: bundledPath }));
+  expect(dependencies.process.findExecutable).not.toHaveBeenCalled();
+});
+
+test('reports missing bundled runtime instead of falling back to system LibreOffice', async () => {
   const dependencies = createRuntimeDependencies({
     files: ['/usr/bin/soffice'],
     systemExecutables: { soffice: '/usr/bin/soffice' },
   });
 
   const state = await detectOfficeRuntime({
+    bundledRootPath: '/vault/plugin/runtime',
     dependencies,
-    operatingSystem: 'linux',
-    platform: 'desktop',
-  });
-
-  expect(state).toEqual(
-    expect.objectContaining({
-      executablePath: '/usr/bin/soffice',
-      source: 'system',
-      status: 'ready',
-    })
-  );
-});
-
-test('reports missing runtime when no desktop candidate can be found', async () => {
-  const state = await detectOfficeRuntime({
-    dependencies: createRuntimeDependencies(),
     operatingSystem: 'linux',
     platform: 'desktop',
   });
 
   expect(state.status).toBe('missing');
   expect(state.isBlocking).toBe(true);
-  expect(state.message).toBe('LibreOffice was not found. HTML editing remains available.');
+
+  expect(state.message).toBe(
+    'Bundled LibreOffice runtime was not found. HTML editing remains available.'
+  );
+
+  expect(dependencies.process.findExecutable).not.toHaveBeenCalled();
 });
 
-test('rejects unsafe and nonexistent configured paths', async () => {
+test('rejects unsafe and nonexistent runtime paths during validation', async () => {
   const dependencies = createRuntimeDependencies();
 
   const unsafeResult = await validateOfficeRuntimePath('https://example.com/soffice', dependencies);
@@ -128,11 +114,11 @@ test('rejects directories and executables that fail version checks', async () =>
   });
 });
 
-test('skips LibreOffice requirement on mobile', async () => {
+test('skips bundled LibreOffice requirement on mobile', async () => {
   const dependencies = createRuntimeDependencies();
 
   const state = await detectOfficeRuntime({
-    configuredPath: '/opt/libreoffice/program/soffice',
+    bundledRootPath: '/vault/plugin/runtime',
     dependencies,
     operatingSystem: 'linux',
     platform: 'mobile',
@@ -143,9 +129,9 @@ test('skips LibreOffice requirement on mobile', async () => {
   expect(dependencies.fileSystem.pathExists).not.toHaveBeenCalled();
 });
 
-test('returns setup state messages for invalid configured and unsupported desktop modes', async () => {
-  const invalidState = await detectOfficeRuntime({
-    configuredPath: '/opt/libreoffice/program/soffice',
+test('returns setup state messages for missing bundled and unsupported desktop modes', async () => {
+  const missingState = await detectOfficeRuntime({
+    bundledRootPath: '/vault/plugin/runtime',
     dependencies: createRuntimeDependencies(),
     operatingSystem: 'linux',
     platform: 'desktop',
@@ -157,11 +143,16 @@ test('returns setup state messages for invalid configured and unsupported deskto
     platform: 'desktop',
   });
 
-  expect(invalidState.message).toBe('LibreOffice is configured but could not be used.');
+  expect(missingState).toEqual(
+    expect.objectContaining({
+      diagnostic: 'Bundled LibreOffice runtime was not found inside the plugin runtime folder.',
+    })
+  );
+
   expect(unsupportedState.message).toBe('LibreOffice desktop detection is not supported here.');
 });
 
-test('extracts configured path from current and legacy plugin data shapes', () => {
+test('extracts configured path only for legacy migration compatibility', () => {
   expect(getConfiguredOfficeRuntimePath({ settings: { libreOfficePath: '/opt/soffice' } })).toBe(
     '/opt/soffice'
   );
@@ -169,10 +160,6 @@ test('extracts configured path from current and legacy plugin data shapes', () =
   expect(
     getConfiguredOfficeRuntimePath({ officeRuntime: { configuredPath: '/app/soffice' } })
   ).toBe('/app/soffice');
-
-  expect(getConfiguredOfficeRuntimePath({ libreOfficePath: 'C:\\LibreOffice\\soffice.exe' })).toBe(
-    'C:\\LibreOffice\\soffice.exe'
-  );
 });
 
 test('runtime module exposes pure helpers without filesystem side effects', () => {

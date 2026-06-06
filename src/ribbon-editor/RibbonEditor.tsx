@@ -4,6 +4,7 @@ import { ConflictRecoveryPanel } from '../conflict-recovery/ConflictRecovery';
 import { HtmlEditor } from '../html-editor/HtmlEditor';
 import { createSkippedMobileRuntimeSetupState } from '../office-runtime/helpers/setup-state/setupState';
 import { DEFAULT_RIBBON_TAB_ID, RIBBON_TABS } from './constants';
+import { DesktopSourceLoader } from './helpers/desktop-source-loader/DesktopSourceLoader';
 import { StatusFooter } from './helpers/status-footer/StatusFooter';
 import { RibbonTabBar } from './helpers/tab-bar/TabBar';
 import {
@@ -18,10 +19,12 @@ import type { RibbonEditorProps } from './interfaces';
 export function RibbonEditor({
   activeFilePath = null,
   autosaveStatus = 'saved',
+  desktopSourceStatus = 'idle',
   importedHtmlSource = null,
   isResolvingConflict = false,
   linkWarningCount = 0,
   officeRuntimeSetupState = createSkippedMobileRuntimeSetupState(),
+  showHtmlEmptyState = activeFilePath === null,
   onEditorBlur,
   onHtmlSourceChange,
   onResolveConflict,
@@ -29,9 +32,6 @@ export function RibbonEditor({
   const [activeRibbonTabId, setActiveRibbonTabId] = useState(DEFAULT_RIBBON_TAB_ID);
 
   const activeRibbonTabDefinition = findRibbonTab(RIBBON_TABS, activeRibbonTabId);
-
-  const htmlSourceStatusText =
-    importedHtmlSource === null ? 'No HTML source loaded' : getAutosaveStatusText(autosaveStatus);
 
   const shouldShowConflictRecovery =
     autosaveStatus === 'conflicted' && onResolveConflict !== undefined;
@@ -52,7 +52,7 @@ export function RibbonEditor({
     'flex flex-1 flex-col gap-4 overflow-auto bg-ribbon-bg px-6 py-5 text-text-primary';
 
   const pageClassName =
-    'min-h-72 rounded-ribbon-sm border border-ribbon-border bg-ribbon-bg p-6 shadow-ribbon-raised';
+    'relative min-h-72 rounded-ribbon-sm border border-ribbon-border bg-ribbon-bg p-6 shadow-ribbon-raised';
 
   const statusClassName =
     'flex flex-wrap justify-between gap-2 border-t border-ribbon-border px-4 py-2 font-sans text-[11px] text-text-muted';
@@ -112,8 +112,11 @@ export function RibbonEditor({
         ) : null}
 
         <article aria-label="Editor surface" className={pageClassName}>
+          <DesktopSourceLoader status={desktopSourceStatus} />
+
           <HtmlEditor
             htmlSource={importedHtmlSource}
+            showEmptyState={showHtmlEmptyState}
             {...(onEditorBlur ? { onEditorBlur } : {})}
             {...(onHtmlSourceChange ? { onHtmlSourceChange } : {})}
           />
@@ -123,7 +126,7 @@ export function RibbonEditor({
       <StatusFooter
         activeFilePath={activeFilePath}
         filePathClassName={filePathClassName}
-        htmlSourceStatusText={htmlSourceStatusText}
+        htmlSourceStatusText={getAutosaveStatusText(autosaveStatus)}
         linkWarningStatusText={getLinkWarningStatusText(linkWarningCount)}
         officeRuntimeSetupState={officeRuntimeSetupState}
         statusClassName={statusClassName}

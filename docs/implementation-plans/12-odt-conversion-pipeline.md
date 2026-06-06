@@ -8,7 +8,7 @@ Add local ODT creation and conversion so desktop edits use `.odt` as the rich so
 
 - Add `src/conversion/`.
 - Convert imported HTML to ODT on desktop first open.
-- Open or launch local LibreOffice for `.odt` editing.
+- Open or launch the plugin-bundled LibreOffice runtime for `.odt` editing.
 - Detect ODT save events through explicit file state checks.
 - After desktop save:
   - convert ODT to HTML
@@ -29,7 +29,7 @@ Add local ODT creation and conversion so desktop edits use `.odt` as the rich so
 
 ## MCP Verification
 
-- With LibreOffice configured, open a desktop note.
+- With bundled LibreOffice present in the plugin `runtime/` folder, open a desktop note.
 - Verify in MCP:
   - First desktop import creates `.odt`.
   - Opening desktop mode launches or focuses local LibreOffice as expected.
@@ -40,7 +40,7 @@ Add local ODT creation and conversion so desktop edits use `.odt` as the rich so
 
 ## Edge Cases
 
-- LibreOffice missing after mapping says desktop mode.
+- Bundled LibreOffice missing after mapping says desktop mode.
 - ODT locked by another process.
 - Conversion timeout.
 - Corrupt ODT.
