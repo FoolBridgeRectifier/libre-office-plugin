@@ -10,7 +10,16 @@ import type {
 } from './interfaces';
 import type { RichDocumentMapping } from '../rich-documents/interfaces';
 
-export { sanitizeConvertedHtmlSource } from './helpers/sanitizer/sanitizer';
+export {
+  sanitizeConvertedHtmlSource,
+  sanitizeConvertedHtmlSourceWithReport,
+  sanitizeHtmlFragmentSourceWithReport,
+} from './helpers/sanitizer/sanitizer';
+export {
+  createLibreOfficeHtmlDocument,
+  getOdtConversionHtmlPath,
+  getOdtConversionOutputPath,
+} from './helpers/odt-input/odtInput';
 
 export function createConversionCommand(
   executablePath: string,

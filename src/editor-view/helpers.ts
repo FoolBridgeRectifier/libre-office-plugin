@@ -7,30 +7,28 @@ import {
 } from './constants';
 import type { FileTrackingView, LibreMarkdownRegistrationTarget } from './interfaces';
 
-export function createLibreMarkdownViewState(file: TFile, active: boolean): ViewState {
+export function createLibreMarkdownViewState(file: TFile | string, active: boolean): ViewState {
   return {
     active,
     state: {
-      file: file.path,
+      file: getFilePath(file),
     },
     type: LIBRE_MARKDOWN_VIEW_TYPE,
   };
 }
 
-export function createNativeMarkdownViewState(file: TFile, active: boolean): ViewState {
+export function createNativeMarkdownViewState(file: TFile | string, active: boolean): ViewState {
   return {
     active,
     state: {
-      file: file.path,
+      file: getFilePath(file),
     },
     type: NATIVE_MARKDOWN_VIEW_TYPE,
   };
 }
 
-export function detachLibreMarkdownLeaves(workspace: Workspace) {
-  for (const workspaceLeaf of workspace.getLeavesOfType(LIBRE_MARKDOWN_VIEW_TYPE)) {
-    workspaceLeaf.detach();
-  }
+function getFilePath(file: TFile | string): string {
+  return typeof file === 'string' ? file : file.path;
 }
 
 export function getWorkspaceLeafFile(workspaceLeaf: WorkspaceLeaf) {
@@ -132,3 +130,5 @@ export function shouldRoutePathToLibreEditor(filePath: string): boolean {
 
   return fileExtension === MARKDOWN_FILE_EXTENSIONS[0];
 }
+
+export { detachLibreMarkdownLeaves } from './helpers/unload/unload';

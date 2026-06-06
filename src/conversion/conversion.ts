@@ -4,7 +4,10 @@ import { createDefaultOfficeRuntimeDependencies } from '../office-runtime/helper
 import { DEFAULT_OPEN_TIMEOUT_MS, ODT_MIME_TYPE, ODT_PACKAGE_SIGNATURE } from './constants';
 import {
   createConversionCommand,
+  createLibreOfficeHtmlDocument,
   getDesktopConversionPaths,
+  getOdtConversionHtmlPath,
+  getOdtConversionOutputPath,
   requireDesktopRuntime,
   resolveLocalVaultPath,
   runConversionCommand,
@@ -19,8 +22,7 @@ import type {
 } from './interfaces';
 import type { OfficeRuntimeSetupState } from '../office-runtime/interfaces';
 
-export { createConversionCommand };
-export { sanitizeConvertedHtmlSource } from './helpers';
+export { createConversionCommand, sanitizeConvertedHtmlSource };
 
 export async function createDefaultDesktopConversionRuntime(
   setupState: OfficeRuntimeSetupState
@@ -40,14 +42,26 @@ export async function createDefaultDesktopConversionRuntime(
 export async function ensureDesktopOdtSource(options: DesktopConversionOptions): Promise<void> {
   const runtime = requireDesktopRuntime(options.runtime);
   const conversionPaths = getDesktopConversionPaths(options.mapping);
-  const localHtmlPath = resolveLocalVaultPath(options.vaultAdapter, conversionPaths.htmlPath);
+
   const localFolderPath = resolveLocalVaultPath(options.vaultAdapter, conversionPaths.folderPath);
+  const conversionHtmlPath = getOdtConversionHtmlPath(conversionPaths.folderPath);
+  const conversionOutputPath = getOdtConversionOutputPath(conversionPaths.folderPath);
+  const localConversionHtmlPath = resolveLocalVaultPath(options.vaultAdapter, conversionHtmlPath);
 
   if (await options.vaultAdapter.exists(conversionPaths.odtPath)) {
     return;
   }
 
-  await runConversionCommand(runtime, localHtmlPath, localFolderPath, 'odt');
+  const htmlSource = await options.vaultAdapter.read(conversionPaths.htmlPath);
+
+  await options.vaultAdapter.write(conversionHtmlPath, createLibreOfficeHtmlDocument(htmlSource));
+  await runConversionCommand(runtime, localConversionHtmlPath, localFolderPath, 'odt');
+
+  if (!(await options.vaultAdapter.exists(conversionOutputPath))) {
+    throw new Error('LibreOffice conversion failed.');
+  }
+
+  await options.vaultAdapter.rename(conversionOutputPath, conversionPaths.odtPath);
   await updateDesktopMapping(options, options.getCurrentTimestamp?.() ?? new Date().toISOString());
 }
 

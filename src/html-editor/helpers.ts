@@ -7,6 +7,7 @@ import {
   REMOTE_LOADING_ELEMENT_SELECTOR,
 } from './constants';
 import { TABLE_SCROLL_CONTAINER_CLASS } from '../attachments/constants';
+import { sanitizeHtmlFragmentSourceWithReport } from '../conversion/helpers';
 
 function isRemoteUrl(value: string | null): boolean {
   if (!value) {
@@ -73,7 +74,8 @@ function protectUnsupportedContent(htmlDocument: Document): void {
 }
 
 function createEditorDocument(htmlSource: string): Document {
-  const htmlDocument = new DOMParser().parseFromString(htmlSource, 'text/html');
+  const sanitizedHtmlSource = sanitizeHtmlFragmentSourceWithReport(htmlSource).htmlSource;
+  const htmlDocument = new DOMParser().parseFromString(sanitizedHtmlSource, 'text/html');
 
   removeRemoteLoadingElements(htmlDocument);
   removeRemoteAssetAttributes(htmlDocument);
@@ -87,6 +89,12 @@ function createEditorDocument(htmlSource: string): Document {
 
 export function prepareHtmlForEditor(htmlSource: string): string {
   return createEditorDocument(htmlSource).body.innerHTML;
+}
+
+export function getHtmlSecurityWarningText(htmlSource: string): string | null {
+  return sanitizeHtmlFragmentSourceWithReport(htmlSource).removedUnsafeContent
+    ? 'Unsafe HTML was removed before editing.'
+    : null;
 }
 
 export function readHtmlFromEditor(editorElement: HTMLElement): string {
@@ -114,7 +122,7 @@ export function readHtmlFromEditor(editorElement: HTMLElement): string {
     }
   }
 
-  return editableDocument.body.innerHTML;
+  return sanitizeHtmlFragmentSourceWithReport(editableDocument.body.innerHTML).htmlSource;
 }
 
 export function isInsideProtectedContent(eventTarget: EventTarget | null): boolean {

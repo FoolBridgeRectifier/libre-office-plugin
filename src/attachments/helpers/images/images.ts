@@ -6,6 +6,10 @@ import {
   ATTACHMENT_STATUS_ATTRIBUTE,
 } from '../../constants';
 import { parseMarkdownImageSource } from './helpers';
+import {
+  isRemoteAttachmentPath,
+  protectRemoteAttachmentElement,
+} from './helpers/remote-attachments/remoteAttachments';
 import { parseObsidianWikiLinkSource } from '../../../obsidian-links/helpers';
 import type { AttachmentStatus } from '../../interfaces';
 import type { MarkdownSourceFact } from '../../../markdown-sync/helpers/markdown/source-facts/interfaces';
@@ -72,7 +76,11 @@ function collectImageElements(htmlDocument: Document): HTMLElement[] {
       return false;
     }
 
-    const sourceText = element.getAttribute('data-href') ?? element.getAttribute('alt') ?? '';
+    const sourceText =
+      element.getAttribute('data-href') ??
+      element.getAttribute('src') ??
+      element.getAttribute('alt') ??
+      '';
 
     return (
       element.matches('img,.image-embed') ||
@@ -102,13 +110,15 @@ export function annotateAttachmentHtml(
     const imageFact = imageFacts[index];
     const pathText = imageFact ? getAttachmentTarget(imageFact.text) : null;
     const captionText = imageFact ? getAttachmentCaption(imageFact.text) : null;
-    const status = getAttachmentStatus(imageElement);
+
+    const isRemoteAttachment = isRemoteAttachmentPath(pathText);
+    const status = isRemoteAttachment ? 'remote' : getAttachmentStatus(imageElement);
 
     if (imageFact) {
       imageElement.setAttribute(ATTACHMENT_SOURCE_ATTRIBUTE, imageFact.text);
     }
 
-    if (pathText) {
+    if (pathText && !isRemoteAttachment) {
       imageElement.setAttribute(ATTACHMENT_PATH_ATTRIBUTE, pathText);
     }
 
@@ -117,6 +127,10 @@ export function annotateAttachmentHtml(
     }
 
     imageElement.setAttribute(ATTACHMENT_STATUS_ATTRIBUTE, status);
+
+    if (pathText && isRemoteAttachment) {
+      protectRemoteAttachmentElement(imageElement, pathText);
+    }
 
     if (status === 'broken' && pathText) {
       showBrokenAttachmentState(imageElement, pathText);

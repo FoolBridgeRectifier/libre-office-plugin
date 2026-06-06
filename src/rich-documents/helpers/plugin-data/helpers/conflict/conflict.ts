@@ -3,6 +3,7 @@ import type {
   RichDocumentConflictState,
   RichDocumentSourceKind,
 } from '../../../../interfaces';
+import { isPathInsideRichDocumentsRoot } from '../../../paths/paths';
 
 export function normalizeConflictState(value: unknown): RichDocumentConflictState {
   if (!isRecord(value) || value.status !== 'conflicted') {
@@ -38,7 +39,11 @@ function normalizeConflictCopies(value: unknown): RichDocumentConflictCopy[] {
   }
 
   return value.flatMap((copyValue) => {
-    if (!isRecord(copyValue) || typeof copyValue.path !== 'string') {
+    if (
+      !isRecord(copyValue) ||
+      typeof copyValue.path !== 'string' ||
+      !isPathInsideRichDocumentsRoot(copyValue.path)
+    ) {
       return [];
     }
 

@@ -22,8 +22,31 @@ export function sanitizeElement(rootElement: Element): void {
 
 function removeUnsafeAttributes(element: HTMLElement): void {
   for (const attribute of Array.from(element.attributes)) {
-    if (/^on/i.test(attribute.name) || attribute.name.startsWith('data-libre-')) {
+    if (
+      /^on/i.test(attribute.name) ||
+      attribute.name.startsWith('data-libre-') ||
+      isDangerousAttribute(attribute.name, attribute.value)
+    ) {
       element.removeAttribute(attribute.name);
     }
   }
+}
+
+function isDangerousAttribute(attributeName: string, attributeValue: string): boolean {
+  const compactAttributeValue = removeWhitespaceAndControlCharacters(attributeValue.toLowerCase());
+
+  if (/^(?:javascript|vbscript|data):/.test(compactAttributeValue)) {
+    return true;
+  }
+
+  return (
+    attributeName.toLowerCase() === 'style' &&
+    /url\(|expression\(|behavior:/.test(attributeValue.toLowerCase())
+  );
+}
+
+function removeWhitespaceAndControlCharacters(attributeValue: string): string {
+  return Array.from(attributeValue)
+    .filter((character) => character > ' ' && character !== '\u007f')
+    .join('');
 }

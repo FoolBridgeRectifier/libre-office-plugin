@@ -13,6 +13,7 @@ import { collectMarkdownSourceFacts } from '../source-facts/helpers';
 import { annotateStructuredMarkdownHtml } from '../structured-blocks/structuredBlocks';
 import { splitMarkdownIntoRenderedChunks } from './helpers/chunks/chunks';
 import { mapRenderedMarkdownElementToHtml } from './helpers';
+import { maskRemoteMarkdownImageSources } from './helpers/remote-images/remoteImages';
 import type {
   MarkdownBodyRenderer,
   MarkdownToHtmlResult,
@@ -64,8 +65,10 @@ async function createRenderedOrFallbackBodyHtml(
     return createProtectedRawMarkdownFallback(bodyMarkdown);
   }
 
+  const renderableBodyMarkdown = maskRemoteMarkdownImageSources(bodyMarkdown);
+
   const renderedBodyHtml = await renderMarkdownBodyToHtml(
-    bodyMarkdown,
+    renderableBodyMarkdown,
     sourcePath,
     markdownRenderer
   );
@@ -77,7 +80,11 @@ async function createRenderedOrFallbackBodyHtml(
   const renderedChunkHtml = (
     await Promise.all(
       splitMarkdownIntoRenderedChunks(bodyMarkdown).map((markdownChunk) =>
-        renderMarkdownBodyToHtml(markdownChunk, sourcePath, markdownRenderer)
+        renderMarkdownBodyToHtml(
+          maskRemoteMarkdownImageSources(markdownChunk),
+          sourcePath,
+          markdownRenderer
+        )
       )
     )
   )

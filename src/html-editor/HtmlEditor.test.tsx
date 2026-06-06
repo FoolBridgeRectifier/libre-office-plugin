@@ -26,6 +26,18 @@ test('shows an editor initialization error state', () => {
   );
 });
 
+test('shows an unsafe content warning after sanitizing loaded html', () => {
+  render(<HtmlEditor htmlSource='<article><p onclick="bad()">Unsafe</p></article>' />);
+
+  expect(screen.getByRole('alert', { name: 'HTML security warning' })).toHaveTextContent(
+    'Unsafe HTML was removed before editing.'
+  );
+
+  expect(screen.getByRole('textbox', { name: 'Local HTML editor' }).innerHTML).not.toContain(
+    'onclick'
+  );
+});
+
 test('loads html source into the local editor surface', () => {
   render(<HtmlEditor htmlSource="<article><h1>Loaded title</h1><p>Body</p></article>" />);
 
@@ -82,6 +94,30 @@ test('emits changed html source and dirty state on editor input', () => {
 
   expect(handleHtmlSourceChange).toHaveBeenLastCalledWith('<article><p>Changed</p></article>');
   expect(handleDirtyStateChange).toHaveBeenLastCalledWith(true);
+});
+
+test('sanitizes unsafe editor input before emitting it', () => {
+  const handleHtmlSourceChange = jest.fn();
+
+  render(
+    <HtmlEditor
+      htmlSource="<article><p>Original</p></article>"
+      onHtmlSourceChange={handleHtmlSourceChange}
+    />
+  );
+
+  const editorElement = screen.getByRole('textbox', { name: 'Local HTML editor' });
+
+  editorElement.innerHTML =
+    '<article><p onmouseover="bad()">Changed</p><script>bad()</script></article>';
+  fireEvent.input(editorElement);
+
+  expect(screen.getByRole('alert', { name: 'HTML security warning' })).toHaveTextContent(
+    'Unsafe HTML was removed before editing.'
+  );
+
+  expect(handleHtmlSourceChange).toHaveBeenLastCalledWith('<article><p>Changed</p></article>');
+  expect(editorElement).not.toContainHTML('onmouseover');
 });
 
 test('emits editor blur for immediate autosave', () => {

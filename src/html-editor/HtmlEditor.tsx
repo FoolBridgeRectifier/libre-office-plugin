@@ -1,7 +1,12 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import classNames from 'classnames';
 
-import { isInsideProtectedContent, prepareHtmlForEditor, readHtmlFromEditor } from './helpers';
+import {
+  getHtmlSecurityWarningText,
+  isInsideProtectedContent,
+  prepareHtmlForEditor,
+  readHtmlFromEditor,
+} from './helpers';
 import type { HtmlEditorProps } from './interfaces';
 
 export function HtmlEditor({
@@ -14,6 +19,7 @@ export function HtmlEditor({
 }: HtmlEditorProps) {
   const editorElementRef = useRef<HTMLDivElement | null>(null);
   const initialHtmlSourceRef = useRef('');
+  const [securityWarningText, setSecurityWarningText] = useState<string | null>(null);
 
   const editorClassName = classNames(
     'libre-html-editor markdown-preview-view min-h-64 w-full min-w-0 max-w-full box-border',
@@ -36,11 +42,20 @@ export function HtmlEditor({
   const errorClassName =
     'min-h-64 min-w-0 max-w-full rounded-ribbon-sm border border-icon-red px-4 py-3 font-sans text-sm text-text-primary';
 
+  const warningClassName =
+    'rounded-ribbon-sm border border-icon-orange px-3 py-2 font-sans text-[12px] text-text-primary';
+
   useEffect(() => {
-    if (!editorElementRef.current || htmlSource === null || initializationError) {
+    if (htmlSource === null || initializationError) {
+      setSecurityWarningText(null);
       return;
     }
 
+    if (!editorElementRef.current) {
+      return;
+    }
+
+    setSecurityWarningText(getHtmlSecurityWarningText(htmlSource));
     const preparedHtmlSource = prepareHtmlForEditor(htmlSource);
     const initialHtmlElement = document.createElement('div');
 
@@ -92,24 +107,39 @@ export function HtmlEditor({
       return;
     }
 
+    const rawHtmlSource = editorElementRef.current.innerHTML;
     const currentHtmlSource = readHtmlFromEditor(editorElementRef.current);
     const isDirty = currentHtmlSource !== initialHtmlSourceRef.current;
+    const unsafeContentWarningText = getHtmlSecurityWarningText(rawHtmlSource);
 
+    if (unsafeContentWarningText) {
+      editorElementRef.current.innerHTML = prepareHtmlForEditor(currentHtmlSource);
+    }
+
+    setSecurityWarningText(unsafeContentWarningText);
     onHtmlSourceChange?.(currentHtmlSource);
     onDirtyStateChange?.(isDirty);
   };
 
   return (
-    <div
-      aria-label="Local HTML editor"
-      className={editorClassName}
-      contentEditable
-      onBlur={onEditorBlur}
-      onInput={handleEditorInput}
-      ref={editorElementRef}
-      role="textbox"
-      suppressContentEditableWarning
-      tabIndex={0}
-    />
+    <>
+      {securityWarningText ? (
+        <div aria-label="HTML security warning" className={warningClassName} role="alert">
+          {securityWarningText}
+        </div>
+      ) : null}
+
+      <div
+        aria-label="Local HTML editor"
+        className={editorClassName}
+        contentEditable
+        onBlur={onEditorBlur}
+        onInput={handleEditorInput}
+        ref={editorElementRef}
+        role="textbox"
+        suppressContentEditableWarning
+        tabIndex={0}
+      />
+    </>
   );
 }

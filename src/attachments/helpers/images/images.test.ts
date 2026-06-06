@@ -93,6 +93,24 @@ test('preserves annotated markdown image source when remote src was stripped', (
   );
 });
 
+test('rejects traversal attachment paths instead of exporting embed syntax', () => {
+  const htmlDocument = new DOMParser().parseFromString(
+    '<span data-libre-attachment-path="../Secrets.png"><img alt="Secret"></span>',
+    'text/html'
+  );
+
+  expect(getAttachmentMarkdown(htmlDocument.body.firstElementChild as HTMLElement)).toBe(null);
+});
+
+test('rejects unsafe stored attachment sources when remote src is absent', () => {
+  const htmlDocument = new DOMParser().parseFromString(
+    '<img alt="Unsafe" data-libre-attachment-source="![Unsafe](data:text/html,bad)">',
+    'text/html'
+  );
+
+  expect(getAttachmentMarkdown(htmlDocument.body.firstElementChild as HTMLElement)).toBe(null);
+});
+
 test('annotates standard markdown images with exact source', () => {
   const annotatedHtml = annotateAttachmentHtml(
     '<img alt="Remote caption" src="https://example.com/image.png">',
@@ -103,4 +121,38 @@ test('annotates standard markdown images with exact source', () => {
     'data-libre-attachment-source="![Remote caption](https://example.com/image.png)"'
   );
   expect(annotatedHtml).toContain('data-libre-attachment-status="remote"');
+
+  expect(annotatedHtml).toContain('data-libre-remote-image-src="https://example.com/image.png"');
+  expect(annotatedHtml).not.toContain('data-libre-attachment-path="https://example.com');
+
+  const htmlDocument = new DOMParser().parseFromString(annotatedHtml, 'text/html');
+
+  expect(htmlDocument.querySelector('img')?.getAttribute('src')).toBe(null);
+});
+
+test('annotates masked remote image placeholders without fetchable src attributes', () => {
+  const annotatedHtml = annotateAttachmentHtml(
+    [
+      '<span alt="Remote one" src="libre-note-editor-remote-image-0.png" class="internal-embed is-loaded file-embed mod-empty-attachment">missing</span>',
+      '<span alt="Remote two" src="libre-note-editor-remote-image-1.png" class="internal-embed is-loaded file-embed mod-empty-attachment">missing</span>',
+    ].join(''),
+    [
+      { text: '![Remote one](https://example.com/one.png)', type: 'markdown-image' },
+      { text: '![Remote two](https://cdn.example/two.png)', type: 'markdown-image' },
+    ]
+  );
+
+  const htmlDocument = new DOMParser().parseFromString(annotatedHtml, 'text/html');
+  const elements = htmlDocument.querySelectorAll('[data-libre-remote-image-src]');
+
+  expect(elements).toHaveLength(2);
+
+  expect(elements[0]?.getAttribute('src')).toBe(null);
+  expect(elements[0]?.getAttribute('data-libre-attachment-source')).toBe(
+    '![Remote one](https://example.com/one.png)'
+  );
+
+  expect(elements[1]?.getAttribute('data-libre-remote-image-src')).toBe(
+    'https://cdn.example/two.png'
+  );
 });

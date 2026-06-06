@@ -52,3 +52,8 @@ export interface OdtSaveDetectionOptions {
 export interface OdtSaveDetectionResult {
   readonly hasSavedOdtChange: boolean;
 }
+
+export interface HtmlSanitizationResult {
+  readonly htmlSource: string;
+  readonly removedUnsafeContent: boolean;
+}

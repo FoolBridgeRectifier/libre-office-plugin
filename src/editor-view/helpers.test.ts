@@ -106,15 +106,33 @@ test('routes a specific markdown leaf using its tracked file', async () => {
   );
 });
 
-test('detaches only Libre markdown view leaves on unload', () => {
+test('restores Libre markdown view leaves to native markdown on unload', async () => {
   const markdownFile = createFile('Open.md', 'md');
   const libreLeaf = createLeaf(LIBRE_MARKDOWN_VIEW_TYPE, markdownFile);
   const nativeLeaf = createLeaf(NATIVE_MARKDOWN_VIEW_TYPE, markdownFile);
 
-  detachLibreMarkdownLeaves(createWorkspace([libreLeaf, nativeLeaf]));
+  await detachLibreMarkdownLeaves(createWorkspace([libreLeaf, nativeLeaf]));
 
-  expect(libreLeaf.detach).toHaveBeenCalledTimes(1);
+  expect(libreLeaf.setViewState).toHaveBeenCalledWith(
+    createNativeMarkdownViewState(markdownFile, true)
+  );
+
+  expect(libreLeaf.detach).not.toHaveBeenCalled();
   expect(nativeLeaf.detach).not.toHaveBeenCalled();
+});
+
+test('restores Libre leaves from view state when the file handle was cleared', async () => {
+  const markdownFile = createFile('State.md', 'md');
+  const libreLeaf = createLeaf(LIBRE_MARKDOWN_VIEW_TYPE, markdownFile);
+
+  Object.assign(libreLeaf.view, { file: null });
+
+  await detachLibreMarkdownLeaves(createWorkspace([libreLeaf]));
+
+  expect(libreLeaf.setViewState).toHaveBeenCalledWith(
+    createNativeMarkdownViewState('State.md', true)
+  );
+  expect(libreLeaf.detach).not.toHaveBeenCalled();
 });
 
 test('opens the native markdown fallback only for markdown files', async () => {

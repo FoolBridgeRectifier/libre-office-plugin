@@ -1,6 +1,11 @@
 import { TABLE_SCROLL_CONTAINER_CLASS } from '../attachments/constants';
 import { EDITOR_CONTAINED_MEDIA_CLASS_NAME } from './constants';
-import { isInsideProtectedContent, prepareHtmlForEditor, readHtmlFromEditor } from './helpers';
+import {
+  getHtmlSecurityWarningText,
+  isInsideProtectedContent,
+  prepareHtmlForEditor,
+  readHtmlFromEditor,
+} from './helpers';
 
 test('marks protected raw blocks read-only in the editor', () => {
   const htmlSource = '<pre data-libre-protected="raw-markdown"># Raw</pre>';
@@ -82,6 +87,34 @@ test('does not keep remote loading elements or remote asset sources', () => {
   expect(remoteImageElement?.getAttribute('src')).toBe(null);
   expect(remoteImageElement?.getAttribute('srcset')).toBe(null);
   expect(localImageElement?.getAttribute('src')).toBe('app://local/image.png');
+});
+
+test('strips executable pasted html before it is emitted for saving', () => {
+  const editorElement = document.createElement('div');
+
+  editorElement.innerHTML = [
+    '<p onclick="bad()">Body</p>',
+    '<a href="vbscript:bad()">Link</a>',
+    '<img src="data:text/html,bad" onerror="bad()">',
+    '<script>bad()</script>',
+  ].join('');
+
+  const htmlSource = readHtmlFromEditor(editorElement);
+
+  expect(htmlSource).toContain('<p>Body</p>');
+  expect(htmlSource).not.toContain('onclick');
+  expect(htmlSource).not.toContain('vbscript:');
+
+  expect(htmlSource).not.toContain('data:text/html');
+  expect(htmlSource).not.toContain('<script');
+});
+
+test('reports unsafe html cleanup for user-facing warning states', () => {
+  expect(getHtmlSecurityWarningText('<p onclick="bad()">Body</p>')).toBe(
+    'Unsafe HTML was removed before editing.'
+  );
+
+  expect(getHtmlSecurityWarningText('<p>Body</p>')).toBe(null);
 });
 
 test('detects whether an event target is inside protected content', () => {

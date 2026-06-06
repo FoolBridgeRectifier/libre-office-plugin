@@ -111,6 +111,33 @@ test('annotates rendered Obsidian link nodes with exact source markdown', async 
   expect(result.htmlSource).toContain('data-libre-obsidian-tag-source="#parent/child"');
 });
 
+test('masks remote markdown images before Obsidian rendering can request them', async () => {
+  const markdownRenderer: jest.MockedFunction<MarkdownBodyRenderer> = jest.fn(
+    async (bodyMarkdown, containerElement, _sourcePath) => {
+      expect(bodyMarkdown).not.toContain('https://example.com/remote.png');
+
+      containerElement.innerHTML = '<img alt="Remote" src="app://vault/placeholder.png">';
+    }
+  );
+
+  const result = await convertMarkdownToHtmlWithObsidianRenderer(
+    '![Remote](https://example.com/remote.png)',
+    { markdownRenderer, sourcePath: 'Remote.md' }
+  );
+
+  expect(result.htmlSource).toContain(
+    'data-libre-attachment-source="![Remote](https://example.com/remote.png)"'
+  );
+
+  expect(result.htmlSource).toContain(
+    'data-libre-remote-image-src="https://example.com/remote.png"'
+  );
+
+  const htmlDocument = new DOMParser().parseFromString(result.htmlSource, 'text/html');
+
+  expect(htmlDocument.querySelector('img')?.getAttribute('src')).toBe(null);
+});
+
 test('preserves raw markdown when Obsidian renders an empty non-empty body', async () => {
   const markdownRenderer: jest.MockedFunction<MarkdownBodyRenderer> = jest.fn(
     async (_bodyMarkdown, _containerElement, _sourcePath) => undefined

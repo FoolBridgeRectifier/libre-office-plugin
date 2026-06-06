@@ -4,6 +4,7 @@ import {
   createConflictState,
   createSourceStates,
 } from '../../conflicts/helpers';
+import { sanitizeConvertedHtmlSource } from '../../conversion/helpers';
 import {
   getHtmlSaveConflictSources,
   getMarkdownMirrorConflictSources,
@@ -15,9 +16,11 @@ import {
 import type { RichDocumentHtmlSaveOptions, RichDocumentSourceWriteOptions } from '../../interfaces';
 
 export async function saveRichDocumentHtml(options: RichDocumentHtmlSaveOptions): Promise<void> {
+  const sanitizedHtmlSource = sanitizeConvertedHtmlSource(options.htmlSource);
   const mapping = await options.richDocumentStore.getOrCreateMapping(options.markdownPath);
   const currentSourceStates = await createSourceStates(mapping, options.vaultAdapter);
   const sourceChanges = collectChangedSourceStates(mapping.sourceStates, currentSourceStates);
+
   const markdownChanged = sourceChanges.some((sourceChange) => sourceChange.source === 'markdown');
 
   const htmlChanged = await hasExternalHtmlChange(
@@ -27,7 +30,7 @@ export async function saveRichDocumentHtml(options: RichDocumentHtmlSaveOptions)
   );
 
   const richSourceChanged = hasRichSourceChange(sourceChanges);
-  const localHtmlChanged = options.htmlSource !== options.previousHtmlSource;
+  const localHtmlChanged = sanitizedHtmlSource !== options.previousHtmlSource;
 
   const richFileDeleted = sourceChanges.some(
     (sourceChange) =>
@@ -45,7 +48,7 @@ export async function saveRichDocumentHtml(options: RichDocumentHtmlSaveOptions)
   ) {
     const conflictState = await createConflictState({
       changedSources: getHtmlSaveConflictSources(sourceChanges, htmlChanged, localHtmlChanged),
-      desktopHtmlSource: options.htmlSource,
+      desktopHtmlSource: sanitizedHtmlSource,
       detectedAt: new Date().toISOString(),
       mapping,
       reason: richFileDeleted ? 'missing-rich-file' : 'multi-source-change',
@@ -62,7 +65,7 @@ export async function saveRichDocumentHtml(options: RichDocumentHtmlSaveOptions)
 
   const currentTimestamp = new Date().toISOString();
 
-  await options.vaultAdapter.write(mapping.htmlPath, options.htmlSource);
+  await options.vaultAdapter.write(mapping.htmlPath, sanitizedHtmlSource);
   const sourceStates = await createSourceStates(mapping, options.vaultAdapter);
 
   await options.richDocumentStore.updateMapping(options.markdownPath, {
@@ -78,9 +81,11 @@ export async function saveRichDocumentHtml(options: RichDocumentHtmlSaveOptions)
 }
 
 export async function syncMarkdownMirror(options: RichDocumentSourceWriteOptions): Promise<void> {
+  const sanitizedHtmlSource = sanitizeConvertedHtmlSource(options.htmlSource);
   const mapping = await options.richDocumentStore.getOrCreateMapping(options.markdownPath);
   const currentSourceStates = await createSourceStates(mapping, options.vaultAdapter);
   const sourceChanges = collectChangedSourceStates(mapping.sourceStates, currentSourceStates);
+
   const markdownChanged = sourceChanges.some((sourceChange) => sourceChange.source === 'markdown');
 
   const richSourceChanged = hasRichSourceChange(sourceChanges);
@@ -97,7 +102,7 @@ export async function syncMarkdownMirror(options: RichDocumentSourceWriteOptions
   if (markdownChanged || richSourceChanged) {
     const conflictState = await createConflictState({
       changedSources: getMarkdownMirrorConflictSources(sourceChanges),
-      desktopHtmlSource: options.htmlSource,
+      desktopHtmlSource: sanitizedHtmlSource,
       detectedAt: new Date().toISOString(),
       mapping,
       reason: richFileDeleted ? 'missing-rich-file' : 'multi-source-change',
@@ -113,7 +118,7 @@ export async function syncMarkdownMirror(options: RichDocumentSourceWriteOptions
   }
 
   const currentMarkdownSource = await options.vaultAdapter.read(options.markdownPath);
-  const currentHtmlSource = options.htmlSource;
+  const currentHtmlSource = sanitizedHtmlSource;
   const markdownMirrorSource = createMarkdownMirrorSource(currentMarkdownSource, currentHtmlSource);
 
   await options.vaultAdapter.write(options.markdownPath, markdownMirrorSource);

@@ -72,3 +72,28 @@ test('does not overwrite markdown when odt changes before mirror sync', async ()
   expect(vault.files.get('Note.md')).toBe('Original markdown');
   expect(updatedMapping.conflictState.status).toBe('conflicted');
 });
+
+test('sanitizes unsafe html before rich source writes and markdown sync', async () => {
+  const { richDocumentStore, vault } = await createOdtTrackedFixture();
+
+  await saveRichDocumentHtml({
+    htmlSource: '<article><p onclick="bad()">Clean body</p><script>bad()</script></article>',
+    markdownPath: 'Note.md',
+    previousHtmlSource: '<article>Original</article>',
+    richDocumentStore,
+    vaultAdapter: vault.adapter,
+  });
+
+  await syncMarkdownMirror({
+    htmlSource: vault.files.get('.libre-note-editor/documents/rich-note/document.html') ?? '',
+    markdownPath: 'Note.md',
+    richDocumentStore,
+    vaultAdapter: vault.adapter,
+  });
+
+  expect(vault.files.get('.libre-note-editor/documents/rich-note/document.html')).toBe(
+    '<article><p>Clean body</p></article>'
+  );
+
+  expect(vault.files.get('Note.md')).toBe('Clean body');
+});

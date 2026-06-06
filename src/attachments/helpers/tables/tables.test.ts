@@ -15,12 +15,21 @@ test('exports simple tables as markdown tables', () => {
 
 test('preserves complex tables as protected sanitized html', () => {
   const annotatedHtml = annotateTableHtml(
-    '<table onclick="bad()"><tr><td colspan="2">Merged</td></tr><script>bad()</script></table>'
+    [
+      '<table onclick="bad()">',
+      '<tr><td colspan="2" style="background:url(https://example.com/track.png)">Merged</td></tr>',
+      '<tr><td><a href="data:text/html,bad">Unsafe</a></td></tr>',
+      '<script>bad()</script>',
+      '</table>',
+    ].join('')
   );
 
   expect(annotatedHtml).toContain('data-libre-table-kind="complex"');
   expect(annotatedHtml).toContain('data-libre-protected="complex-table"');
   expect(annotatedHtml).not.toContain('onclick');
+
+  expect(annotatedHtml).not.toContain('data:text/html');
+  expect(annotatedHtml).not.toContain('background:url');
   expect(annotatedHtml).not.toContain('<script>');
 });
 

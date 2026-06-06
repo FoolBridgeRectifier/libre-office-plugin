@@ -8,6 +8,7 @@ import {
   createObsidianWikiLinkSource,
   parseObsidianWikiLinkSource,
 } from '../../../obsidian-links/helpers';
+import { isSafeAttachmentPath, isSafeStoredAttachmentTarget } from './helpers/path-safety/helpers';
 
 export function parseMarkdownImageSource(sourceText: string): {
   readonly altText: string | null;
@@ -56,6 +57,17 @@ function getRemoteImageMarkdown(element: HTMLElement): string | null {
   return `![${getCurrentCaption(element) ?? ''}](${sourceValue})`;
 }
 
+function isSafeStoredAttachmentSource(
+  parsedSource: ReturnType<typeof parseObsidianWikiLinkSource>,
+  parsedMarkdownImage: ReturnType<typeof parseMarkdownImageSource>
+): boolean {
+  if (parsedMarkdownImage) {
+    return isSafeStoredAttachmentTarget(parsedMarkdownImage.target, true);
+  }
+
+  return parsedSource !== null && isSafeAttachmentPath(parsedSource.target);
+}
+
 function isAttachmentElement(element: HTMLElement): boolean {
   return (
     element.hasAttribute(ATTACHMENT_SOURCE_ATTRIBUTE) ||
@@ -80,11 +92,20 @@ export function getAttachmentMarkdown(element: HTMLElement): string | null {
   const parsedSource = sourceText ? parseObsidianWikiLinkSource(sourceText) : null;
   const parsedMarkdownImage = sourceText ? parseMarkdownImageSource(sourceText) : null;
 
-  if (sourceText && element.getAttribute(ATTACHMENT_STATUS_ATTRIBUTE) === 'broken') {
+  if (
+    sourceText &&
+    element.getAttribute(ATTACHMENT_STATUS_ATTRIBUTE) === 'broken' &&
+    isSafeStoredAttachmentSource(parsedSource, parsedMarkdownImage)
+  ) {
     return sourceText;
   }
 
-  if (sourceText && parsedMarkdownImage && !getCurrentAttachmentPath(element)) {
+  if (
+    sourceText &&
+    parsedMarkdownImage &&
+    !getCurrentAttachmentPath(element) &&
+    isSafeStoredAttachmentSource(parsedSource, parsedMarkdownImage)
+  ) {
     return sourceText;
   }
 
@@ -94,7 +115,7 @@ export function getAttachmentMarkdown(element: HTMLElement): string | null {
     parsedMarkdownImage?.target ??
     null;
 
-  if (!currentPath) {
+  if (!currentPath || !isSafeAttachmentPath(currentPath)) {
     return null;
   }
 

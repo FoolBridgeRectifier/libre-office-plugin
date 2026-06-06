@@ -66,6 +66,65 @@ test('uses injected Obsidian-rendered markdown import when available', async () 
   );
 });
 
+test('sanitizes executable html during first markdown import', async () => {
+  const mapping = createRichDocumentMapping('Unsafe.md', 'rich-unsafe', '2026-05-31', 'desktop');
+  const richDocumentStore = createStore(mapping);
+  const vault = createVaultAdapter();
+
+  const result = await ensureFirstMarkdownImport({
+    mapping,
+    markdownFile: createMarkdownFile('Unsafe.md'),
+    markdownRenderer: createMarkdownRenderer(
+      [
+        '<div class="markdown-preview-section">',
+        '<p onclick="bad()">Body</p>',
+        '<a href="javascript:bad()">Link</a>',
+        '<script>bad()</script>',
+        '</div>',
+      ].join('')
+    ),
+    richDocumentStore,
+    vaultAdapter: vault.adapter,
+    vaultReader: createVaultReader('[Link](javascript:bad())'),
+  });
+
+  expect(result.htmlSource).toContain('<p>Body</p>');
+  expect(result.htmlSource).not.toContain('onclick');
+  expect(result.htmlSource).not.toContain('javascript:');
+
+  expect(result.htmlSource).not.toContain('<script');
+  expect(vault.files.get(mapping.htmlPath)).toBe(result.htmlSource);
+});
+
+test('sanitizes an existing richer html source before returning it', async () => {
+  const mapping = createRichDocumentMapping(
+    'Existing.md',
+    'rich-existing',
+    '2026-05-31',
+    'desktop'
+  );
+
+  const richDocumentStore = createStore(mapping);
+  const vault = createVaultAdapter(
+    new Map([[mapping.htmlPath, '<article><img src="https://example.com/remote.png"></article>']])
+  );
+
+  const result = await ensureFirstMarkdownImport({
+    mapping,
+    markdownFile: createMarkdownFile('Existing.md'),
+    richDocumentStore,
+    vaultAdapter: vault.adapter,
+    vaultReader: createVaultReader('# Replacement'),
+  });
+
+  expect(result.imported).toBe(false);
+  expect(result.htmlSource).toContain('data-libre-remote-image-src');
+  const htmlDocument = new DOMParser().parseFromString(result.htmlSource, 'text/html');
+
+  expect(htmlDocument.querySelector('img')?.getAttribute('src')).toBe(null);
+  expect(vault.files.get(mapping.htmlPath)).toBe(result.htmlSource);
+});
+
 test('uses protected raw markdown when no renderer is injected on first import', async () => {
   const mapping = createRichDocumentMapping('Raw.md', 'rich-raw', '2026-05-31', 'desktop');
   const richDocumentStore = createStore(mapping);

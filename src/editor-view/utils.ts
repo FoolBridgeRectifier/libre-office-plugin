@@ -13,6 +13,13 @@ export function createLeaf(viewType: string, file: TFile | null): WorkspaceLeaf 
   const workspaceLeaf = {} as WorkspaceLeaf;
 
   workspaceLeaf.detach = jest.fn();
+
+  const getViewState = jest.fn(() => ({
+    state: { file: file?.path },
+    type: viewType,
+  }));
+
+  workspaceLeaf.getViewState = getViewState;
   workspaceLeaf.openFile = jest.fn().mockResolvedValue(undefined);
   workspaceLeaf.setViewState = jest.fn().mockResolvedValue(undefined);
 

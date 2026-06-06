@@ -1,5 +1,6 @@
 import { HTML_FALLBACK_ACTIVE_SOURCE } from './constants';
 import { createSourceStates } from '../conflicts/helpers';
+import { sanitizeConvertedHtmlSourceWithReport } from '../conversion/helpers';
 import { convertMarkdownToHtmlWithObsidianRenderer } from './helpers';
 import { ensureVaultFolder } from '../rich-documents/helpers/vault/vault';
 import { createRichDocumentFilePaths } from '../rich-documents/helpers';
@@ -14,10 +15,26 @@ export async function ensureFirstMarkdownImport(
 ): Promise<FirstMarkdownImportResult> {
   // Existing HTML is treated as the richer source and must not be overwritten by markdown.
   if (await options.vaultAdapter.exists(options.mapping.htmlPath)) {
+    const existingHtmlSource = await options.vaultAdapter.read(options.mapping.htmlPath);
+    const sanitizedExistingHtml = sanitizeConvertedHtmlSourceWithReport(existingHtmlSource);
+    let existingMapping = options.mapping;
+
+    if (sanitizedExistingHtml.removedUnsafeContent) {
+      await options.vaultAdapter.write(options.mapping.htmlPath, sanitizedExistingHtml.htmlSource);
+      const sourceStates = await createSourceStates(options.mapping, options.vaultAdapter);
+
+      existingMapping = await options.richDocumentStore.updateMapping(
+        options.mapping.markdownPath,
+        {
+          sourceStates,
+        }
+      );
+    }
+
     return {
-      htmlSource: await options.vaultAdapter.read(options.mapping.htmlPath),
+      htmlSource: sanitizedExistingHtml.htmlSource,
       imported: false,
-      mapping: options.mapping,
+      mapping: existingMapping,
     };
   }
 
@@ -34,6 +51,10 @@ export async function ensureFirstMarkdownImport(
     renderedMarkdownOptions
   );
 
+  const sanitizedImportHtml = sanitizeConvertedHtmlSourceWithReport(
+    markdownToHtmlResult.htmlSource
+  );
+
   // A single timestamp keeps the first HTML sync and overall sync markers aligned.
   const currentTimestamp = options.getCurrentTimestamp?.() ?? new Date().toISOString();
 
@@ -42,7 +63,7 @@ export async function ensureFirstMarkdownImport(
 
   // The hidden rich-document folder is created lazily on the first markdown import.
   await ensureVaultFolder(options.vaultAdapter, richDocumentFilePaths.folderPath);
-  await options.vaultAdapter.write(options.mapping.htmlPath, markdownToHtmlResult.htmlSource);
+  await options.vaultAdapter.write(options.mapping.htmlPath, sanitizedImportHtml.htmlSource);
   const sourceStates = await createSourceStates(options.mapping, options.vaultAdapter);
 
   // After import, the rich HTML file becomes the active editable source for this note.
@@ -61,7 +82,7 @@ export async function ensureFirstMarkdownImport(
   );
 
   return {
-    htmlSource: markdownToHtmlResult.htmlSource,
+    htmlSource: sanitizedImportHtml.htmlSource,
     imported: true,
     mapping: importedMapping,
   };

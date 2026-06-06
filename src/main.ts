@@ -97,7 +97,7 @@ export default class LibreNoteEditorPlugin extends Plugin {
   }
   async onunload(): Promise<void> {
     await flushOpenLibreEditors(this.app.workspace);
-    detachLibreMarkdownLeaves(this.app.workspace);
+    await detachLibreMarkdownLeaves(this.app.workspace);
   }
   async saveSettings(settings: LibreNoteEditorSettings): Promise<void> {
     this.settings = settings;

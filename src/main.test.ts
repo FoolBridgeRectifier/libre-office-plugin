@@ -144,7 +144,7 @@ test('refreshes open Libre link warnings after metadata cache changes', async ()
   expect(editorView.refreshLinkWarnings).toHaveBeenCalledTimes(1);
 });
 
-test('detaches Libre leaves on plugin unload', async () => {
+test('restores Libre leaves to native markdown on plugin unload', async () => {
   const { default: LibreNoteEditorPlugin } = await import('./main');
   const markdownFile = createMarkdownFile('Unload.md');
   const libreLeaf = createLeaf(markdownFile, LIBRE_MARKDOWN_VIEW_TYPE);
@@ -159,5 +159,8 @@ test('detaches Libre leaves on plugin unload', async () => {
   await plugin.onload();
   await plugin.onunload();
 
-  expect(libreLeaf.detach).toHaveBeenCalledTimes(1);
+  expect(libreLeaf.setViewState).toHaveBeenCalledWith(
+    expect.objectContaining({ type: NATIVE_MARKDOWN_VIEW_TYPE })
+  );
+  expect(libreLeaf.detach).not.toHaveBeenCalled();
 });

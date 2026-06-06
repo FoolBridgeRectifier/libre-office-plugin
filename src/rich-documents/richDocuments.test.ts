@@ -109,6 +109,47 @@ test('ignores malformed plugin data and repairs unsafe rich paths', async () => 
   expect(repairedMapping?.conflictState.status).toBe('none');
 });
 
+test('drops unsafe persisted conflict copy paths during plugin data normalization', async () => {
+  const unsafePluginData = {
+    mappings: [
+      {
+        conflictState: {
+          changedSources: ['html'],
+          conflictCopies: [
+            {
+              createdAt: '2026-06-06T12:00:00.000Z',
+              path: '../outside.html',
+              source: 'html',
+            },
+            {
+              createdAt: '2026-06-06T12:00:00.000Z',
+              path: `${RICH_DOCUMENTS_ROOT_PATH}/rich-safe/conflicts/copy.html`,
+              source: 'html',
+            },
+          ],
+          detectedAt: '2026-06-06T12:00:00.000Z',
+          reason: 'multi-source-change',
+          status: 'conflicted',
+        },
+        markdownPath: 'Unsafe Conflict.md',
+        richDocumentId: 'rich-safe',
+      },
+    ],
+  };
+
+  const { store } = createStore(unsafePluginData);
+  const mapping = (await store.loadMappings())[0];
+
+  expect(mapping?.conflictState.status).toBe('conflicted');
+
+  if (mapping?.conflictState.status === 'conflicted') {
+    expect(mapping.conflictState.conflictCopies).toHaveLength(1);
+    expect(mapping.conflictState.conflictCopies[0]?.path).toBe(
+      `${RICH_DOCUMENTS_ROOT_PATH}/rich-safe/conflicts/copy.html`
+    );
+  }
+});
+
 test('keeps duplicate note names in different folders as separate mappings', async () => {
   let idIndex = 0;
   const identifiers = ['rich-first', 'rich-second'];
