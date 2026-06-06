@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "build": "tsc --noEmit && node esbuild.config.mjs",
+    "build": "tsc --noEmit && node esbuild.config.mjs && node scripts/bundle-plugin.mjs",
     "build:dev": "tsc --noEmit && node esbuild.config.mjs --sourcemap",
     "dev": "node esbuild.config.mjs --watch",
     "format": "prettier . --write",

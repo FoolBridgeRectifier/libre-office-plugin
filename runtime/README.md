@@ -11,7 +11,9 @@ runtime/
 `-- libreoffice/program/soffice              # Linux
 ```
 
-The runtime payload is intentionally ignored by Git because LibreOffice is large and platform-specific. Distribution packaging should copy the appropriate portable LibreOffice build into this folder before release.
+The runtime payload is intentionally ignored by Git because LibreOffice is large and platform-specific. Prepare every platform runtime you want to ship before release.
+
+`npm run build` copies `main.js`, `manifest.json`, and every prepared runtime directory into `dist/`. If Windows, macOS, and Linux runtime folders are present, all three are bundled in `dist/runtime/`.
 
 Use the runtime preparation script after extracting a platform LibreOffice package:
 
