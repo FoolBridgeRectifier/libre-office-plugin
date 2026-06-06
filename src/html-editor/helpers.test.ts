@@ -1,3 +1,5 @@
+import { TABLE_SCROLL_CONTAINER_CLASS } from '../attachments/constants';
+import { EDITOR_CONTAINED_MEDIA_CLASS_NAME } from './constants';
 import { isInsideProtectedContent, prepareHtmlForEditor, readHtmlFromEditor } from './helpers';
 
 test('marks protected raw blocks read-only in the editor', () => {
@@ -20,6 +22,14 @@ test('removes editor-only protected markers when reading html source', () => {
   );
 });
 
+test('keeps editor-only image containment classes out of saved html', () => {
+  const editorElement = document.createElement('div');
+
+  editorElement.innerHTML = `<img alt="Wide" class="${EDITOR_CONTAINED_MEDIA_CLASS_NAME}" src="wide.png">`;
+
+  expect(readHtmlFromEditor(editorElement)).toBe('<img alt="Wide" src="wide.png">');
+});
+
 test('keeps existing protected classes when reading html source', () => {
   const editorElement = document.createElement('div');
 
@@ -29,6 +39,25 @@ test('keeps existing protected classes when reading html source', () => {
   expect(readHtmlFromEditor(editorElement)).toBe(
     '<pre data-libre-protected="raw-markdown" class="language-md"># Raw</pre>'
   );
+});
+
+test('prepares images and tables for container-safe mobile editing', () => {
+  const preparedHtmlSource = prepareHtmlForEditor(
+    '<article><img alt="Wide" src="wide.png"><table><tr><td>Wide</td></tr></table></article>'
+  );
+
+  expect(preparedHtmlSource).toContain(`class="${EDITOR_CONTAINED_MEDIA_CLASS_NAME}"`);
+  expect(preparedHtmlSource).toContain(`class="${TABLE_SCROLL_CONTAINER_CLASS}"`);
+});
+
+test('does not duplicate existing table overflow wrappers', () => {
+  const preparedHtmlSource = prepareHtmlForEditor(
+    `<div class="${TABLE_SCROLL_CONTAINER_CLASS}"><table><tr><td>Wide</td></tr></table></div>`
+  );
+
+  const htmlDocument = new DOMParser().parseFromString(preparedHtmlSource, 'text/html');
+
+  expect(htmlDocument.querySelectorAll('.libre-table-scroll')).toHaveLength(1);
 });
 
 test('does not keep remote loading elements or remote asset sources', () => {
@@ -46,8 +75,13 @@ test('does not keep remote loading elements or remote asset sources', () => {
   expect(preparedHtmlSource).not.toContain('<link');
   expect(preparedHtmlSource).not.toContain('<iframe');
 
-  expect(preparedHtmlSource).toContain('<img alt="remote">');
-  expect(preparedHtmlSource).toContain('<img src="app://local/image.png" alt="local">');
+  const htmlDocument = new DOMParser().parseFromString(preparedHtmlSource, 'text/html');
+  const remoteImageElement = htmlDocument.querySelector('img[alt="remote"]');
+  const localImageElement = htmlDocument.querySelector('img[alt="local"]');
+
+  expect(remoteImageElement?.getAttribute('src')).toBe(null);
+  expect(remoteImageElement?.getAttribute('srcset')).toBe(null);
+  expect(localImageElement?.getAttribute('src')).toBe('app://local/image.png');
 });
 
 test('detects whether an event target is inside protected content', () => {

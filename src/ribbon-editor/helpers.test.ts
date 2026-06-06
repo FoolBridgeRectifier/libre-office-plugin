@@ -5,6 +5,8 @@ import {
   getAutosaveStatusText,
   getCommandButtonClassName,
   getCommandIcon,
+  getEditorPageClassName,
+  getTabButtonClassName,
 } from './helpers';
 import type { RibbonTabDefinition } from './interfaces';
 
@@ -38,6 +40,19 @@ test('uses known command icons and preview as the unknown fallback', () => {
 test('marks disabled command buttons with disabled text styling', () => {
   expect(getCommandButtonClassName(true)).toContain('text-text-disabled');
   expect(getCommandButtonClassName(false)).toContain('hover:bg-button-hover-bg');
+});
+
+test('keeps page-width layout chrome desktop-only', () => {
+  const pageWidthClassName = getEditorPageClassName('page-width');
+
+  expect(getEditorPageClassName('pageless')).toContain('max-w-full');
+  expect(pageWidthClassName).toContain('p-0');
+  expect(pageWidthClassName).toContain('libre-page-width');
+});
+
+test('uses reduced-motion classes for command and tab transitions', () => {
+  expect(getCommandButtonClassName(false)).toContain('motion-reduce:transition-none');
+  expect(getTabButtonClassName(false)).toContain('motion-reduce:transition-none');
 });
 
 test('maps autosave statuses to footer text', () => {

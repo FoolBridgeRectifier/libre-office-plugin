@@ -4,7 +4,7 @@ exports[`renders the OneNote-style ribbon editor shell 1`] = `
 <div>
   <section
     aria-label="Libre Note Editor"
-    class="flex h-full min-h-[480px] flex-col overflow-hidden bg-ribbon-bg font-sans text-text-primary"
+    class="flex h-full min-h-0 flex-col overflow-hidden bg-ribbon-bg font-sans text-text-primary"
   >
     <nav
       aria-label="Ribbon tabs"
@@ -12,21 +12,21 @@ exports[`renders the OneNote-style ribbon editor shell 1`] = `
     >
       <button
         aria-pressed="true"
-        class="min-h-8 whitespace-nowrap px-4 font-sans text-[11px] font-medium transition-colors duration-150 ease-ribbon-fast focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-button-focus-ring bg-ribbon-bg text-text-primary"
+        class="min-h-8 whitespace-nowrap px-4 font-sans text-[11px] font-medium transition-colors duration-150 ease-ribbon-fast motion-reduce:transition-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-button-focus-ring bg-ribbon-bg text-text-primary"
         type="button"
       >
         Home
       </button>
       <button
         aria-pressed="false"
-        class="min-h-8 whitespace-nowrap px-4 font-sans text-[11px] font-medium transition-colors duration-150 ease-ribbon-fast focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-button-focus-ring text-white hover:bg-ribbon-purple-mid"
+        class="min-h-8 whitespace-nowrap px-4 font-sans text-[11px] font-medium transition-colors duration-150 ease-ribbon-fast motion-reduce:transition-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-button-focus-ring text-white hover:bg-ribbon-purple-mid"
         type="button"
       >
         Insert
       </button>
       <button
         aria-pressed="false"
-        class="min-h-8 whitespace-nowrap px-4 font-sans text-[11px] font-medium transition-colors duration-150 ease-ribbon-fast focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-button-focus-ring text-white hover:bg-ribbon-purple-mid"
+        class="min-h-8 whitespace-nowrap px-4 font-sans text-[11px] font-medium transition-colors duration-150 ease-ribbon-fast motion-reduce:transition-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-button-focus-ring text-white hover:bg-ribbon-purple-mid"
         type="button"
       >
         View
@@ -34,18 +34,18 @@ exports[`renders the OneNote-style ribbon editor shell 1`] = `
     </nav>
     <div
       aria-label="Home commands"
-      class="flex flex-wrap gap-0 border-b border-ribbon-border bg-ribbon-bg px-2 py-2 shadow-ribbon-raised"
+      class="flex max-w-full flex-wrap gap-0 overflow-x-auto border-b border-ribbon-border bg-ribbon-bg px-2 py-2 shadow-ribbon-raised"
     >
       <section
         aria-label="Clipboard"
-        class="flex min-w-fit flex-col justify-between gap-1 border-r border-ribbon-border px-2 last:border-r-0"
+        class="flex min-w-fit shrink-0 flex-col justify-between gap-1 border-r border-ribbon-border px-2 last:border-r-0"
       >
         <div
           class="flex flex-wrap items-start gap-1"
         >
           <button
             aria-label="Copy formatting between rich note selections."
-            class="flex min-w-16 flex-col items-center gap-1 rounded-ribbon-sm border px-2 py-1.5 font-sans text-[10px] transition-colors duration-150 ease-ribbon-fast focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-button-focus-ring border-transparent text-text-primary hover:border-button-hover-border hover:bg-button-hover-bg"
+            class="flex min-w-16 flex-col items-center gap-1 rounded-ribbon-sm border px-2 py-1.5 font-sans text-[10px] transition-colors duration-150 ease-ribbon-fast motion-reduce:transition-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-button-focus-ring border-transparent text-text-primary hover:border-button-hover-border hover:bg-button-hover-bg"
             type="button"
           >
             <span>
@@ -54,7 +54,7 @@ exports[`renders the OneNote-style ribbon editor shell 1`] = `
           </button>
           <button
             aria-label="Paste clipboard content into the rich editor."
-            class="flex min-w-16 flex-col items-center gap-1 rounded-ribbon-sm border px-2 py-1.5 font-sans text-[10px] transition-colors duration-150 ease-ribbon-fast focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-button-focus-ring border-transparent text-text-primary hover:border-button-hover-border hover:bg-button-hover-bg"
+            class="flex min-w-16 flex-col items-center gap-1 rounded-ribbon-sm border px-2 py-1.5 font-sans text-[10px] transition-colors duration-150 ease-ribbon-fast motion-reduce:transition-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-button-focus-ring border-transparent text-text-primary hover:border-button-hover-border hover:bg-button-hover-bg"
             type="button"
           >
             <span>
@@ -70,14 +70,14 @@ exports[`renders the OneNote-style ribbon editor shell 1`] = `
       </section>
       <section
         aria-label="Basic Text"
-        class="flex min-w-fit flex-col justify-between gap-1 border-r border-ribbon-border px-2 last:border-r-0"
+        class="flex min-w-fit shrink-0 flex-col justify-between gap-1 border-r border-ribbon-border px-2 last:border-r-0"
       >
         <div
           class="flex flex-wrap items-start gap-1"
         >
           <button
             aria-label="Apply bold formatting to the current selection."
-            class="flex min-w-16 flex-col items-center gap-1 rounded-ribbon-sm border px-2 py-1.5 font-sans text-[10px] transition-colors duration-150 ease-ribbon-fast focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-button-focus-ring border-transparent text-text-primary hover:border-button-hover-border hover:bg-button-hover-bg"
+            class="flex min-w-16 flex-col items-center gap-1 rounded-ribbon-sm border px-2 py-1.5 font-sans text-[10px] transition-colors duration-150 ease-ribbon-fast motion-reduce:transition-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-button-focus-ring border-transparent text-text-primary hover:border-button-hover-border hover:bg-button-hover-bg"
             type="button"
           >
             <span>
@@ -86,7 +86,7 @@ exports[`renders the OneNote-style ribbon editor shell 1`] = `
           </button>
           <button
             aria-label="Apply italic formatting to the current selection."
-            class="flex min-w-16 flex-col items-center gap-1 rounded-ribbon-sm border px-2 py-1.5 font-sans text-[10px] transition-colors duration-150 ease-ribbon-fast focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-button-focus-ring border-transparent text-text-primary hover:border-button-hover-border hover:bg-button-hover-bg"
+            class="flex min-w-16 flex-col items-center gap-1 rounded-ribbon-sm border px-2 py-1.5 font-sans text-[10px] transition-colors duration-150 ease-ribbon-fast motion-reduce:transition-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-button-focus-ring border-transparent text-text-primary hover:border-button-hover-border hover:bg-button-hover-bg"
             type="button"
           >
             <span>
@@ -102,20 +102,20 @@ exports[`renders the OneNote-style ribbon editor shell 1`] = `
       </section>
     </div>
     <main
-      class="flex flex-1 flex-col gap-4 overflow-auto bg-ribbon-bg px-6 py-5 text-text-primary"
+      class="flex min-w-0 flex-1 flex-col gap-4 overflow-auto bg-ribbon-bg px-3 py-3 text-text-primary sm:px-6 sm:py-5"
     >
       <article
         aria-label="Editor surface"
-        class="relative min-h-72 rounded-ribbon-sm border border-ribbon-border bg-ribbon-bg p-6 shadow-ribbon-raised"
+        class="relative min-h-72 w-full min-w-0 max-w-full rounded-ribbon-sm bg-ribbon-bg text-text-primary p-0"
       >
         <div
           aria-label="Empty HTML editor"
-          class="min-h-64 rounded-ribbon-sm border border-dashed border-ribbon-border px-4 py-3 font-sans text-sm text-text-secondary"
+          class="min-h-64 min-w-0 max-w-full rounded-ribbon-sm border border-dashed border-ribbon-border px-4 py-3 font-sans text-sm text-text-secondary"
         />
       </article>
     </main>
     <footer
-      class="flex flex-wrap justify-between gap-2 border-t border-ribbon-border px-4 py-2 font-sans text-[11px] text-text-muted"
+      class="flex min-w-0 flex-wrap justify-between gap-2 border-t border-ribbon-border px-4 py-2 font-sans text-[11px] text-text-muted"
     >
       <span
         aria-label="HTML source status"

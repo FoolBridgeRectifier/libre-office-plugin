@@ -79,6 +79,18 @@ test('shows active source, mode, and layout status labels', () => {
   expect(screen.getByLabelText('Editor layout')).toHaveTextContent('Page width layout');
 });
 
+test('applies page-width chrome only at desktop breakpoints', () => {
+  render(
+    <RibbonEditor
+      importedHtmlSource="<article><p>Page width body</p></article>"
+      pageLayout="page-width"
+    />
+  );
+
+  expect(screen.getByLabelText('Editor surface')).toHaveClass('p-0');
+  expect(screen.getByLabelText('Editor surface')).toHaveClass('libre-page-width');
+});
+
 test('shows only the top corner ODT loader while desktop source work is running', () => {
   render(
     <RibbonEditor
@@ -88,7 +100,14 @@ test('shows only the top corner ODT loader while desktop source work is running'
     />
   );
 
+  const spinnerElement = screen.getByLabelText('ODT source loading').querySelector('[aria-hidden]');
+
+  if (!spinnerElement) {
+    throw new Error('Expected loading status to include a visible spinner indicator.');
+  }
+
   expect(screen.getByLabelText('ODT source loading')).toHaveTextContent('ODT');
+  expect(spinnerElement).toHaveClass('motion-reduce:animate-none');
   expect(screen.getByLabelText('HTML source status')).toHaveTextContent('HTML source saved');
   expect(screen.queryByText('No rich HTML source loaded.')).toBeNull();
 });

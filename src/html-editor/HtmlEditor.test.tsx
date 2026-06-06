@@ -34,6 +34,35 @@ test('loads html source into the local editor surface', () => {
   );
 });
 
+test('uses pageless mobile-safe editor classes for wrapping and media containment', () => {
+  render(
+    <HtmlEditor htmlSource="<article><p>LongUnbrokenWord</p><img alt='Wide' src='wide.png'></article>" />
+  );
+
+  const editorElement = screen.getByRole('textbox', { name: 'Local HTML editor' });
+
+  expect(editorElement).toHaveClass('p-0');
+  expect(editorElement).toHaveClass('box-border');
+  expect(editorElement).toHaveClass('min-w-0');
+  expect(editorElement).toHaveClass('max-w-full');
+
+  expect(editorElement.className).toContain('[overflow-wrap:anywhere]');
+  expect(editorElement.className).toContain('[&_.libre-contained-editor-media]:max-w-full');
+});
+
+test('renders table content inside a horizontal overflow container', () => {
+  render(<HtmlEditor htmlSource="<article><table><tr><td>Wide</td></tr></table></article>" />);
+
+  const tableScrollElement = screen.getByText('Wide').closest('.libre-table-scroll');
+
+  if (!tableScrollElement) {
+    throw new Error('Expected wide table content to be wrapped for horizontal scrolling.');
+  }
+
+  expect(tableScrollElement).toHaveClass('overflow-x-auto');
+  expect(tableScrollElement).toHaveClass('max-w-full');
+});
+
 test('emits changed html source and dirty state on editor input', () => {
   const handleHtmlSourceChange = jest.fn();
   const handleDirtyStateChange = jest.fn();
@@ -78,6 +107,18 @@ test('renders protected raw blocks as read-only editor content', () => {
   expect(protectedElement).toHaveAttribute('data-libre-editor-protected', 'true');
 });
 
+test('keeps desktop-only protected content visible and guarded', () => {
+  render(
+    <HtmlEditor htmlSource='<article><section data-libre-protected="desktop-only">Desktop layout</section></article>' />
+  );
+
+  const protectedElement = screen.getByText('Desktop layout');
+
+  expect(protectedElement).toBeVisible();
+  expect(protectedElement).toHaveClass('libre-protected-html-block');
+  expect(protectedElement).toHaveAttribute('contenteditable', 'false');
+});
+
 test('prevents direct input inside protected raw blocks', () => {
   render(
     <HtmlEditor htmlSource='<article><pre data-libre-protected="raw-markdown"># Raw</pre></article>' />
@@ -93,4 +134,21 @@ test('prevents direct input inside protected raw blocks', () => {
 
   expect(editorElement).toContainElement(protectedElement);
   expect(fireEvent(protectedElement, beforeInputEvent)).toBe(false);
+});
+
+test('snapshots narrow editor rendering without a fixed page canvas', () => {
+  const originalInnerWidth = window.innerWidth;
+
+  Object.defineProperty(window, 'innerWidth', { configurable: true, value: 360 });
+
+  try {
+    const { container } = render(
+      <HtmlEditor htmlSource="<article><p>Narrow body</p><img alt='Wide' src='wide.png'></article>" />
+    );
+
+    expect(screen.getByRole('textbox', { name: 'Local HTML editor' })).toHaveClass('w-full');
+    expect(container).toMatchSnapshot();
+  } finally {
+    Object.defineProperty(window, 'innerWidth', { configurable: true, value: originalInnerWidth });
+  }
 });

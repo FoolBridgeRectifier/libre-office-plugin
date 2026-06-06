@@ -61,6 +61,42 @@
 }
 
 @layer utilities {
+  .libre-html-editor.markdown-preview-view {
+    padding: 0 !important;
+  }
+
+  @media (min-width: 768px) {
+    .libre-page-width {
+      border: 1px solid var(--ribbon-border);
+      box-shadow: var(--shadow-ribbon);
+      margin-inline: auto;
+      max-width: 816px;
+      padding: 1.5rem;
+    }
+  }
+
+  .libre-html-editor ul,
+  .libre-html-editor ol {
+    list-style-position: inside;
+    max-width: 100%;
+    min-width: 0;
+    overflow-wrap: anywhere;
+    padding-inline-start: 1.25rem;
+  }
+
+  .libre-html-editor ul ul,
+  .libre-html-editor ul ol,
+  .libre-html-editor ol ul,
+  .libre-html-editor ol ol {
+    padding-inline-start: 0.75rem;
+  }
+
+  .libre-html-editor li {
+    margin-inline-start: 0 !important;
+    min-width: 0;
+    overflow-wrap: anywhere;
+  }
+
   .libre-imported-markdown .callout {
     margin-bottom: 0 !important;
     margin-top: 0 !important;

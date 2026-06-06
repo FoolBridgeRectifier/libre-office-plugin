@@ -17,7 +17,9 @@ export function DesktopSourceLoader({ status }: DesktopSourceLoaderProps) {
 
   const spinnerClassName = classNames(
     'size-3 rounded-full border border-ribbon-border',
-    status === 'loading' ? 'animate-spin border-t-icon-purple' : 'border-icon-red'
+    status === 'loading'
+      ? 'animate-spin border-t-icon-purple motion-reduce:animate-none'
+      : 'border-icon-red'
   );
 
   return (

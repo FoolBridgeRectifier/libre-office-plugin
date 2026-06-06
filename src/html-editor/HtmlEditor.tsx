@@ -1,4 +1,5 @@
 import { useEffect, useRef } from 'react';
+import classNames from 'classnames';
 
 import { isInsideProtectedContent, prepareHtmlForEditor, readHtmlFromEditor } from './helpers';
 import type { HtmlEditorProps } from './interfaces';
@@ -14,16 +15,26 @@ export function HtmlEditor({
   const editorElementRef = useRef<HTMLDivElement | null>(null);
   const initialHtmlSourceRef = useRef('');
 
-  const editorClassName =
-    'libre-html-editor markdown-preview-view min-h-64 w-full rounded-ribbon-sm bg-ribbon-bg p-0 font-sans text-text-primary outline-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-button-focus-ring';
+  const editorClassName = classNames(
+    'libre-html-editor markdown-preview-view min-h-64 w-full min-w-0 max-w-full box-border',
+    'overflow-x-hidden rounded-ribbon-sm bg-ribbon-bg p-0 font-sans text-text-primary',
+    'outline-none [overflow-wrap:anywhere] focus-visible:outline focus-visible:outline-2',
+    'focus-visible:outline-button-focus-ring',
+    '[&_.libre-contained-editor-media]:h-auto [&_.libre-contained-editor-media]:max-w-full',
+    '[&_.libre-contained-editor-media]:object-contain',
+    '[&_.libre-protected-html-block]:max-w-full',
+    '[&_.libre-protected-html-block]:overflow-x-auto',
+    '[&_.libre-table-scroll]:max-w-full [&_.libre-table-scroll]:overflow-x-auto',
+    '[&_pre]:max-w-full [&_pre]:overflow-x-auto'
+  );
 
   const stateClassName =
-    'min-h-64 rounded-ribbon-sm border border-dashed border-ribbon-border px-4 py-3 font-sans text-sm text-text-secondary';
+    'min-h-64 min-w-0 max-w-full rounded-ribbon-sm border border-dashed border-ribbon-border px-4 py-3 font-sans text-sm text-text-secondary';
 
-  const blankStateClassName = 'min-h-64 w-full';
+  const blankStateClassName = 'min-h-64 w-full min-w-0 max-w-full';
 
   const errorClassName =
-    'min-h-64 rounded-ribbon-sm border border-icon-red px-4 py-3 font-sans text-sm text-text-primary';
+    'min-h-64 min-w-0 max-w-full rounded-ribbon-sm border border-icon-red px-4 py-3 font-sans text-sm text-text-primary';
 
   useEffect(() => {
     if (!editorElementRef.current || htmlSource === null || initializationError) {

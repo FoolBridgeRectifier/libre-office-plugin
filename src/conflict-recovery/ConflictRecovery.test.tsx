@@ -21,3 +21,11 @@ test('disables recovery choices while resolution is running', () => {
   expect(screen.getByRole('button', { name: 'Desktop' })).toBeDisabled();
   expect(screen.getByRole('button', { name: 'Duplicate' })).toBeDisabled();
 });
+
+test('uses reduced-motion styling for recovery actions', () => {
+  render(<ConflictRecoveryPanel onResolveConflict={jest.fn()} />);
+
+  expect(screen.getByRole('button', { name: 'Desktop' })).toHaveClass(
+    'motion-reduce:transition-none'
+  );
+});

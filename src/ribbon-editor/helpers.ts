@@ -12,6 +12,7 @@ import classNames from 'classnames';
 
 import type { AutosaveStatus } from '../autosave/interfaces';
 import type { RibbonTabDefinition } from './interfaces';
+import type { LibreNoteEditorPageLayout } from '../settings/interfaces';
 
 export function findRibbonTab(
   ribbonTabDefinitions: ReadonlyArray<RibbonTabDefinition>,
@@ -38,11 +39,20 @@ export function getCommandButtonClassName(isDisabledCommand: boolean) {
   return classNames(
     'flex min-w-16 flex-col items-center gap-1 rounded-ribbon-sm border px-2 py-1.5',
     'font-sans text-[10px] transition-colors duration-150 ease-ribbon-fast',
+    'motion-reduce:transition-none',
     'focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2',
     'focus-visible:outline-button-focus-ring',
     isDisabledCommand
       ? 'border-ribbon-border text-text-disabled'
       : 'border-transparent text-text-primary hover:border-button-hover-border hover:bg-button-hover-bg'
+  );
+}
+
+export function getEditorPageClassName(pageLayout: LibreNoteEditorPageLayout): string {
+  return classNames(
+    'relative min-h-72 w-full min-w-0 max-w-full rounded-ribbon-sm bg-ribbon-bg',
+    'text-text-primary',
+    pageLayout === 'page-width' ? 'libre-page-width p-0' : 'p-0'
   );
 }
 
@@ -95,7 +105,8 @@ export function getLinkWarningStatusText(linkWarningCount: number): string {
 export function getTabButtonClassName(isActiveRibbonTab: boolean) {
   return classNames(
     'min-h-8 whitespace-nowrap px-4 font-sans text-[11px] font-medium transition-colors',
-    'duration-150 ease-ribbon-fast focus-visible:outline focus-visible:outline-2',
+    'duration-150 ease-ribbon-fast motion-reduce:transition-none',
+    'focus-visible:outline focus-visible:outline-2',
     'focus-visible:outline-offset-[-2px] focus-visible:outline-button-focus-ring',
     isActiveRibbonTab ? 'bg-ribbon-bg text-text-primary' : 'text-white hover:bg-ribbon-purple-mid'
   );
