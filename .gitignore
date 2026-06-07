@@ -18,3 +18,8 @@ runtime/*
 !runtime/LibreOffice-aarch64.app/**
 !runtime/LibreOffice-linux/
 !runtime/LibreOffice-linux/**
+runtime/**/__pycache__/
+runtime/**/*.pyc
+runtime/**/*.pyo
+runtime/**/*.dmp
+runtime/*/program/logs/

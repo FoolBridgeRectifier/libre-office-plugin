@@ -1,6 +1,8 @@
 import { access, cp, mkdir, rm } from 'node:fs/promises';
 import path from 'node:path';
 
+import { prunePreparedRuntime } from './runtime-pruning.mjs';
+
 const RUNTIME_LAYOUTS = {
   linux: {
     candidates: ['libreoffice', 'LibreOffice'],
@@ -101,27 +103,6 @@ async function assertPathExists(filePath) {
   if (!(await pathExists(filePath))) {
     fail(`Prepared runtime is missing ${filePath}.`);
   }
-}
-
-async function prunePreparedRuntime(targetPath, platform) {
-  if (!platform.startsWith('macos')) {
-    return;
-  }
-
-  await Promise.all([
-    rm(path.join(targetPath, 'Contents/MacOS/urelibs'), { force: true, recursive: true }),
-    rm(path.join(targetPath, 'Contents/Frameworks/LibreOfficePython.framework/Versions/Current'), {
-      force: true,
-      recursive: true,
-    }),
-    rm(
-      path.join(
-        targetPath,
-        'Contents/Frameworks/LibreOfficePython.framework/Versions/3.12/lib/python3.12'
-      ),
-      { force: true, recursive: true }
-    ),
-  ]);
 }
 
 function fail(message) {
