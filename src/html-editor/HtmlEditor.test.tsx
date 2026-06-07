@@ -79,7 +79,7 @@ test('emits changed html source and dirty state on editor input', () => {
   const handleHtmlSourceChange = jest.fn();
   const handleDirtyStateChange = jest.fn();
 
-  render(
+  const { rerender } = render(
     <HtmlEditor
       htmlSource="<article><p>Original</p></article>"
       onDirtyStateChange={handleDirtyStateChange}
@@ -91,9 +91,19 @@ test('emits changed html source and dirty state on editor input', () => {
 
   editorElement.innerHTML = '<article><p>Changed</p></article>';
   fireEvent.input(editorElement);
+  const changedParagraphElement = screen.getByText('Changed');
+
+  rerender(
+    <HtmlEditor
+      htmlSource="<article><p>Changed</p></article>"
+      onDirtyStateChange={handleDirtyStateChange}
+      onHtmlSourceChange={handleHtmlSourceChange}
+    />
+  );
 
   expect(handleHtmlSourceChange).toHaveBeenLastCalledWith('<article><p>Changed</p></article>');
   expect(handleDirtyStateChange).toHaveBeenLastCalledWith(true);
+  expect(screen.getByText('Changed')).toBe(changedParagraphElement);
 });
 
 test('sanitizes unsafe editor input before emitting it', () => {
