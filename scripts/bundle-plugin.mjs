@@ -3,7 +3,7 @@ import path from 'node:path';
 
 const DIST_DIRECTORY = 'dist';
 const RUNTIME_DIRECTORY = 'runtime';
-const PLUGIN_ENTRY_FILES = ['main.js', 'manifest.json'];
+const PLUGIN_ENTRY_FILES = ['main.js', 'manifest.json', 'THIRD_PARTY_NOTICES.md'];
 const RUNTIME_DOCUMENTATION_FILES = ['README.md'];
 const RUNTIME_PLACEHOLDER_FILES = ['.gitkeep'];
 

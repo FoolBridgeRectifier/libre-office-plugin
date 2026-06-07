@@ -29,3 +29,5 @@ npm run runtime:prepare -- --platform linux --source output/runtime-extract
 Windows packages should come from LibreOffice Portable for PortableApps. macOS packages should provide `LibreOffice.app`. Linux packages should provide a portable LibreOffice folder with `program/soffice`.
 
 The preparation script removes generated Python bytecode caches, crash dumps, runtime logs, and macOS Python scripting payloads that are not needed for headless ODT conversion. This keeps the bundle clean and the macOS app path lengths safe for Windows release builds.
+
+Keep every bundled LibreOffice license, notice, credit, extension license, and readme file. The distributable also includes `THIRD_PARTY_NOTICES.md` at the plugin root so users can find the LibreOffice license/source/trademark notice without searching through platform runtime folders.

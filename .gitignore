@@ -7,6 +7,7 @@ main.js
 data.json
 Data/
 *.log
+# Prepared runtime roots are tracked; keep license, notice, credits, and config files.
 runtime/*
 !runtime/README.md
 !runtime/.gitkeep
@@ -18,6 +19,7 @@ runtime/*
 !runtime/LibreOffice-aarch64.app/**
 !runtime/LibreOffice-linux/
 !runtime/LibreOffice-linux/**
+# Ignore only generated runtime artifacts that are safe to delete.
 runtime/**/__pycache__/
 runtime/**/*.pyc
 runtime/**/*.pyo
