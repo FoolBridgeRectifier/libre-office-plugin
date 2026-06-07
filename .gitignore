@@ -14,5 +14,7 @@ runtime/*
 !runtime/LibreOffice/**
 !runtime/LibreOffice.app/
 !runtime/LibreOffice.app/**
-!runtime/libreoffice/
-!runtime/libreoffice/**
+!runtime/LibreOffice-aarch64.app/
+!runtime/LibreOffice-aarch64.app/**
+!runtime/LibreOffice-linux/
+!runtime/LibreOffice-linux/**

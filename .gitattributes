@@ -1,3 +1,4 @@
 runtime/LibreOffice/** filter=lfs diff=lfs merge=lfs -text
 runtime/LibreOffice.app/** filter=lfs diff=lfs merge=lfs -text
-runtime/libreoffice/** filter=lfs diff=lfs merge=lfs -text
+runtime/LibreOffice-aarch64.app/** filter=lfs diff=lfs merge=lfs -text
+runtime/LibreOffice-linux/** filter=lfs diff=lfs merge=lfs -text

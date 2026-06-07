@@ -25,8 +25,11 @@ export const OFFICE_RUNTIME_BUNDLED_PATHS: Record<
   OfficeRuntimeOperatingSystem,
   ReadonlyArray<string>
 > = {
-  linux: ['libreoffice/program/soffice'],
-  macos: ['LibreOffice.app/Contents/MacOS/soffice'],
+  linux: ['LibreOffice-linux/program/soffice'],
+  macos: [
+    'LibreOffice-aarch64.app/Contents/MacOS/soffice',
+    'LibreOffice.app/Contents/MacOS/soffice',
+  ],
   unsupported: [],
   windows: [
     'LibreOffice/program/soffice.com',

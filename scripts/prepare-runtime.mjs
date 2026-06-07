@@ -5,12 +5,17 @@ const RUNTIME_LAYOUTS = {
   linux: {
     candidates: ['libreoffice', 'LibreOffice'],
     executablePath: 'program/soffice',
-    targetDirectoryName: 'libreoffice',
+    targetDirectoryName: 'LibreOffice-linux',
   },
   macos: {
     candidates: ['LibreOffice.app'],
     executablePath: 'Contents/MacOS/soffice',
     targetDirectoryName: 'LibreOffice.app',
+  },
+  'macos-aarch64': {
+    candidates: ['LibreOffice.app'],
+    executablePath: 'Contents/MacOS/soffice',
+    targetDirectoryName: 'LibreOffice-aarch64.app',
   },
   windows: {
     candidates: ['App/libreoffice', 'libreoffice', 'LibreOffice'],
@@ -23,7 +28,7 @@ const parsedArguments = parseArguments(process.argv.slice(2));
 const layout = RUNTIME_LAYOUTS[parsedArguments.platform];
 
 if (!layout) {
-  fail('Use --platform windows, --platform macos, or --platform linux.');
+  fail('Use --platform windows, --platform macos, --platform macos-aarch64, or --platform linux.');
 }
 
 if (!parsedArguments.sourcePath) {
@@ -39,6 +44,7 @@ const targetExecutablePath = path.join(targetPath, layout.executablePath);
 await rm(targetPath, { force: true, recursive: true });
 await mkdir(runtimeRootPath, { recursive: true });
 await cp(runtimeSourcePath, targetPath, { recursive: true });
+await prunePreparedRuntime(targetPath, parsedArguments.platform);
 await assertPathExists(targetExecutablePath);
 
 console.log(`Prepared ${parsedArguments.platform} runtime at ${targetExecutablePath}`);
@@ -95,6 +101,27 @@ async function assertPathExists(filePath) {
   if (!(await pathExists(filePath))) {
     fail(`Prepared runtime is missing ${filePath}.`);
   }
+}
+
+async function prunePreparedRuntime(targetPath, platform) {
+  if (!platform.startsWith('macos')) {
+    return;
+  }
+
+  await Promise.all([
+    rm(path.join(targetPath, 'Contents/MacOS/urelibs'), { force: true, recursive: true }),
+    rm(path.join(targetPath, 'Contents/Frameworks/LibreOfficePython.framework/Versions/Current'), {
+      force: true,
+      recursive: true,
+    }),
+    rm(
+      path.join(
+        targetPath,
+        'Contents/Frameworks/LibreOfficePython.framework/Versions/3.12/lib/python3.12'
+      ),
+      { force: true, recursive: true }
+    ),
+  ]);
 }
 
 function fail(message) {

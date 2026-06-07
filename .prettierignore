@@ -6,4 +6,5 @@ main.js
 .worktrees/
 runtime/LibreOffice/
 runtime/LibreOffice.app/
-runtime/libreoffice/
+runtime/LibreOffice-aarch64.app/
+runtime/LibreOffice-linux/

@@ -23,7 +23,7 @@ test('detects bundled runtime from the plugin runtime folder', async () => {
 });
 
 test('ignores configured and system LibreOffice paths on desktop', async () => {
-  const bundledPath = '/vault/plugin/runtime/libreoffice/program/soffice';
+  const bundledPath = '/vault/plugin/runtime/LibreOffice-linux/program/soffice';
 
   const dependencies = createRuntimeDependencies({
     files: ['/configured/soffice', '/usr/bin/soffice', bundledPath],
@@ -40,6 +40,23 @@ test('ignores configured and system LibreOffice paths on desktop', async () => {
 
   expect(state).toEqual(expect.objectContaining({ executablePath: bundledPath }));
   expect(dependencies.process.findExecutable).not.toHaveBeenCalled();
+});
+
+test('detects bundled macOS runtimes from architecture-specific app folders', async () => {
+  const bundledPath = '/vault/plugin/runtime/LibreOffice.app/Contents/MacOS/soffice';
+
+  const dependencies = createRuntimeDependencies({
+    files: [bundledPath],
+  });
+
+  const state = await detectOfficeRuntime({
+    bundledRootPath: '/vault/plugin/runtime',
+    dependencies,
+    operatingSystem: 'macos',
+    platform: 'desktop',
+  });
+
+  expect(state).toEqual(expect.objectContaining({ executablePath: bundledPath }));
 });
 
 test('reports missing bundled runtime instead of falling back to system LibreOffice', async () => {
