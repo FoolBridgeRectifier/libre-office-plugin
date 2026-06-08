@@ -1,14 +1,13 @@
 import { $generateHtmlFromNodes, $generateNodesFromDOM } from '@lexical/html';
 import { $getRoot, type LexicalEditor } from 'lexical';
 
-import { SOURCE_PRESERVED_HTML_SELECTOR } from '../../constants';
 import { LOCKED_HTML_PLACEHOLDER_ATTRIBUTE } from '../html-element/constants';
 import { prepareHtmlForEditor, readHtmlFromEditor } from '../source-html/sourceHtml';
 
 export function createLockedHtmlImportSource(htmlSource: string): string {
   const htmlDocument = new DOMParser().parseFromString(htmlSource, 'text/html');
 
-  htmlDocument.querySelectorAll<HTMLElement>(SOURCE_PRESERVED_HTML_SELECTOR).forEach((element) => {
+  htmlDocument.querySelectorAll<HTMLElement>('[data-libre-protected]').forEach((element) => {
     const placeholderElement = htmlDocument.createElement('div');
 
     placeholderElement.setAttribute(LOCKED_HTML_PLACEHOLDER_ATTRIBUTE, element.outerHTML);

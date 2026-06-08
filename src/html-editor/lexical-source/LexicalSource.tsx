@@ -8,7 +8,7 @@ import { HistoryPlugin } from '@lexical/react/LexicalHistoryPlugin';
 import { HTML_EDITOR_CLASS_NAME } from '../constants';
 import { LEXICAL_EDITOR_NAMESPACE, LEXICAL_SOURCE_ERROR_MESSAGE } from './constants';
 import { HtmlElementNode, LockedHtmlNode } from './html-element/htmlElement';
-import { HtmlSourcePlugin, LockedContentGuardPlugin } from './plugins/plugins';
+import { HtmlSourcePlugin, ProtectedContentGuardPlugin } from './plugins/plugins';
 import { getHtmlSecurityWarningText, readHtmlFromEditor } from './source-html/sourceHtml';
 import type { LexicalSourceProps } from './interfaces';
 
@@ -71,7 +71,7 @@ export function LexicalSource({
         {...(onInitializationError ? { onInitializationError } : {})}
         {...(onSecurityWarningChange ? { onSecurityWarningChange } : {})}
       />
-      <LockedContentGuardPlugin />
+      <ProtectedContentGuardPlugin />
     </LexicalComposer>
   );
 }

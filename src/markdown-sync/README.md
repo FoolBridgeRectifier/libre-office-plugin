@@ -6,6 +6,12 @@
 
 The import path prefers Obsidian's own renderer, then annotates the rendered HTML with preserved source metadata for links, embeds, tags, code, callouts, raw Markdown, attachments, and tables.
 
+## Protected Content
+
+`data-libre-protected` is the durable marker for source that must survive import/export but is not represented as normal editable rich HTML yet. Markdown sync uses it for frontmatter templates, source-facts templates, raw Markdown fallback blocks, and structured Markdown that needs exact original source during Markdown mirror export.
+
+Protected content is not a user-facing block type. It is a preservation contract between import, the HTML editor, autosave, and export.
+
 ## Main Components
 
 - `markdownSync.ts` implements `ensureFirstMarkdownImport`. It skips import when HTML already exists, sanitizes existing or imported HTML, creates the rich-document folder, writes the initial HTML, snapshots source states, and updates the mapping.

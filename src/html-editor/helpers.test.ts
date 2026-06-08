@@ -2,25 +2,25 @@ import { TABLE_SCROLL_CONTAINER_CLASS } from '../attachments/constants';
 import { EDITOR_CONTAINED_MEDIA_CLASS_NAME } from './constants';
 import {
   getHtmlSecurityWarningText,
-  isInsideLockedContent,
+  isInsideProtectedContent,
   prepareHtmlForEditor,
   readHtmlFromEditor,
 } from './lexical-source/source-html/sourceHtml';
 
-test('marks source-preserved raw markdown read-only in the editor', () => {
+test('marks protected raw blocks read-only in the editor', () => {
   const htmlSource = '<pre data-libre-protected="raw-markdown"># Raw</pre>';
   const preparedHtmlSource = prepareHtmlForEditor(htmlSource);
 
   expect(preparedHtmlSource).toContain('contenteditable="false"');
-  expect(preparedHtmlSource).toContain('data-libre-editor-locked="true"');
-  expect(preparedHtmlSource).toContain('libre-locked-html-block');
+  expect(preparedHtmlSource).toContain('data-libre-editor-protected="true"');
+  expect(preparedHtmlSource).toContain('libre-protected-html-block');
 });
 
-test('removes editor-only locked markers when reading html source', () => {
+test('removes editor-only protected markers when reading html source', () => {
   const editorElement = document.createElement('div');
 
   editorElement.innerHTML =
-    '<pre data-libre-protected="raw-markdown" data-libre-editor-locked="true" contenteditable="false" class="libre-locked-html-block"># Raw</pre>';
+    '<pre data-libre-protected="raw-markdown" data-libre-editor-protected="true" contenteditable="false" class="libre-protected-html-block"># Raw</pre>';
 
   expect(readHtmlFromEditor(editorElement)).toBe(
     '<pre data-libre-protected="raw-markdown"># Raw</pre>'
@@ -35,11 +35,11 @@ test('keeps editor-only image containment classes out of saved html', () => {
   expect(readHtmlFromEditor(editorElement)).toBe('<img alt="Wide" src="wide.png">');
 });
 
-test('keeps existing source classes when reading html source', () => {
+test('keeps existing protected classes when reading html source', () => {
   const editorElement = document.createElement('div');
 
   editorElement.innerHTML =
-    '<pre data-libre-protected="raw-markdown" data-libre-editor-locked="true" contenteditable="false" class="language-md libre-locked-html-block"># Raw</pre>';
+    '<pre data-libre-protected="raw-markdown" data-libre-editor-protected="true" contenteditable="false" class="language-md libre-protected-html-block"># Raw</pre>';
 
   expect(readHtmlFromEditor(editorElement)).toBe(
     '<pre data-libre-protected="raw-markdown" class="language-md"># Raw</pre>'
@@ -117,13 +117,13 @@ test('reports unsafe html cleanup for user-facing warning states', () => {
   expect(getHtmlSecurityWarningText('<p>Body</p>')).toBe(null);
 });
 
-test('detects whether an event target is inside locked source-preserved content', () => {
+test('detects whether an event target is inside protected content', () => {
   const wrapperElement = document.createElement('div');
 
   wrapperElement.innerHTML =
     '<pre data-libre-protected="raw-markdown"><code><span># Raw</span></code></pre>';
 
-  expect(isInsideLockedContent(wrapperElement.querySelector('span'))).toBe(true);
-  expect(isInsideLockedContent(wrapperElement)).toBe(false);
-  expect(isInsideLockedContent(null)).toBe(false);
+  expect(isInsideProtectedContent(wrapperElement.querySelector('span'))).toBe(true);
+  expect(isInsideProtectedContent(wrapperElement)).toBe(false);
+  expect(isInsideProtectedContent(null)).toBe(false);
 });

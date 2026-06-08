@@ -110,44 +110,44 @@ test('emits editor blur for immediate autosave', () => {
   expect(handleEditorBlur).toHaveBeenCalledTimes(1);
 });
 
-test('renders source-preserved raw markdown as read-only editor content', () => {
+test('renders protected raw blocks as read-only editor content', () => {
   render(
     <HtmlEditor htmlSource='<article><pre data-libre-protected="raw-markdown"># Raw</pre></article>' />
   );
 
-  const lockedElement = screen.getByText('# Raw');
+  const protectedElement = screen.getByText('# Raw');
 
-  expect(lockedElement).toHaveAttribute('contenteditable', 'false');
-  expect(lockedElement).toHaveAttribute('data-libre-editor-locked', 'true');
+  expect(protectedElement).toHaveAttribute('contenteditable', 'false');
+  expect(protectedElement).toHaveAttribute('data-libre-editor-protected', 'true');
 });
 
-test('keeps desktop-only source-preserved content visible and guarded', () => {
+test('keeps desktop-only protected content visible and guarded', () => {
   render(
     <HtmlEditor htmlSource='<article><section data-libre-protected="desktop-only">Desktop layout</section></article>' />
   );
 
-  const lockedElement = screen.getByText('Desktop layout');
+  const protectedElement = screen.getByText('Desktop layout');
 
-  expect(lockedElement).toBeVisible();
-  expect(lockedElement).toHaveClass('libre-locked-html-block');
-  expect(lockedElement).toHaveAttribute('contenteditable', 'false');
+  expect(protectedElement).toBeVisible();
+  expect(protectedElement).toHaveClass('libre-protected-html-block');
+  expect(protectedElement).toHaveAttribute('contenteditable', 'false');
 });
 
-test('prevents direct input inside locked raw markdown', () => {
+test('prevents direct input inside protected raw blocks', () => {
   render(
     <HtmlEditor htmlSource='<article><pre data-libre-protected="raw-markdown"># Raw</pre></article>' />
   );
 
   const editorElement = screen.getByRole('textbox', { name: 'Local HTML editor' });
-  const lockedElement = screen.getByText('# Raw');
+  const protectedElement = screen.getByText('# Raw');
 
   const beforeInputEvent = new InputEvent('beforeinput', {
     bubbles: true,
     cancelable: true,
   });
 
-  expect(editorElement).toContainElement(lockedElement);
-  expect(fireEvent(lockedElement, beforeInputEvent)).toBe(false);
+  expect(editorElement).toContainElement(protectedElement);
+  expect(fireEvent(protectedElement, beforeInputEvent)).toBe(false);
 });
 
 test('snapshots narrow editor rendering without a fixed page canvas', () => {
