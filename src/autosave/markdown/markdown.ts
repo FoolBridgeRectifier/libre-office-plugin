@@ -1,7 +1,7 @@
 import { getObsidianBlockMarkdown, getObsidianInlineMarkdown } from '../../obsidian-links';
 import { getAttachmentMarkdown, getTableMarkdown } from '../../attachments';
 import { getStructuredMarkdownSource } from '../../markdown-sync/markdown/structured-blocks/structuredBlocks';
-import { getCodeBlockMarkdown, getListMarkdown } from './utils';
+import { getCodeFenceMarkdown, getListMarkdown } from './utils';
 
 function getInlineMarkdown(node: Node): string {
   if (node.nodeType === Node.TEXT_NODE) {
@@ -71,11 +71,18 @@ function getBlockMarkdown(element: HTMLElement): string {
     return obsidianMarkdown;
   }
 
+  const tagName = element.tagName.toLowerCase();
+
+  if (tagName === 'pre') {
+    return element.dataset.libreProtected === 'raw-markdown'
+      ? (element.textContent ?? '')
+      : getCodeFenceMarkdown(element, structuredMarkdownSource);
+  }
+
   if (structuredMarkdownSource !== null) {
     return structuredMarkdownSource;
   }
 
-  const tagName = element.tagName.toLowerCase();
   const inlineMarkdown = getInlineMarkdown(element).trim();
 
   if (/^h[1-6]$/.test(tagName)) {
@@ -86,12 +93,6 @@ function getBlockMarkdown(element: HTMLElement): string {
 
   if (tagName === 'p') {
     return inlineMarkdown;
-  }
-
-  if (tagName === 'pre') {
-    return element.dataset.libreProtected === 'raw-markdown'
-      ? (element.textContent ?? '')
-      : getCodeBlockMarkdown(element);
   }
 
   if (tagName === 'ul' || tagName === 'ol') {

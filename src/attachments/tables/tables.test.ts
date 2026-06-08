@@ -49,3 +49,33 @@ test('exports simple table captions as nearby markdown text', () => {
     getTableMarkdown(htmlDocument.querySelector('table') as HTMLElement, readInlineMarkdown)
   ).toBe(['Caption', '', '| A |', '| --- |', '| B |'].join('\n'));
 });
+
+test('exports complex tables from current sanitized html', () => {
+  const htmlDocument = new DOMParser().parseFromString(
+    [
+      '<table data-libre-protected="complex-table" data-libre-table-html-source="<table><tr><td>Old</td></tr></table>">',
+      '<tr><td rowspan="2" onclick="bad()">Edited</td></tr>',
+      '</table>',
+    ].join(''),
+    'text/html'
+  );
+
+  expect(
+    getTableMarkdown(htmlDocument.querySelector('table') as HTMLElement, readInlineMarkdown)
+  ).toBe('<table><tbody><tr><td rowspan="2">Edited</td></tr></tbody></table>');
+});
+
+test('exports stored complex table source when current html is unchanged', () => {
+  const htmlDocument = new DOMParser().parseFromString(
+    [
+      '<table data-libre-protected="complex-table" data-libre-table-html-source="<table><tr><td rowspan=&quot;2&quot;>Merged</td></tr></table>">',
+      '<tr><td rowspan="2">Merged</td></tr>',
+      '</table>',
+    ].join(''),
+    'text/html'
+  );
+
+  expect(
+    getTableMarkdown(htmlDocument.querySelector('table') as HTMLElement, readInlineMarkdown)
+  ).toBe('<table><tr><td rowspan="2">Merged</td></tr></table>');
+});

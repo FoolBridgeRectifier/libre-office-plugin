@@ -78,7 +78,7 @@ The Markdown mirror is the compatibility contract.
 
 `obsidian-links`, `attachments`, and `markdown-sync` preserve source-level details that Obsidian's rendered HTML cannot fully represent. Original wiki links, embeds, tags, block ids, Markdown image syntax, callouts, code fences, inline code, comments, raw HTML, and complex table source are stored on protected templates or `data-libre-*` attributes.
 
-Protected content is the durable preservation mechanism for source that must round-trip exactly but is not modeled as editable rich content yet. The serialized marker is `data-libre-protected`; editor-only guards such as `data-libre-editor-protected`, `contenteditable="false"`, and `libre-protected-html-block` are temporary render-time markers and must be stripped before saving HTML.
+Protected content is the durable preservation mechanism for source that must round-trip exactly or needs special export handling. The serialized marker is `data-libre-protected`. Code fences and complex tables remain editable and removable, and export uses their current DOM rather than stale preserved source attributes. Read-only protected content, such as frontmatter templates, source-facts templates, raw Markdown fallbacks, remote media fallbacks, and desktop-only content, gets temporary render-time guards such as `data-libre-editor-protected`, `contenteditable="false"`, and `libre-protected-html-block`; those guards must be stripped before saving HTML, and delete operations must remain possible.
 
 `editor-view/link-warnings` refreshes warning counts when Obsidian metadata changes so missing heading and block targets stay visible in the UI.
 

@@ -9,6 +9,42 @@ export function getCodeBlockMarkdown(element: HTMLElement): string {
   return `\`\`\`${languageName}\n${(codeElement ?? element).textContent ?? ''}\n\`\`\``;
 }
 
+function getCodeFenceParts(
+  markdownSource: string
+): { readonly code: string; readonly language: string } | null {
+  const sourceLines = markdownSource.replace(/\r\n/g, '\n').split('\n');
+  const openingFence = /^(`{3,}|~{3,})([^\n]*)$/.exec(sourceLines[0] ?? '');
+  const closingFence = sourceLines[sourceLines.length - 1] ?? '';
+
+  if (!openingFence || closingFence.trim() !== openingFence[1]) {
+    return null;
+  }
+
+  const infoText = openingFence[2]?.trim() ?? '';
+
+  return {
+    code: sourceLines.slice(1, -1).join('\n'),
+    language: infoText.split(/\s+/)[0] ?? '',
+  };
+}
+
+export function getCodeFenceMarkdown(element: HTMLElement, preservedSource: string | null): string {
+  const currentMarkdown = getCodeBlockMarkdown(element);
+  const preservedCodeFence = preservedSource ? getCodeFenceParts(preservedSource) : null;
+  const currentCodeFence = getCodeFenceParts(currentMarkdown);
+
+  if (
+    preservedCodeFence &&
+    currentCodeFence &&
+    preservedCodeFence.code === currentCodeFence.code &&
+    preservedCodeFence.language === currentCodeFence.language
+  ) {
+    return preservedSource as string;
+  }
+
+  return currentMarkdown;
+}
+
 export function getListMarkdown(
   element: HTMLElement,
   isOrdered: boolean,

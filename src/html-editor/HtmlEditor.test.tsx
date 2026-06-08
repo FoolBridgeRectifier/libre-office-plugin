@@ -150,6 +150,36 @@ test('prevents direct input inside protected raw blocks', () => {
   expect(fireEvent(protectedElement, beforeInputEvent)).toBe(false);
 });
 
+test('allows delete input events inside protected raw blocks', () => {
+  render(
+    <HtmlEditor htmlSource='<article><pre data-libre-protected="raw-markdown"># Raw</pre></article>' />
+  );
+
+  const protectedElement = screen.getByText('# Raw');
+
+  const deleteEvent = new InputEvent('beforeinput', {
+    bubbles: true,
+    cancelable: true,
+    inputType: 'deleteContentBackward',
+  });
+
+  expect(fireEvent(protectedElement, deleteEvent)).toBe(true);
+});
+
+test('keeps protected code fences and complex tables editable', () => {
+  render(
+    <HtmlEditor htmlSource='<article><pre data-libre-protected="code-fence"><code>const value = true;</code></pre><table data-libre-protected="complex-table"><tr><td>Cell</td></tr></table></article>' />
+  );
+
+  const codeFenceElement = screen.getByText('const value = true;').closest('pre');
+  const tableElement = screen.getByText('Cell').closest('table');
+
+  expect(codeFenceElement).not.toHaveAttribute('contenteditable', 'false');
+  expect(codeFenceElement).not.toHaveAttribute('data-libre-editor-protected');
+  expect(tableElement).not.toHaveAttribute('contenteditable', 'false');
+  expect(tableElement).not.toHaveAttribute('data-libre-editor-protected');
+});
+
 test('snapshots narrow editor rendering without a fixed page canvas', () => {
   const originalInnerWidth = window.innerWidth;
 

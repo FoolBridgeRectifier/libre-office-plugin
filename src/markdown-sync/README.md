@@ -8,9 +8,9 @@ The import path prefers Obsidian's own renderer, then annotates the rendered HTM
 
 ## Protected Content
 
-`data-libre-protected` is the durable marker for source that must survive import/export but is not represented as normal editable rich HTML yet. Markdown sync uses it for frontmatter templates, source-facts templates, raw Markdown fallback blocks, and structured Markdown that needs exact original source during Markdown mirror export.
+`data-libre-protected` is the durable marker for source that must survive import/export or needs special export handling. Markdown sync uses it for frontmatter templates, source-facts templates, raw Markdown fallback blocks, code fences, and structured Markdown that needs exact original source during Markdown mirror export.
 
-Protected content is not a user-facing block type. It is a preservation contract between import, the HTML editor, autosave, and export.
+Protected content is not a user-facing block type. It is a preservation contract between import, the HTML editor, autosave, and export. Code fences are editable; autosave exports them from current HTML instead of the original structured source after editing.
 
 ## Main Components
 

@@ -1,2 +1,2 @@
 export { createAutosaveController } from './autosave';
-export { createMarkdownMirrorSource } from './helpers';
+export { convertHtmlToMarkdownMirror, createMarkdownMirrorSource } from './helpers';

@@ -104,7 +104,10 @@ export function getTableMarkdown(
     return getSimpleTableMarkdown(tableElement, readInlineMarkdown);
   }
 
-  return (
-    tableElement.getAttribute(TABLE_SOURCE_ATTRIBUTE) ?? sanitizeHtmlSource(tableElement.outerHTML)
-  );
+  const currentTableHtml = sanitizeHtmlSource(tableElement.outerHTML);
+  const storedTableHtml = tableElement.getAttribute(TABLE_SOURCE_ATTRIBUTE);
+
+  return storedTableHtml && sanitizeHtmlSource(storedTableHtml) === currentTableHtml
+    ? storedTableHtml
+    : currentTableHtml;
 }

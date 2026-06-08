@@ -2,7 +2,7 @@ import {
   EDITOR_CONTAINED_MEDIA_CLASS_NAME,
   EDITOR_PROTECTED_ATTRIBUTE,
   EDITOR_PROTECTED_CLASS_NAME,
-  PROTECTED_HTML_SELECTOR,
+  READ_ONLY_PROTECTED_HTML_SELECTOR,
   REMOTE_ASSET_SOURCE_SELECTOR,
   REMOTE_LOADING_ELEMENT_SELECTOR,
 } from '../../constants';
@@ -45,7 +45,7 @@ function applyResponsiveTableWrappers(htmlDocument: Document): void {
 
 function protectUnsupportedContent(htmlDocument: Document): void {
   htmlDocument
-    .querySelectorAll<HTMLElement>(PROTECTED_HTML_SELECTOR)
+    .querySelectorAll<HTMLElement>(READ_ONLY_PROTECTED_HTML_SELECTOR)
     .forEach((protectedElement) => {
       protectedElement.setAttribute('contenteditable', 'false');
       protectedElement.setAttribute(EDITOR_PROTECTED_ATTRIBUTE, 'true');
@@ -99,7 +99,6 @@ function removeLexicalEditorArtifacts(htmlDocument: Document): void {
 function createEditorDocument(htmlSource: string): Document {
   const sanitizedHtmlSource = sanitizeHtmlFragmentSourceWithReport(htmlSource).htmlSource;
   const htmlDocument = new DOMParser().parseFromString(sanitizedHtmlSource, 'text/html');
-
   removeRemoteLoadingElements(htmlDocument);
   removeRemoteAssetAttributes(htmlDocument);
 
@@ -122,7 +121,6 @@ export function getHtmlSecurityWarningText(htmlSource: string): string | null {
 
 export function readHtmlFromEditor(editorElement: HTMLElement): string {
   const editableDocument = new DOMParser().parseFromString(editorElement.innerHTML, 'text/html');
-
   removeLexicalEditorArtifacts(editableDocument);
 
   editableDocument
@@ -145,5 +143,8 @@ export function readHtmlFromEditor(editorElement: HTMLElement): string {
 }
 
 export function isInsideProtectedContent(eventTarget: EventTarget | null): boolean {
-  return eventTarget instanceof Element && eventTarget.closest(PROTECTED_HTML_SELECTOR) !== null;
+  return (
+    eventTarget instanceof Element &&
+    eventTarget.closest(READ_ONLY_PROTECTED_HTML_SELECTOR) !== null
+  );
 }

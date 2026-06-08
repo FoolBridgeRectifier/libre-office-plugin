@@ -1,7 +1,11 @@
 export const EDITOR_PROTECTED_ATTRIBUTE = 'data-libre-editor-protected';
 export const EDITOR_PROTECTED_CLASS_NAME = 'libre-protected-html-block';
 export const EDITOR_CONTAINED_MEDIA_CLASS_NAME = 'libre-contained-editor-media';
+export const EDITABLE_PROTECTED_HTML_SELECTOR =
+  '[data-libre-protected="code-fence"],[data-libre-protected="complex-table"]';
 export const PROTECTED_HTML_SELECTOR = '[data-libre-protected]';
+export const READ_ONLY_PROTECTED_HTML_SELECTOR =
+  '[data-libre-protected]:not([data-libre-protected="code-fence"]):not([data-libre-protected="complex-table"])';
 export const REMOTE_ASSET_SOURCE_SELECTOR = 'audio,img,source,video';
 export const REMOTE_LOADING_ELEMENT_SELECTOR = 'embed,iframe,object,script,link[rel="stylesheet"]';
 

@@ -16,6 +16,24 @@ test('marks protected raw blocks read-only in the editor', () => {
   expect(preparedHtmlSource).toContain('libre-protected-html-block');
 });
 
+test('keeps protected code fences and complex tables editable in the editor', () => {
+  const preparedHtmlSource = prepareHtmlForEditor(
+    [
+      '<pre data-libre-protected="code-fence"><code>const value = true;</code></pre>',
+      '<table data-libre-protected="complex-table"><tr><td>Merged</td></tr></table>',
+    ].join('')
+  );
+
+  const htmlDocument = new DOMParser().parseFromString(preparedHtmlSource, 'text/html');
+  const codeFenceElement = htmlDocument.querySelector('[data-libre-protected="code-fence"]');
+  const tableElement = htmlDocument.querySelector('[data-libre-protected="complex-table"]');
+
+  expect(codeFenceElement?.getAttribute('contenteditable')).toBe(null);
+  expect(codeFenceElement?.getAttribute('data-libre-editor-protected')).toBe(null);
+  expect(tableElement?.getAttribute('contenteditable')).toBe(null);
+  expect(tableElement?.getAttribute('data-libre-editor-protected')).toBe(null);
+});
+
 test('removes editor-only protected markers when reading html source', () => {
   const editorElement = document.createElement('div');
 
@@ -120,10 +138,24 @@ test('reports unsafe html cleanup for user-facing warning states', () => {
 test('detects whether an event target is inside protected content', () => {
   const wrapperElement = document.createElement('div');
 
-  wrapperElement.innerHTML =
-    '<pre data-libre-protected="raw-markdown"><code><span># Raw</span></code></pre>';
+  wrapperElement.innerHTML = [
+    '<pre data-libre-protected="raw-markdown"><code><span># Raw</span></code></pre>',
+    '<pre data-libre-protected="code-fence"><code><span>const value = true;</span></code></pre>',
+    '<table data-libre-protected="complex-table"><tr><td>Cell</td></tr></table>',
+  ].join('');
 
   expect(isInsideProtectedContent(wrapperElement.querySelector('span'))).toBe(true);
+
+  expect(
+    isInsideProtectedContent(
+      wrapperElement.querySelector('[data-libre-protected="code-fence"] span')
+    )
+  ).toBe(false);
+
+  expect(
+    isInsideProtectedContent(wrapperElement.querySelector('[data-libre-protected="complex-table"]'))
+  ).toBe(false);
+
   expect(isInsideProtectedContent(wrapperElement)).toBe(false);
   expect(isInsideProtectedContent(null)).toBe(false);
 });

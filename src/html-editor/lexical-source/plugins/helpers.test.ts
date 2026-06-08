@@ -57,3 +57,19 @@ test('preserves protected raw blocks as read-only html source', () => {
     '<article><pre data-libre-protected="raw-markdown"># Raw</pre></article>'
   );
 });
+
+test('loads protected code fences and complex tables as editable html', () => {
+  const exportedHtmlSource = exportLoadedHtmlSource(
+    [
+      '<article>',
+      '<pre data-libre-protected="code-fence"><code>const value = true;</code></pre>',
+      '<table data-libre-protected="complex-table"><tr><td>Cell</td></tr></table>',
+      '</article>',
+    ].join('')
+  );
+
+  expect(exportedHtmlSource).toContain('data-libre-protected="code-fence"');
+  expect(exportedHtmlSource).toContain('data-libre-protected="complex-table"');
+  expect(exportedHtmlSource).not.toContain('data-libre-editor-protected');
+  expect(exportedHtmlSource).not.toContain('contenteditable="false"');
+});

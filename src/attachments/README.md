@@ -6,7 +6,7 @@
 
 The module keeps Obsidian attachment references vault-relative, marks broken or remote attachments, wraps wide tables for pageless editing, and protects complex tables that Markdown cannot represent safely.
 
-Remote attachment fallbacks and complex table HTML use the shared `data-libre-protected` marker when the original source must be preserved but should not be edited as normal rich content.
+Remote attachment fallbacks and complex table HTML use the shared `data-libre-protected` marker when the original source needs special handling. Remote fallbacks remain read-only and removable; complex tables stay editable and export from current sanitized table HTML.
 
 ## Main Components
 

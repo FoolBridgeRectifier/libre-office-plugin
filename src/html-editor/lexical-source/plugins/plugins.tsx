@@ -88,7 +88,7 @@ export function ProtectedContentGuardPlugin() {
         }
 
         const handleBeforeInput = (event: InputEvent) => {
-          if (isInsideProtectedContent(event.target)) {
+          if (isInsideProtectedContent(event.target) && !event.inputType.startsWith('delete')) {
             event.preventDefault();
           }
         };

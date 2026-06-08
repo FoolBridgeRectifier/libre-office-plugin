@@ -47,7 +47,7 @@ test('preserves protected raw markdown blocks as markdown source', () => {
   );
 });
 
-test('exports exact structured markdown sources from annotated html', () => {
+test('exports structured markdown sources and current edited code fence html', () => {
   const htmlSource = [
     '<article>',
     '<div class="callout" data-libre-structured-markdown-source="&gt; [!todo]- Custom&#10;&gt; Body" data-libre-structured-markdown-type="callout"></div>',
@@ -65,12 +65,26 @@ test('exports exact structured markdown sources from annotated html', () => {
       '> [!custom]+ Unknown',
       '> Nested',
       '',
-      '~~~js',
-      'const value = `tick`;',
-      '~~~',
+      '```',
+      'ignored',
+      '```',
       '',
       'Inline ``code ` value``',
     ].join('\n')
+  );
+});
+
+test('exports edited protected code fences from current html instead of stale source', () => {
+  const htmlSource = [
+    '<article>',
+    '<pre data-libre-protected="code-fence" data-libre-structured-markdown-source="~~~js&#10;old();&#10;~~~" data-libre-structured-markdown-type="code-fence">',
+    '<code class="language-ts">const edited = true;</code>',
+    '</pre>',
+    '</article>',
+  ].join('');
+
+  expect(convertHtmlToMarkdownMirror(htmlSource)).toBe(
+    ['```ts', 'const edited = true;', '```'].join('\n')
   );
 });
 
@@ -177,6 +191,20 @@ test('exports complex html tables as sanitized html fallback', () => {
 
   expect(convertHtmlToMarkdownMirror(htmlSource)).toBe(
     '<table><tr><td rowspan="2">Merged</td></tr></table>'
+  );
+});
+
+test('exports edited complex tables from current html instead of stale source', () => {
+  const htmlSource = [
+    '<article>',
+    '<table data-libre-protected="complex-table" data-libre-table-html-source="<table><tr><td>Old</td></tr></table>">',
+    '<tr><td rowspan="2">Edited</td></tr>',
+    '</table>',
+    '</article>',
+  ].join('');
+
+  expect(convertHtmlToMarkdownMirror(htmlSource)).toBe(
+    '<table><tbody><tr><td rowspan="2">Edited</td></tr></tbody></table>'
   );
 });
 
