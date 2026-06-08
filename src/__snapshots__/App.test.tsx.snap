@@ -106,7 +106,7 @@ exports[`renders the OneNote-style ribbon editor shell 1`] = `
     >
       <article
         aria-label="Editor surface"
-        class="relative box-border min-h-72 w-full min-w-0 max-w-full overflow-hidden rounded-ribbon-sm bg-ribbon-bg text-text-primary p-0"
+        class="relative box-border min-h-72 w-full min-w-0 max-w-full overflow-hidden rounded-ribbon-sm bg-editor-bg text-editor-text p-0"
       >
         <div
           aria-label="Empty HTML editor"

@@ -4,7 +4,7 @@ import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext
 
 import { LEXICAL_LOAD_TAG, LEXICAL_SOURCE_ERROR_MESSAGE } from '../constants';
 import { exportHtmlSourceFromLexicalEditor, loadHtmlSourceIntoLexicalEditor } from './helpers';
-import { getHtmlSecurityWarningText, isInsideProtectedContent } from '../source-html/sourceHtml';
+import { getHtmlSecurityWarningText, isInsideProtectedContent } from '../source-html';
 import type { HtmlSourcePluginProps } from '../interfaces';
 
 export function HtmlSourcePlugin({

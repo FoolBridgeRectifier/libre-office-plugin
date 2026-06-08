@@ -1,5 +1,7 @@
+import { useState } from 'react';
 import { fireEvent, render, screen } from '@testing-library/react';
 
+import { TASK_CHECKBOX_COLOR_PROPERTY } from './constants';
 import { HtmlEditor } from './HtmlEditor';
 
 test('shows an empty editor state without html source', () => {
@@ -56,12 +58,33 @@ test('uses pageless mobile-safe editor classes for wrapping and media containmen
   const editorElement = screen.getByRole('textbox', { name: 'Local HTML editor' });
 
   expect(editorElement).toHaveClass('p-0');
+  expect(editorElement).toHaveClass('m-2');
   expect(editorElement).toHaveClass('box-border');
   expect(editorElement).toHaveClass('min-w-0');
-  expect(editorElement).toHaveClass('max-w-full');
 
+  expect(editorElement).toHaveClass('max-w-full');
+  expect(editorElement).toHaveClass('bg-editor-bg');
+  expect(editorElement).toHaveClass('text-editor-text');
+  expect(editorElement).not.toHaveClass('border');
+
+  expect(editorElement.className).toContain('[caret-color:var(--editor-caret)]');
   expect(editorElement.className).toContain('[overflow-wrap:anywhere]');
   expect(editorElement.className).toContain('[&_.libre-contained-editor-media]:max-w-full');
+});
+
+test('keeps editor tokens computable for theme-sensitive styles', () => {
+  document.documentElement.style.setProperty('--editor-caret', '#1f1f1f');
+  document.documentElement.style.setProperty('--editor-bg', '#ffffff');
+  document.documentElement.style.setProperty('--editor-text', '#201f1e');
+
+  render(<HtmlEditor htmlSource="<article><p>Token body</p></article>" />);
+
+  const editorElement = screen.getByRole('textbox', { name: 'Local HTML editor' });
+  const rootStyles = getComputedStyle(document.documentElement);
+
+  expect(rootStyles.getPropertyValue('--editor-caret')).toBe('#1f1f1f');
+  expect(rootStyles.getPropertyValue('--editor-bg')).toBe('#ffffff');
+  expect(editorElement).toHaveClass('bg-editor-bg');
 });
 
 test('renders table content inside a horizontal overflow container', () => {
@@ -75,6 +98,158 @@ test('renders table content inside a horizontal overflow container', () => {
 
   expect(tableScrollElement).toHaveClass('overflow-x-auto');
   expect(tableScrollElement).toHaveClass('max-w-full');
+});
+
+test('preserves checked and unchecked task checkbox markup', () => {
+  render(
+    <HtmlEditor htmlSource='<article><ul><li class="task-list-item" data-task=" "><input class="task-list-item-checkbox" type="checkbox">Todo</li><li class="task-list-item" data-task="x"><input checked class="task-list-item-checkbox" type="checkbox">Done</li></ul></article>' />
+  );
+
+  const checkboxElements = document.querySelectorAll<HTMLInputElement>('.task-list-item-checkbox');
+
+  expect(checkboxElements).toHaveLength(2);
+  expect(checkboxElements[0]?.checked).toBe(false);
+  expect(checkboxElements[1]?.checked).toBe(true);
+});
+
+test('checkbox toggles update checked state and task metadata', () => {
+  const handleHtmlSourceChange = jest.fn();
+
+  render(
+    <HtmlEditor
+      htmlSource='<article><ul><li class="task-list-item" data-task=" "><input class="task-list-item-checkbox" type="checkbox">Todo</li></ul></article>'
+      onHtmlSourceChange={handleHtmlSourceChange}
+    />
+  );
+
+  const checkboxElement = document.querySelector<HTMLInputElement>('.task-list-item-checkbox');
+
+  if (!checkboxElement) {
+    throw new Error('Expected rendered task checkbox.');
+  }
+
+  const mouseDownEvent = new MouseEvent('mousedown', {
+    bubbles: true,
+    cancelable: true,
+  });
+
+  expect(fireEvent(checkboxElement, mouseDownEvent)).toBe(true);
+
+  fireEvent.click(checkboxElement);
+
+  expect(checkboxElement.checked).toBe(true);
+  expect(checkboxElement).toHaveAttribute('checked', '');
+  expect(checkboxElement.closest('li')).toHaveAttribute('data-task', 'x');
+  expect(handleHtmlSourceChange).toHaveBeenLastCalledWith(expect.stringContaining('data-task="x"'));
+});
+
+test('input edits emit from the edited dom position without a leading insertion', () => {
+  const handleHtmlSourceChange = jest.fn();
+
+  render(
+    <HtmlEditor
+      htmlSource="<article><p>First paragraph</p><p>Last paragraph</p></article>"
+      onHtmlSourceChange={handleHtmlSourceChange}
+    />
+  );
+
+  const editorElement = screen.getByRole('textbox', { name: 'Local HTML editor' });
+  const lastParagraphElement = screen.getByText('Last paragraph');
+
+  lastParagraphElement.textContent = 'Last paragraph typed';
+  fireEvent.input(editorElement);
+
+  expect(handleHtmlSourceChange).toHaveBeenLastCalledWith(
+    '<article><p>First paragraph</p><p>Last paragraph typed</p></article>'
+  );
+});
+
+test('controlled html source updates do not reload self-emitted editor input', () => {
+  function ControlledEditor() {
+    const [htmlSource, setHtmlSource] = useState(
+      '<article><p>First paragraph</p><p>Last paragraph</p></article>'
+    );
+
+    return <HtmlEditor htmlSource={htmlSource} onHtmlSourceChange={setHtmlSource} />;
+  }
+
+  render(<ControlledEditor />);
+
+  const editorElement = screen.getByRole('textbox', { name: 'Local HTML editor' });
+  const lastParagraphElement = screen.getByText('Last paragraph');
+
+  lastParagraphElement.textContent = 'Last paragraph typed';
+  fireEvent.input(editorElement);
+
+  expect(screen.getByText('Last paragraph typed')).toBeVisible();
+  expect(editorElement.textContent?.startsWith('typed')).toBe(false);
+});
+
+test('checkbox color follows changed task text color while defaulting through css', () => {
+  render(
+    <HtmlEditor htmlSource='<article><ul><li class="task-list-item" data-task="x" style="color: rgb(180, 40, 120); font-size: 28px;"><input checked class="task-list-item-checkbox" type="checkbox">Colored task</li></ul></article>' />
+  );
+
+  const checkboxElement = document.querySelector<HTMLInputElement>('.task-list-item-checkbox');
+
+  if (!checkboxElement) {
+    throw new Error('Expected rendered task checkbox.');
+  }
+
+  expect(checkboxElement.style.getPropertyValue(TASK_CHECKBOX_COLOR_PROPERTY)).toBe(
+    'rgb(180, 40, 120)'
+  );
+});
+
+test('checked checkbox toggles back to an unchecked task item', () => {
+  const handleHtmlSourceChange = jest.fn();
+
+  render(
+    <HtmlEditor
+      htmlSource='<article><ul><li class="task-list-item" data-task="x"><input checked class="task-list-item-checkbox" type="checkbox">Done</li></ul></article>'
+      onHtmlSourceChange={handleHtmlSourceChange}
+    />
+  );
+
+  const checkboxElement = document.querySelector<HTMLInputElement>('.task-list-item-checkbox');
+
+  if (!checkboxElement) {
+    throw new Error('Expected rendered task checkbox.');
+  }
+
+  fireEvent.click(checkboxElement);
+
+  expect(checkboxElement.checked).toBe(false);
+  expect(checkboxElement).not.toHaveAttribute('checked');
+  expect(checkboxElement.closest('li')).toHaveAttribute('data-task', ' ');
+  expect(handleHtmlSourceChange).toHaveBeenLastCalledWith(expect.stringContaining('data-task=" "'));
+});
+
+test('renders callout pseudo-icon hooks while preserving legacy icon markup', () => {
+  render(
+    <HtmlEditor htmlSource='<article><div class="callout" data-callout="note"><div class="callout-title"><div class="callout-icon">icon</div><div class="callout-title-inner">Note</div></div><div class="callout-content"><p>Body</p></div></div></article>' />
+  );
+
+  const calloutTitleElement = screen.getByText('Note').closest('.callout-title');
+  const legacyIconElement = document.querySelector('.callout-icon');
+
+  expect(calloutTitleElement).toHaveAttribute('data-libre-editor-callout-icon', 'true');
+  expect(legacyIconElement).toHaveTextContent('icon');
+});
+
+test('snapshots dark-mode compatible editor rendering', () => {
+  document.body.classList.add('theme-dark');
+
+  try {
+    const { container } = render(<HtmlEditor htmlSource="<article><p>Dark body</p></article>" />);
+
+    expect(screen.getByRole('textbox', { name: 'Local HTML editor' })).toHaveClass(
+      'text-editor-text'
+    );
+    expect(container).toMatchSnapshot();
+  } finally {
+    document.body.classList.remove('theme-dark');
+  }
 });
 
 test('resets dirty state when changed html source is loaded', () => {

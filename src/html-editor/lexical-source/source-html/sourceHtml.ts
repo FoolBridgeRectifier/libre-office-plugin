@@ -8,6 +8,12 @@ import {
 } from '../../constants';
 import { wrapTableForHorizontalScroll } from '../../../attachments/tables/structure/structure';
 import { sanitizeHtmlFragmentSourceWithReport } from '../../../conversion';
+import {
+  applyCalloutIconHooks,
+  removeCalloutIconHooks,
+  removeEmptyClassAttribute,
+  removeTaskCheckboxColorHooks,
+} from './editor-dom/editorDom';
 
 function isRemoteUrl(value: string | null): boolean {
   return value ? /^(?:https?:)?\/\//i.test(value.trim()) : false;
@@ -51,12 +57,6 @@ function protectUnsupportedContent(htmlDocument: Document): void {
       protectedElement.setAttribute(EDITOR_PROTECTED_ATTRIBUTE, 'true');
       protectedElement.classList.add(EDITOR_PROTECTED_CLASS_NAME);
     });
-}
-
-function removeEmptyClassAttribute(element: HTMLElement): void {
-  if (!element.getAttribute('class')) {
-    element.removeAttribute('class');
-  }
 }
 
 function unwrapLexicalTextElement(element: HTMLElement): void {
@@ -105,6 +105,7 @@ function createEditorDocument(htmlSource: string): Document {
   applyResponsiveMediaClasses(htmlDocument);
   applyResponsiveTableWrappers(htmlDocument);
   protectUnsupportedContent(htmlDocument);
+  applyCalloutIconHooks(htmlDocument);
 
   return htmlDocument;
 }
@@ -139,12 +140,8 @@ export function readHtmlFromEditor(editorElement: HTMLElement): string {
       removeEmptyClassAttribute(imageElement);
     });
 
-  return sanitizeHtmlFragmentSourceWithReport(editableDocument.body.innerHTML).htmlSource;
-}
+  removeCalloutIconHooks(editableDocument);
+  removeTaskCheckboxColorHooks(editableDocument);
 
-export function isInsideProtectedContent(eventTarget: EventTarget | null): boolean {
-  return (
-    eventTarget instanceof Element &&
-    eventTarget.closest(READ_ONLY_PROTECTED_HTML_SELECTOR) !== null
-  );
+  return sanitizeHtmlFragmentSourceWithReport(editableDocument.body.innerHTML).htmlSource;
 }

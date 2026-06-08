@@ -4,7 +4,7 @@ import type { EditorViewDesktopSourceTarget } from '../interfaces';
 export async function syncEditorViewDesktopSource(
   target: EditorViewDesktopSourceTarget
 ): Promise<void> {
-  await target.autosaveController.flushAll();
+  await target.autosaveController.flushHtml();
 
   if (target.activeEditorSource !== 'desktop-odt') {
     return;

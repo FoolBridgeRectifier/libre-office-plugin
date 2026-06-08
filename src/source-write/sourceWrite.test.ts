@@ -73,6 +73,40 @@ test('does not overwrite markdown when odt changes before mirror sync', async ()
   expect(updatedMapping.conflictState.status).toBe('conflicted');
 });
 
+test('skips source writes after a markdown note has been archived and deleted', async () => {
+  const { mapping, richDocumentStore, vault } = await createOdtTrackedFixture();
+
+  const archivedMapping = {
+    ...mapping,
+    archivedAt: '2026-06-08T20:00:00.000Z',
+    lifecycleState: 'archived' as const,
+  };
+
+  vault.files.delete('Note.md');
+  await richDocumentStore.updateMapping('Note.md', archivedMapping);
+
+  await saveRichDocumentHtml({
+    htmlSource: '<article><p>Ignored</p></article>',
+    markdownPath: 'Note.md',
+    previousHtmlSource: '<article>Original</article>',
+    richDocumentStore,
+    vaultAdapter: vault.adapter,
+  });
+
+  await syncMarkdownMirror({
+    htmlSource: '<article><p>Ignored</p></article>',
+    markdownPath: 'Note.md',
+    richDocumentStore,
+    vaultAdapter: vault.adapter,
+  });
+
+  const updatedMapping = await richDocumentStore.getOrCreateMapping('Note.md');
+
+  expect(vault.files.has('Note.md')).toBe(false);
+  expect(vault.files.get(mapping.htmlPath)).toBe('<article>Original</article>');
+  expect(updatedMapping.conflictState.status).toBe('none');
+});
+
 test('sanitizes unsafe html before rich source writes and markdown sync', async () => {
   const { richDocumentStore, vault } = await createOdtTrackedFixture();
 

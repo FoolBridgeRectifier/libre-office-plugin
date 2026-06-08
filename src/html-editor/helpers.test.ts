@@ -1,11 +1,11 @@
 import { TABLE_SCROLL_CONTAINER_CLASS } from '../attachments/constants';
-import { EDITOR_CONTAINED_MEDIA_CLASS_NAME } from './constants';
+import { EDITOR_CONTAINED_MEDIA_CLASS_NAME, TASK_CHECKBOX_COLOR_PROPERTY } from './constants';
 import {
   getHtmlSecurityWarningText,
   isInsideProtectedContent,
   prepareHtmlForEditor,
   readHtmlFromEditor,
-} from './lexical-source/source-html/sourceHtml';
+} from './lexical-source/source-html';
 
 test('marks protected raw blocks read-only in the editor', () => {
   const htmlSource = '<pre data-libre-protected="raw-markdown"># Raw</pre>';
@@ -51,6 +51,18 @@ test('keeps editor-only image containment classes out of saved html', () => {
   editorElement.innerHTML = `<img alt="Wide" class="${EDITOR_CONTAINED_MEDIA_CLASS_NAME}" src="wide.png">`;
 
   expect(readHtmlFromEditor(editorElement)).toBe('<img alt="Wide" src="wide.png">');
+});
+
+test('keeps editor-only checkbox color hooks out of saved html', () => {
+  const editorElement = document.createElement('div');
+
+  editorElement.innerHTML = [
+    '<ul><li class="task-list-item" data-task="x">',
+    `<input checked class="task-list-item-checkbox" style="${TASK_CHECKBOX_COLOR_PROPERTY}: rgb(180, 40, 120);" type="checkbox">`,
+    'Done</li></ul>',
+  ].join('');
+
+  expect(readHtmlFromEditor(editorElement)).not.toContain(TASK_CHECKBOX_COLOR_PROPERTY);
 });
 
 test('keeps existing protected classes when reading html source', () => {

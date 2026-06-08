@@ -7,6 +7,7 @@ import {
   hasExternalHtmlChange,
   hasIndependentMarkdownAndHtmlChanges,
   hasRichSourceChange,
+  isArchivedMarkdownMissing,
   updateMarkdownSyncTimestamp,
 } from './helpers';
 import type { RichDocumentHtmlSaveOptions, RichDocumentSourceWriteOptions } from '../interfaces';
@@ -14,6 +15,17 @@ import type { RichDocumentHtmlSaveOptions, RichDocumentSourceWriteOptions } from
 export async function saveRichDocumentHtml(options: RichDocumentHtmlSaveOptions): Promise<void> {
   const sanitizedHtmlSource = sanitizeConvertedHtmlSource(options.htmlSource);
   const mapping = await options.richDocumentStore.getOrCreateMapping(options.markdownPath);
+
+  if (
+    await isArchivedMarkdownMissing(
+      options.vaultAdapter,
+      mapping.markdownPath,
+      mapping.lifecycleState
+    )
+  ) {
+    return;
+  }
+
   const currentSourceStates = await createSourceStates(mapping, options.vaultAdapter);
   const sourceChanges = collectChangedSourceStates(mapping.sourceStates, currentSourceStates);
 
@@ -79,6 +91,17 @@ export async function saveRichDocumentHtml(options: RichDocumentHtmlSaveOptions)
 export async function syncMarkdownMirror(options: RichDocumentSourceWriteOptions): Promise<void> {
   const sanitizedHtmlSource = sanitizeConvertedHtmlSource(options.htmlSource);
   const mapping = await options.richDocumentStore.getOrCreateMapping(options.markdownPath);
+
+  if (
+    await isArchivedMarkdownMissing(
+      options.vaultAdapter,
+      mapping.markdownPath,
+      mapping.lifecycleState
+    )
+  ) {
+    return;
+  }
+
   const currentSourceStates = await createSourceStates(mapping, options.vaultAdapter);
   const sourceChanges = collectChangedSourceStates(mapping.sourceStates, currentSourceStates);
 

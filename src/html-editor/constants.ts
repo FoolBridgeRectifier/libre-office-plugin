@@ -1,6 +1,10 @@
 export const EDITOR_PROTECTED_ATTRIBUTE = 'data-libre-editor-protected';
+export const EDITOR_CALLOUT_ICON_ATTRIBUTE = 'data-libre-editor-callout-icon';
 export const EDITOR_PROTECTED_CLASS_NAME = 'libre-protected-html-block';
 export const EDITOR_CONTAINED_MEDIA_CLASS_NAME = 'libre-contained-editor-media';
+export const TASK_LIST_ITEM_CHECKBOX_SELECTOR = 'input.task-list-item-checkbox';
+export const TASK_CHECKBOX_COLOR_PROPERTY = '--libre-task-checkbox-color';
+export const TASK_LIST_ITEM_SELECTOR = 'li.task-list-item';
 export const EDITABLE_PROTECTED_HTML_SELECTOR =
   '[data-libre-protected="code-fence"],[data-libre-protected="complex-table"]';
 export const PROTECTED_HTML_SELECTOR = '[data-libre-protected]';
@@ -11,7 +15,8 @@ export const REMOTE_LOADING_ELEMENT_SELECTOR = 'embed,iframe,object,script,link[
 
 export const HTML_EDITOR_CLASS_NAME = [
   'libre-html-editor markdown-preview-view min-h-64 w-full min-w-0 max-w-full box-border',
-  'overflow-x-hidden rounded-ribbon-sm bg-ribbon-bg p-0 font-sans text-text-primary',
+  'm-2 overflow-x-hidden rounded-ribbon-sm bg-editor-bg p-0 font-sans text-editor-text',
+  'max-w-[calc(100%-1rem)] [caret-color:var(--editor-caret)]',
   'outline-none [overflow-wrap:anywhere] focus-visible:outline focus-visible:outline-2',
   'focus-visible:outline-button-focus-ring',
   '[&_.libre-contained-editor-media]:h-auto [&_.libre-contained-editor-media]:max-w-full',

@@ -9,19 +9,23 @@ test('does not sync ODT changes after dirty HTML flush creates a conflict', asyn
 
   await syncEditorViewDesktopSource(target);
 
-  expect(target.autosaveController.flushAll).toHaveBeenCalledTimes(1);
+  expect(target.autosaveController.flushHtml).toHaveBeenCalledTimes(1);
   expect(target.editorViewOptions.syncDesktopSource).not.toHaveBeenCalled();
   expect(target.importedHtmlSource).toBe('<article>Dirty</article>');
 });
 
-test('applies synced desktop HTML when flush leaves the editor saved', async () => {
+test('applies synced desktop HTML without forcing markdown mirror sync first', async () => {
   const target = createDesktopSourceTarget('saved');
 
   await syncEditorViewDesktopSource(target);
 
+  expect(target.autosaveController.flushHtml).toHaveBeenCalledTimes(1);
+  expect(target.autosaveController.flushAll).not.toHaveBeenCalled();
+
   expect(target.editorViewOptions.syncDesktopSource).toHaveBeenCalledWith(
     target.activeMarkdownFile
   );
+
   expect(target.importedHtmlSource).toBe('<article>Synced</article>');
 
   expect(target.autosaveController.setActiveDocument).toHaveBeenCalledWith({
@@ -85,7 +89,9 @@ function createDesktopSourceTarget(
       flushAll: jest.fn(async () => {
         target.autosaveStatus = statusAfterFlush;
       }),
-      flushHtml: jest.fn(),
+      flushHtml: jest.fn(async () => {
+        target.autosaveStatus = statusAfterFlush;
+      }),
       handleHtmlSourceChange: jest.fn(),
       setActiveDocument: jest.fn(),
     },

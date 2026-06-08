@@ -2,6 +2,7 @@ import { createSourceStates } from '../conflicts';
 import type { RichDocumentHtmlSaveOptions, RichDocumentSourceWriteOptions } from '../interfaces';
 import type { SourceStateChange } from '../conflicts/interfaces';
 import type {
+  RichDocumentMapping,
   RichDocumentSourceKind,
   RichDocumentStore,
   RichDocumentVaultAdapter,
@@ -71,4 +72,12 @@ export async function hasExternalHtmlChange(
   }
 
   return (await vaultAdapter.read(htmlPath)) !== previousHtmlSource;
+}
+
+export async function isArchivedMarkdownMissing(
+  vaultAdapter: RichDocumentVaultAdapter,
+  markdownPath: string,
+  lifecycleState: RichDocumentMapping['lifecycleState']
+): Promise<boolean> {
+  return lifecycleState === 'archived' && !(await vaultAdapter.exists(markdownPath));
 }

@@ -56,6 +56,12 @@ Preferred tokens:
 | `--text-secondary`    | Secondary text                     |
 | `--text-muted`        | Muted labels and group headers     |
 | `--text-disabled`     | Disabled text                      |
+| `--editor-bg`         | Editable Markdown surface          |
+| `--editor-text`       | Editable Markdown body text        |
+| `--editor-muted`      | Muted Markdown editor text         |
+| `--editor-border`     | Editor-only structure borders      |
+| `--editor-caret`      | Current theme caret color          |
+| `--editor-selection`  | Editor selection background        |
 | `--shadow-ribbon`     | Ribbon shadow                      |
 | `--transition-fast`   | Button hover transitions           |
 | `--transition-mid`    | Dropdown and panel transitions     |

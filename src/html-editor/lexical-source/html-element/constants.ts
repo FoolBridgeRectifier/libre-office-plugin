@@ -44,6 +44,7 @@ export const IMPORTED_HTML_TAG_NAMES = [
   'h6',
   'hr',
   'img',
+  'input',
   'li',
   'ol',
   'p',
