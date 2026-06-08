@@ -48,7 +48,7 @@ test('preserves obsidian metadata attributes during lexical html round trip', ()
   expect(exportedHtmlSource).not.toContain('data-lexical');
 });
 
-test('preserves protected raw blocks as read-only html source', () => {
+test('preserves source-preserved raw markdown as read-only html source', () => {
   const exportedHtmlSource = exportLoadedHtmlSource(
     '<article><pre data-libre-protected="raw-markdown"># Raw</pre></article>'
   );

@@ -4,7 +4,7 @@ import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext
 
 import { LEXICAL_LOAD_TAG, LEXICAL_SOURCE_ERROR_MESSAGE } from '../constants';
 import { exportHtmlSourceFromLexicalEditor, loadHtmlSourceIntoLexicalEditor } from './helpers';
-import { getHtmlSecurityWarningText, isInsideProtectedContent } from '../source-html/sourceHtml';
+import { getHtmlSecurityWarningText, isInsideLockedContent } from '../source-html/sourceHtml';
 import type { HtmlSourcePluginProps } from '../interfaces';
 
 export function HtmlSourcePlugin({
@@ -77,7 +77,7 @@ export function HtmlSourcePlugin({
   );
 }
 
-export function ProtectedContentGuardPlugin() {
+export function LockedContentGuardPlugin() {
   const [editor] = useLexicalComposerContext();
 
   useEffect(
@@ -88,7 +88,7 @@ export function ProtectedContentGuardPlugin() {
         }
 
         const handleBeforeInput = (event: InputEvent) => {
-          if (isInsideProtectedContent(event.target)) {
+          if (isInsideLockedContent(event.target)) {
             event.preventDefault();
           }
         };

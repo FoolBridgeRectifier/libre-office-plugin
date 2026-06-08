@@ -1,10 +1,10 @@
 import {
   EDITOR_CONTAINED_MEDIA_CLASS_NAME,
-  EDITOR_PROTECTED_ATTRIBUTE,
-  EDITOR_PROTECTED_CLASS_NAME,
-  PROTECTED_HTML_SELECTOR,
+  EDITOR_LOCKED_ATTRIBUTE,
+  EDITOR_LOCKED_CLASS_NAME,
   REMOTE_ASSET_SOURCE_SELECTOR,
   REMOTE_LOADING_ELEMENT_SELECTOR,
+  SOURCE_PRESERVED_HTML_SELECTOR,
 } from '../../constants';
 import { wrapTableForHorizontalScroll } from '../../../attachments/tables/structure/structure';
 import { sanitizeHtmlFragmentSourceWithReport } from '../../../conversion';
@@ -43,13 +43,13 @@ function applyResponsiveTableWrappers(htmlDocument: Document): void {
   htmlDocument.querySelectorAll<HTMLTableElement>('table').forEach(wrapTableForHorizontalScroll);
 }
 
-function protectUnsupportedContent(htmlDocument: Document): void {
+function lockSourcePreservedContent(htmlDocument: Document): void {
   htmlDocument
-    .querySelectorAll<HTMLElement>(PROTECTED_HTML_SELECTOR)
-    .forEach((protectedElement) => {
-      protectedElement.setAttribute('contenteditable', 'false');
-      protectedElement.setAttribute(EDITOR_PROTECTED_ATTRIBUTE, 'true');
-      protectedElement.classList.add(EDITOR_PROTECTED_CLASS_NAME);
+    .querySelectorAll<HTMLElement>(SOURCE_PRESERVED_HTML_SELECTOR)
+    .forEach((lockedElement) => {
+      lockedElement.setAttribute('contenteditable', 'false');
+      lockedElement.setAttribute(EDITOR_LOCKED_ATTRIBUTE, 'true');
+      lockedElement.classList.add(EDITOR_LOCKED_CLASS_NAME);
     });
 }
 
@@ -105,7 +105,7 @@ function createEditorDocument(htmlSource: string): Document {
 
   applyResponsiveMediaClasses(htmlDocument);
   applyResponsiveTableWrappers(htmlDocument);
-  protectUnsupportedContent(htmlDocument);
+  lockSourcePreservedContent(htmlDocument);
 
   return htmlDocument;
 }
@@ -122,16 +122,15 @@ export function getHtmlSecurityWarningText(htmlSource: string): string | null {
 
 export function readHtmlFromEditor(editorElement: HTMLElement): string {
   const editableDocument = new DOMParser().parseFromString(editorElement.innerHTML, 'text/html');
-
   removeLexicalEditorArtifacts(editableDocument);
 
   editableDocument
-    .querySelectorAll<HTMLElement>(`[${EDITOR_PROTECTED_ATTRIBUTE}]`)
-    .forEach((protectedElement) => {
-      protectedElement.removeAttribute('contenteditable');
-      protectedElement.removeAttribute(EDITOR_PROTECTED_ATTRIBUTE);
-      protectedElement.classList.remove(EDITOR_PROTECTED_CLASS_NAME);
-      removeEmptyClassAttribute(protectedElement);
+    .querySelectorAll<HTMLElement>(`[${EDITOR_LOCKED_ATTRIBUTE}]`)
+    .forEach((lockedElement) => {
+      lockedElement.removeAttribute('contenteditable');
+      lockedElement.removeAttribute(EDITOR_LOCKED_ATTRIBUTE);
+      lockedElement.classList.remove(EDITOR_LOCKED_CLASS_NAME);
+      removeEmptyClassAttribute(lockedElement);
     });
 
   editableDocument
@@ -144,6 +143,8 @@ export function readHtmlFromEditor(editorElement: HTMLElement): string {
   return sanitizeHtmlFragmentSourceWithReport(editableDocument.body.innerHTML).htmlSource;
 }
 
-export function isInsideProtectedContent(eventTarget: EventTarget | null): boolean {
-  return eventTarget instanceof Element && eventTarget.closest(PROTECTED_HTML_SELECTOR) !== null;
+export function isInsideLockedContent(eventTarget: EventTarget | null): boolean {
+  return (
+    eventTarget instanceof Element && eventTarget.closest(SOURCE_PRESERVED_HTML_SELECTOR) !== null
+  );
 }
