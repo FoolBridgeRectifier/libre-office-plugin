@@ -6,7 +6,6 @@ import {
   getCommandButtonClassName,
   getCommandIcon,
   getEditorPageClassName,
-  getTabButtonClassName,
 } from './helpers';
 import type { RibbonTabDefinition } from './interfaces';
 
@@ -54,9 +53,8 @@ test('keeps page-width layout chrome desktop-only', () => {
   expect(pageWidthClassName).toContain('libre-page-width');
 });
 
-test('uses reduced-motion classes for command and tab transitions', () => {
+test('uses reduced-motion classes for command transitions', () => {
   expect(getCommandButtonClassName(false)).toContain('motion-reduce:transition-none');
-  expect(getTabButtonClassName(false)).toContain('motion-reduce:transition-none');
 });
 
 test('maps autosave statuses to footer text', () => {

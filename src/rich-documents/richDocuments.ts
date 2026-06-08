@@ -1,10 +1,12 @@
 import {
   createArchivedRichDocumentMapping,
   createRichDocumentMapping,
-  createRichDocumentPluginData,
   createStableRichDocumentId,
+} from './mapping/mapping';
+import {
+  createRichDocumentPluginData,
   normalizeRichDocumentPluginData,
-} from '.';
+} from './plugin-data/pluginData';
 import {
   archiveRichDocumentFiles,
   persistMappingSidecar,
@@ -24,7 +26,6 @@ export function createRichDocumentStore(options: RichDocumentStoreOptions) {
 
   let cachedMappings: ReadonlyArray<RichDocumentMapping> | null = null;
   let operationQueue = Promise.resolve();
-  const ignoreQueuedResult = () => undefined;
 
   const saveMappings = async (mappings: ReadonlyArray<RichDocumentMapping>) => {
     cachedMappings = mappings;
@@ -37,7 +38,6 @@ export function createRichDocumentStore(options: RichDocumentStoreOptions) {
     }
 
     const pluginData = normalizeRichDocumentPluginData(await options.persistenceTarget.loadData());
-
     cachedMappings = pluginData.mappings.length > 0 ? pluginData.mappings : await recoverMappings();
 
     return cachedMappings;
@@ -52,7 +52,7 @@ export function createRichDocumentStore(options: RichDocumentStoreOptions) {
   const runExclusive = async <TResult>(operation: () => Promise<TResult>) => {
     const queuedOperation = operationQueue.then(operation, operation);
 
-    operationQueue = queuedOperation.then(ignoreQueuedResult, ignoreQueuedResult);
+    operationQueue = queuedOperation.catch(() => undefined).then(() => undefined);
 
     return queuedOperation;
   };

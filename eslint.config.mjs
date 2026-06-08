@@ -1271,6 +1271,402 @@ const strictStructurePlugin = {
       },
     },
 
+    'single-child-function-exports-stay-local': {
+      meta: {
+        type: 'problem',
+        docs: {
+          description:
+            'Require exported functions used only by one child folder to live in that child folder.',
+        },
+        schema: [],
+      },
+      create(context) {
+        const currentFilePath = context.filename.replace(/\\/g, '/');
+        const isTestOrTestHelperFile =
+          /\.(test)\.(ts|tsx)$/.test(currentFilePath) ||
+          /TestHelpers\.ts$/.test(currentFilePath) ||
+          currentFilePath.endsWith('/testFileHelpers.ts');
+
+        if (isTestOrTestHelperFile) {
+          return {};
+        }
+
+        const projectRootPath = process.cwd().replace(/\\/g, '/');
+        const sourceRootPath = path.join(projectRootPath, 'src').replace(/\\/g, '/');
+        const supportedExtensions = ['.ts', '.tsx'];
+        const resolvedFunctionCache = new Map();
+        const sourceTextCache = new Map();
+        const allSourceFilesCache = { value: null };
+
+        const isFilePath = (filePath) => {
+          try {
+            return statSync(filePath).isFile();
+          } catch {
+            return false;
+          }
+        };
+
+        const isProductionSourceFile = (filePath) =>
+          /\.(ts|tsx)$/.test(filePath) &&
+          !/\.(test)\.(ts|tsx)$/.test(filePath) &&
+          !filePath.includes('/__mocks__/') &&
+          !filePath.includes('/test-utils/') &&
+          !filePath.includes('/tests/') &&
+          !filePath.includes('/e2e/');
+
+        const getSourceText = (filePath) => {
+          if (sourceTextCache.has(filePath)) {
+            return sourceTextCache.get(filePath);
+          }
+
+          let sourceText = '';
+
+          try {
+            sourceText = readFileSync(filePath, 'utf8');
+          } catch {
+            sourceText = '';
+          }
+
+          sourceTextCache.set(filePath, sourceText);
+
+          return sourceText;
+        };
+
+        const getSourceFiles = (folderPath) => {
+          const sourceFiles = [];
+
+          for (const directoryEntry of readdirSync(folderPath, { withFileTypes: true })) {
+            const entryPath = path.join(folderPath, directoryEntry.name).replace(/\\/g, '/');
+
+            if (directoryEntry.isDirectory()) {
+              if (!['coverage', 'dist', 'node_modules', 'runtime'].includes(directoryEntry.name)) {
+                sourceFiles.push(...getSourceFiles(entryPath));
+              }
+
+              continue;
+            }
+
+            if (directoryEntry.isFile() && isProductionSourceFile(entryPath)) {
+              sourceFiles.push(entryPath);
+            }
+          }
+
+          return sourceFiles;
+        };
+
+        const getAllSourceFiles = () => {
+          if (allSourceFilesCache.value === null) {
+            allSourceFilesCache.value = getSourceFiles(sourceRootPath);
+          }
+
+          return allSourceFilesCache.value;
+        };
+
+        const resolveLocalModulePath = (sourceValue, sourceFilePath) => {
+          if (typeof sourceValue !== 'string' || !sourceValue.startsWith('.')) {
+            return null;
+          }
+
+          const currentDirectoryPath = path.dirname(sourceFilePath);
+          const modulePath = path.resolve(currentDirectoryPath, sourceValue).replace(/\\/g, '/');
+          const candidatePaths = [
+            modulePath,
+            ...supportedExtensions.map((extensionName) => `${modulePath}${extensionName}`),
+            ...supportedExtensions.map((extensionName) =>
+              path.join(modulePath, `index${extensionName}`).replace(/\\/g, '/')
+            ),
+          ];
+
+          return candidatePaths.find((candidatePath) => isFilePath(candidatePath)) ?? null;
+        };
+
+        const parseNamedBindings = (bindingListText) =>
+          bindingListText
+            .split(',')
+            .map((bindingPart) => bindingPart.trim())
+            .filter(Boolean)
+            .map((bindingPart) => {
+              const aliasMatch = /^(\w+)\s+as\s+(\w+)$/.exec(bindingPart);
+
+              if (aliasMatch) {
+                return {
+                  importedName: aliasMatch[1],
+                  localName: aliasMatch[2],
+                };
+              }
+
+              return {
+                importedName: bindingPart,
+                localName: bindingPart,
+              };
+            });
+
+        const getDirectFunctionExportNames = (filePath) => {
+          const sourceText = getSourceText(filePath);
+          const functionExportNames = new Set();
+          const declarationPattern = /export\s+(?:async\s+)?function\s+([A-Za-z_$][\w$]*)\s*\(/g;
+          const constFunctionPattern =
+            /export\s+const\s+([A-Za-z_$][\w$]*)\s*=\s*(?:async\s*)?(?:function\b|\([^)]*\)\s*=>|[A-Za-z_$][\w$]*\s*=>)/g;
+
+          for (const functionMatch of sourceText.matchAll(declarationPattern)) {
+            functionExportNames.add(functionMatch[1]);
+          }
+
+          for (const functionMatch of sourceText.matchAll(constFunctionPattern)) {
+            functionExportNames.add(functionMatch[1]);
+          }
+
+          return functionExportNames;
+        };
+
+        const getImportedBindingSources = (filePath) => {
+          const sourceText = getSourceText(filePath);
+          const importedBindingSources = new Map();
+          const importPattern = /import\s+\{([\s\S]*?)\}\s+from\s+['"]([^'"]+)['"]/g;
+
+          for (const importMatch of sourceText.matchAll(importPattern)) {
+            const modulePath = resolveLocalModulePath(importMatch[2], filePath);
+
+            if (!modulePath) {
+              continue;
+            }
+
+            for (const binding of parseNamedBindings(importMatch[1])) {
+              importedBindingSources.set(binding.localName, {
+                importedName: binding.importedName,
+                modulePath,
+              });
+            }
+          }
+
+          return importedBindingSources;
+        };
+
+        const getFunctionExportSource = (filePath, exportedName, visitedKeys = new Set()) => {
+          const cacheKey = `${filePath}:${exportedName}`;
+
+          if (resolvedFunctionCache.has(cacheKey)) {
+            return resolvedFunctionCache.get(cacheKey);
+          }
+
+          if (visitedKeys.has(cacheKey)) {
+            return null;
+          }
+
+          visitedKeys.add(cacheKey);
+
+          if (getDirectFunctionExportNames(filePath).has(exportedName)) {
+            const functionSource = { exportedName, filePath };
+
+            resolvedFunctionCache.set(cacheKey, functionSource);
+
+            return functionSource;
+          }
+
+          const sourceText = getSourceText(filePath);
+          const reExportPattern = /export\s+\{([\s\S]*?)\}\s+from\s+['"]([^'"]+)['"]/g;
+
+          for (const exportMatch of sourceText.matchAll(reExportPattern)) {
+            const modulePath = resolveLocalModulePath(exportMatch[2], filePath);
+
+            if (!modulePath) {
+              continue;
+            }
+
+            const matchingExport = parseNamedBindings(exportMatch[1]).find(
+              (binding) => binding.localName === exportedName
+            );
+
+            if (!matchingExport) {
+              continue;
+            }
+
+            const functionSource = getFunctionExportSource(
+              modulePath,
+              matchingExport.importedName,
+              visitedKeys
+            );
+
+            if (functionSource) {
+              resolvedFunctionCache.set(cacheKey, functionSource);
+
+              return functionSource;
+            }
+          }
+
+          const importedBindingSources = getImportedBindingSources(filePath);
+          const localExportPattern = /export\s+\{([\s\S]*?)\}/g;
+
+          for (const exportMatch of sourceText.matchAll(localExportPattern)) {
+            const sourceIndex = exportMatch.index + exportMatch[0].length;
+
+            if (
+              sourceText
+                .slice(sourceIndex, sourceIndex + 6)
+                .trimStart()
+                .startsWith('from')
+            ) {
+              continue;
+            }
+
+            const matchingExport = parseNamedBindings(exportMatch[1]).find(
+              (binding) => binding.localName === exportedName
+            );
+
+            if (!matchingExport) {
+              continue;
+            }
+
+            const importedBindingSource = importedBindingSources.get(matchingExport.importedName);
+
+            if (!importedBindingSource) {
+              continue;
+            }
+
+            const functionSource = getFunctionExportSource(
+              importedBindingSource.modulePath,
+              importedBindingSource.importedName,
+              visitedKeys
+            );
+
+            if (functionSource) {
+              resolvedFunctionCache.set(cacheKey, functionSource);
+
+              return functionSource;
+            }
+          }
+
+          resolvedFunctionCache.set(cacheKey, null);
+
+          return null;
+        };
+
+        const getFunctionImporters = (functionSource) => {
+          const importingFilePaths = [];
+          const importPattern = /import\s+\{([\s\S]*?)\}\s+from\s+['"]([^'"]+)['"]/g;
+
+          for (const sourceFilePath of getAllSourceFiles()) {
+            if (sourceFilePath === functionSource.filePath) {
+              continue;
+            }
+
+            for (const importMatch of getSourceText(sourceFilePath).matchAll(importPattern)) {
+              const modulePath = resolveLocalModulePath(importMatch[2], sourceFilePath);
+
+              if (!modulePath) {
+                continue;
+              }
+
+              for (const binding of parseNamedBindings(importMatch[1])) {
+                const importedFunctionSource = getFunctionExportSource(
+                  modulePath,
+                  binding.importedName
+                );
+
+                if (
+                  importedFunctionSource?.filePath === functionSource.filePath &&
+                  importedFunctionSource.exportedName === functionSource.exportedName
+                ) {
+                  importingFilePaths.push(sourceFilePath);
+                }
+              }
+            }
+          }
+
+          return importingFilePaths;
+        };
+
+        const getOwningChildFolderName = (importingFilePath, ownerFolderPath) => {
+          const relativePath = path
+            .relative(ownerFolderPath, importingFilePath)
+            .replace(/\\/g, '/');
+
+          if (relativePath === '' || relativePath.startsWith('../') || relativePath === '..') {
+            return null;
+          }
+
+          const pathParts = relativePath.split('/');
+
+          return pathParts.length > 1 ? pathParts[0] : null;
+        };
+
+        const isOnlyUsedByOneChildFolder = (functionSource) => {
+          const ownerFolderPath = path.dirname(functionSource.filePath).replace(/\\/g, '/');
+          const importingFilePaths = getFunctionImporters(functionSource);
+          const childFolderNames = new Set();
+
+          if (ownerFolderPath === sourceRootPath) {
+            return null;
+          }
+
+          if (importingFilePaths.length === 0) {
+            return null;
+          }
+
+          for (const importingFilePath of importingFilePaths) {
+            const childFolderName = getOwningChildFolderName(importingFilePath, ownerFolderPath);
+
+            if (!childFolderName) {
+              return null;
+            }
+
+            childFolderNames.add(childFolderName);
+          }
+
+          if (childFolderNames.size !== 1) {
+            return null;
+          }
+
+          return [...childFolderNames][0];
+        };
+
+        const reportIfSingleChildExport = (node, exportedName) => {
+          const functionSource = { exportedName, filePath: currentFilePath };
+          const childFolderName = isOnlyUsedByOneChildFolder(functionSource);
+
+          if (!childFolderName) {
+            return;
+          }
+
+          context.report({
+            node,
+            message: `Function ${exportedName} is only used by the ${childFolderName} child folder. Move it into that child module instead of exporting it from the parent folder.`,
+          });
+        };
+
+        return {
+          ExportNamedDeclaration(node) {
+            if (!node.declaration) {
+              return;
+            }
+
+            if (node.declaration.type === 'FunctionDeclaration' && node.declaration.id) {
+              reportIfSingleChildExport(node.declaration.id, node.declaration.id.name);
+              return;
+            }
+
+            if (node.declaration.type !== 'VariableDeclaration') {
+              return;
+            }
+
+            for (const declaratorNode of node.declaration.declarations) {
+              const initializerNode = declaratorNode.init;
+
+              if (
+                declaratorNode.id.type !== 'Identifier' ||
+                (initializerNode?.type !== 'ArrowFunctionExpression' &&
+                  initializerNode?.type !== 'FunctionExpression')
+              ) {
+                continue;
+              }
+
+              reportIfSingleChildExport(declaratorNode.id, declaratorNode.id.name);
+            }
+          },
+        };
+      },
+    },
+
     'strict-file-name': {
       meta: {
         type: 'problem',
@@ -1507,6 +1903,7 @@ export default [
       'strict-structure/single-helper-utils-level': 'error',
       'strict-structure/barrel-files-use-index': 'error',
       'strict-structure/function-imports-follow-index-visibility': 'error',
+      'strict-structure/single-child-function-exports-stay-local': 'error',
     },
   },
 

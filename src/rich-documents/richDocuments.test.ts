@@ -1,5 +1,6 @@
 import { RICH_DOCUMENTS_ROOT_PATH } from './constants';
-import { createRichDocumentMapping, serializeRichDocumentMapping } from '.';
+import { createRichDocumentMapping } from './mapping/mapping';
+import { serializeRichDocumentMapping } from './plugin-data/pluginData';
 import { createRichDocumentStore } from './richDocuments';
 import { createPersistenceTarget, createStore, createVaultAdapter } from './utils';
 

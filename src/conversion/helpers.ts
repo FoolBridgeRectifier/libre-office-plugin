@@ -1,6 +1,6 @@
 import { DEFAULT_CONVERSION_TIMEOUT_MS } from './constants';
 import { createSourceStates } from '../conflicts';
-import { isPathInsideRichDocumentsRoot } from '../rich-documents';
+import { isPathInsideRichDocumentsRoot } from '../rich-documents/paths/paths';
 import type {
   ConversionCommand,
   ConversionFormat,

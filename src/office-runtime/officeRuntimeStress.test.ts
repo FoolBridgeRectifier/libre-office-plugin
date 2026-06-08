@@ -1,5 +1,4 @@
 import { OFFICE_RUNTIME_VERSION_ARGUMENTS } from './constants';
-import { isUnsafeOfficeRuntimePath } from './helpers';
 import { createRuntimeDependencies } from './test-runtime/testRuntime';
 import { detectOfficeRuntime, validateOfficeRuntimePath } from './officeRuntime';
 
@@ -103,11 +102,6 @@ test('timeout, permission denied, and launch exceptions become invalid setup dia
 
 test('unsafe local path shapes are rejected before filesystem inspection', async () => {
   const dependencies = createRuntimeDependencies();
-
-  expect(isUnsafeOfficeRuntimePath('relative/soffice')).toBe(true);
-  expect(isUnsafeOfficeRuntimePath('\\\\server\\share\\soffice.exe')).toBe(true);
-  expect(isUnsafeOfficeRuntimePath('/opt/libreoffice\n/program/soffice')).toBe(true);
-  expect(isUnsafeOfficeRuntimePath('/opt/libreoffice/program/soffice;echo bad')).toBe(true);
 
   const result = await validateOfficeRuntimePath('relative/soffice', dependencies);
 

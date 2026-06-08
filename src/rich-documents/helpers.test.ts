@@ -1,9 +1,6 @@
 import { RICH_DOCUMENTS_ROOT_PATH } from './constants';
-import {
-  createRichDocumentFilePaths,
-  createStableRichDocumentId,
-  isPathInsideRichDocumentsRoot,
-} from '.';
+import { createStableRichDocumentId } from './mapping/mapping';
+import { createRichDocumentFilePaths, isPathInsideRichDocumentsRoot } from './paths/paths';
 
 test('generates stable rich document ids with unique random segments', () => {
   const firstId = createStableRichDocumentId('2026-05-31T12:00:00.000Z', 0.1);

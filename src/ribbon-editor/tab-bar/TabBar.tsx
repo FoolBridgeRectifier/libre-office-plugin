@@ -1,5 +1,5 @@
 import { RIBBON_TABS } from '../constants';
-import { getTabButtonClassName } from '../helpers';
+import { getTabButtonClassName } from './helpers';
 import type { RibbonTabBarProps } from './interfaces';
 
 export function RibbonTabBar({ activeRibbonTabId, onActiveRibbonTabChange }: RibbonTabBarProps) {

@@ -1,9 +1,3 @@
-export {
-  createBundledRuntimeCandidates,
-  getOfficeRuntimeVersion,
-  isUnsafeOfficeRuntimePath,
-} from './helpers';
-
 export { createDefaultOfficeRuntimeDependencies } from './node-runtime/nodeRuntime';
 export { detectOfficeRuntime, validateOfficeRuntimePath } from './officeRuntime';
 

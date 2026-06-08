@@ -3,7 +3,7 @@ import { createSourceStates } from '../conflicts';
 import { sanitizeConvertedHtmlSourceWithReport } from '../conversion';
 import { convertMarkdownToHtmlWithObsidianRenderer } from '.';
 import { ensureVaultFolder } from '../rich-documents/vault/vault';
-import { createRichDocumentFilePaths } from '../rich-documents';
+import { createRichDocumentFilePaths } from '../rich-documents/paths/paths';
 import type {
   FirstMarkdownImportResult,
   MarkdownImportOptions,

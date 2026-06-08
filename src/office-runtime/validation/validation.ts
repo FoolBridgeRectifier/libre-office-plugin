@@ -1,5 +1,5 @@
 import { DEFAULT_OFFICE_RUNTIME_TIMEOUT_MS, OFFICE_RUNTIME_VERSION_ARGUMENTS } from '../constants';
-import { getOfficeRuntimeVersion, isUnsafeOfficeRuntimePath } from '../helpers';
+import { getOfficeRuntimeVersion, isUnsafeOfficeRuntimePath } from './helpers';
 import type {
   OfficeRuntimeDependencies,
   OfficeRuntimeExecutionResult,

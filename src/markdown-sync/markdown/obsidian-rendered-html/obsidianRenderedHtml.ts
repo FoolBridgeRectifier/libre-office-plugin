@@ -4,11 +4,11 @@ import type { App } from 'obsidian';
 import { MARKDOWN_IMPORT_ARTICLE_ATTRIBUTE, MARKDOWN_IMPORT_ARTICLE_CLASS } from '../../constants';
 import { annotateAttachmentHtml, annotateTableHtml } from '../../../attachments';
 import { annotateObsidianLinkHtml } from '../../../obsidian-links';
-import { createFrontmatterTemplate, createProtectedJsonTemplate, escapeHtml } from '../utils';
 import { splitFrontmatter } from '../markdown';
 import { collectMarkdownSourceFacts } from '../source-facts/sourceFacts';
 import { annotateStructuredMarkdownHtml } from '../structured-blocks/structuredBlocks';
 import { splitMarkdownIntoRenderedChunks } from './chunks/chunks';
+import { createFrontmatterTemplate, createProtectedJsonTemplate, escapeHtml } from './helpers';
 import { mapRenderedMarkdownElementToHtml } from '.';
 import { maskRemoteMarkdownImageSources } from './remote-images/remoteImages';
 import type {

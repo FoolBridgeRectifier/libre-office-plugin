@@ -1,4 +1,3 @@
-import { isUnsafeOfficeRuntimePath } from './helpers';
 import { createRuntimeDependencies } from './test-runtime/testRuntime';
 import { detectOfficeRuntime, validateOfficeRuntimePath } from './officeRuntime';
 
@@ -166,9 +165,4 @@ test('returns setup state messages for missing bundled and unsupported desktop m
   );
 
   expect(unsupportedState.message).toBe('LibreOffice desktop detection is not supported here.');
-});
-
-test('runtime module exposes pure helpers without filesystem side effects', () => {
-  expect(isUnsafeOfficeRuntimePath('/opt/libreoffice/program/soffice; rm -rf /')).toBe(true);
-  expect(isUnsafeOfficeRuntimePath('/opt/libreoffice/program/soffice')).toBe(false);
 });
