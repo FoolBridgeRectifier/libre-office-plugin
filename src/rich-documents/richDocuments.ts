@@ -4,12 +4,12 @@ import {
   createRichDocumentPluginData,
   createStableRichDocumentId,
   normalizeRichDocumentPluginData,
-} from './helpers';
+} from '.';
 import {
   archiveRichDocumentFiles,
   persistMappingSidecar,
   recoverMappingsFromSidecars,
-} from './helpers/vault/vault';
+} from './vault/vault';
 import type {
   RichDocumentMapping,
   RichDocumentStore,

@@ -4,7 +4,7 @@ import {
   createConversionTestProcess,
   createConversionTestStore,
   createConversionTestVaultAdapter,
-} from './helpers/test-runtime/testRuntime';
+} from './test-runtime/testRuntime';
 
 test.each([
   ['plain text', 'not a zip package'],

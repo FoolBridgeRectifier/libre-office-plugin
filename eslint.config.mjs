@@ -1,5 +1,5 @@
 import path from 'node:path';
-import { readdirSync } from 'node:fs';
+import { existsSync, readFileSync, readdirSync, statSync } from 'node:fs';
 import js from '@eslint/js';
 import tsParser from 'typescript-eslint';
 import importPlugin from 'eslint-plugin-import';
@@ -781,6 +781,496 @@ const strictStructurePlugin = {
       },
     },
 
+    'helper-modules-private-to-folder': {
+      meta: {
+        type: 'problem',
+        docs: {
+          description:
+            'Require files or folders named helper/helpers to be imported only from their containing folder.',
+        },
+        schema: [],
+      },
+      create(context) {
+        const currentFilePath = context.filename.replace(/\\/g, '/');
+        const helperFolderNames = new Set(['helper', 'helpers']);
+        const supportedExtensions = ['.ts', '.tsx', '.js', '.jsx', '.mjs', '.cjs'];
+
+        const resolveLocalModulePath = (sourceValue) => {
+          if (typeof sourceValue !== 'string' || !sourceValue.startsWith('.')) {
+            return null;
+          }
+
+          const currentDirectoryPath = path.dirname(currentFilePath);
+          const modulePath = path.resolve(currentDirectoryPath, sourceValue).replace(/\\/g, '/');
+          const candidatePaths = [
+            modulePath,
+            ...supportedExtensions.map((extensionName) => `${modulePath}${extensionName}`),
+            ...supportedExtensions.map((extensionName) =>
+              path.join(modulePath, `index${extensionName}`).replace(/\\/g, '/')
+            ),
+          ];
+
+          return candidatePaths.find((candidatePath) => {
+            try {
+              return readdirSync(path.dirname(candidatePath)).includes(
+                path.basename(candidatePath)
+              );
+            } catch {
+              return false;
+            }
+          });
+        };
+
+        const getHelperContainingFolderPath = (resolvedPath) => {
+          const pathParts = resolvedPath.split('/');
+          const helperSegmentIndex = pathParts.findIndex((pathPart) =>
+            helperFolderNames.has(pathPart)
+          );
+
+          if (helperSegmentIndex > 0) {
+            return pathParts.slice(0, helperSegmentIndex).join('/');
+          }
+
+          const parsedPath = path.parse(resolvedPath);
+
+          if (helperFolderNames.has(parsedPath.name)) {
+            return parsedPath.dir.replace(/\\/g, '/');
+          }
+
+          return null;
+        };
+
+        const isInsideFolder = (filePath, folderPath) => {
+          const relativePath = path.relative(folderPath, filePath).replace(/\\/g, '/');
+
+          return relativePath === '' || (!relativePath.startsWith('../') && relativePath !== '..');
+        };
+
+        const checkImportSource = (node, sourceValue) => {
+          const resolvedPath = resolveLocalModulePath(sourceValue);
+
+          if (!resolvedPath) {
+            return;
+          }
+
+          const helperContainingFolderPath = getHelperContainingFolderPath(resolvedPath);
+
+          if (
+            helperContainingFolderPath === null ||
+            isInsideFolder(currentFilePath, helperContainingFolderPath)
+          ) {
+            return;
+          }
+
+          context.report({
+            node,
+            message:
+              'Helper modules are private to their containing folder. Import the feature index or move shared code into a named module.',
+          });
+        };
+
+        return {
+          ExportAllDeclaration(node) {
+            checkImportSource(node, node.source.value);
+          },
+          ExportNamedDeclaration(node) {
+            if (node.source) {
+              checkImportSource(node, node.source.value);
+            }
+          },
+          ImportDeclaration(node) {
+            checkImportSource(node, node.source.value);
+          },
+        };
+      },
+    },
+
+    'single-helper-utils-level': {
+      meta: {
+        type: 'problem',
+        docs: {
+          description: 'Disallow more than one helper/helpers/utils path level in a module path.',
+        },
+        schema: [],
+      },
+      create(context) {
+        const currentFilePath = context.filename.replace(/\\/g, '/');
+        const countedNames = new Set(['helper', 'helpers', 'utils']);
+
+        const helperUtilsLevelCount = currentFilePath
+          .split('/')
+          .map((pathPart) => path.parse(pathPart).name)
+          .filter((pathPart) => countedNames.has(pathPart)).length;
+
+        if (helperUtilsLevelCount <= 1) {
+          return {};
+        }
+
+        return {
+          Program(programNode) {
+            context.report({
+              node: programNode,
+              message:
+                'Use at most one helper/helpers/utils level in a path. Promote nested helper or utils code into a named feature folder.',
+            });
+          },
+        };
+      },
+    },
+
+    'barrel-files-use-index': {
+      meta: {
+        type: 'problem',
+        docs: {
+          description: 'Require files that only re-export other modules to be named index.ts.',
+        },
+        schema: [],
+      },
+      create(context) {
+        const currentFilePath = context.filename.replace(/\\/g, '/');
+        const baseName = path.basename(currentFilePath);
+
+        const isReExportStatement = (node) =>
+          node.type === 'ExportAllDeclaration' ||
+          (node.type === 'ExportNamedDeclaration' && node.source !== null);
+
+        return {
+          Program(programNode) {
+            if (programNode.body.length === 0 || baseName === 'index.ts') {
+              return;
+            }
+
+            if (!programNode.body.every(isReExportStatement)) {
+              return;
+            }
+
+            context.report({
+              node: programNode,
+              message: 'Files that only re-export other modules must be named index.ts.',
+            });
+          },
+        };
+      },
+    },
+
+    'function-imports-follow-index-visibility': {
+      meta: {
+        type: 'problem',
+        docs: {
+          description:
+            'Require imported functions to stay within their local folder scope unless parent index.ts files re-export them.',
+        },
+        schema: [],
+      },
+      create(context) {
+        const currentFilePath = context.filename.replace(/\\/g, '/');
+        const isTestOrTestHelperFile =
+          /\.(test)\.(ts|tsx)$/.test(currentFilePath) ||
+          /TestHelpers\.ts$/.test(currentFilePath) ||
+          currentFilePath.endsWith('/testFileHelpers.ts');
+
+        if (isTestOrTestHelperFile) {
+          return {};
+        }
+
+        const projectRootPath = process.cwd().replace(/\\/g, '/');
+        const sourceRootPath = path.join(projectRootPath, 'src').replace(/\\/g, '/');
+        const supportedExtensions = ['.ts', '.tsx'];
+        const resolvedFunctionCache = new Map();
+
+        const isFilePath = (filePath) => {
+          try {
+            return statSync(filePath).isFile();
+          } catch {
+            return false;
+          }
+        };
+
+        const resolveLocalModulePath = (sourceValue, sourceFilePath = currentFilePath) => {
+          if (typeof sourceValue !== 'string' || !sourceValue.startsWith('.')) {
+            return null;
+          }
+
+          const currentDirectoryPath = path.dirname(sourceFilePath);
+          const modulePath = path.resolve(currentDirectoryPath, sourceValue).replace(/\\/g, '/');
+          const candidatePaths = [
+            modulePath,
+            ...supportedExtensions.map((extensionName) => `${modulePath}${extensionName}`),
+            ...supportedExtensions.map((extensionName) =>
+              path.join(modulePath, `index${extensionName}`).replace(/\\/g, '/')
+            ),
+          ];
+
+          return candidatePaths.find((candidatePath) => isFilePath(candidatePath)) ?? null;
+        };
+
+        const getSourceText = (filePath) => {
+          try {
+            return readFileSync(filePath, 'utf8');
+          } catch {
+            return '';
+          }
+        };
+
+        const parseNamedExports = (exportListText) =>
+          exportListText
+            .split(',')
+            .map((exportPart) => exportPart.trim())
+            .filter(Boolean)
+            .map((exportPart) => {
+              const aliasMatch = /^(\w+)\s+as\s+(\w+)$/.exec(exportPart);
+
+              if (aliasMatch) {
+                return {
+                  importedName: aliasMatch[1],
+                  exportedName: aliasMatch[2],
+                };
+              }
+
+              return {
+                importedName: exportPart,
+                exportedName: exportPart,
+              };
+            });
+
+        const getDirectFunctionExportNames = (filePath) => {
+          const sourceText = getSourceText(filePath);
+          const functionExportNames = new Set();
+          const declarationPattern = /export\s+(?:async\s+)?function\s+([A-Za-z_$][\w$]*)\s*\(/g;
+          const constFunctionPattern =
+            /export\s+const\s+([A-Za-z_$][\w$]*)\s*=\s*(?:async\s*)?(?:function\b|\([^)]*\)\s*=>|[A-Za-z_$][\w$]*\s*=>)/g;
+
+          for (const functionMatch of sourceText.matchAll(declarationPattern)) {
+            functionExportNames.add(functionMatch[1]);
+          }
+
+          for (const functionMatch of sourceText.matchAll(constFunctionPattern)) {
+            functionExportNames.add(functionMatch[1]);
+          }
+
+          return functionExportNames;
+        };
+
+        const getImportedBindingSources = (filePath) => {
+          const sourceText = getSourceText(filePath);
+          const importedBindingSources = new Map();
+          const importPattern = /import\s+\{([\s\S]*?)\}\s+from\s+['"]([^'"]+)['"]/g;
+
+          for (const importMatch of sourceText.matchAll(importPattern)) {
+            const modulePath = resolveLocalModulePath(importMatch[2], filePath);
+
+            if (!modulePath) {
+              continue;
+            }
+
+            for (const binding of parseNamedExports(importMatch[1])) {
+              importedBindingSources.set(binding.exportedName, {
+                importedName: binding.importedName,
+                modulePath,
+              });
+            }
+          }
+
+          return importedBindingSources;
+        };
+
+        const getFunctionExportSource = (filePath, exportedName, visitedKeys = new Set()) => {
+          const cacheKey = `${filePath}:${exportedName}`;
+
+          if (resolvedFunctionCache.has(cacheKey)) {
+            return resolvedFunctionCache.get(cacheKey);
+          }
+
+          if (visitedKeys.has(cacheKey)) {
+            return null;
+          }
+
+          visitedKeys.add(cacheKey);
+
+          const directFunctionExportNames = getDirectFunctionExportNames(filePath);
+
+          if (directFunctionExportNames.has(exportedName)) {
+            const functionSource = { exportedName, filePath };
+
+            resolvedFunctionCache.set(cacheKey, functionSource);
+
+            return functionSource;
+          }
+
+          const sourceText = getSourceText(filePath);
+          const reExportPattern = /export\s+\{([\s\S]*?)\}\s+from\s+['"]([^'"]+)['"]/g;
+
+          for (const exportMatch of sourceText.matchAll(reExportPattern)) {
+            const modulePath = resolveLocalModulePath(exportMatch[2], filePath);
+
+            if (!modulePath) {
+              continue;
+            }
+
+            const matchingExport = parseNamedExports(exportMatch[1]).find(
+              (binding) => binding.exportedName === exportedName
+            );
+
+            if (!matchingExport) {
+              continue;
+            }
+
+            const functionSource = getFunctionExportSource(
+              modulePath,
+              matchingExport.importedName,
+              visitedKeys
+            );
+
+            if (functionSource) {
+              resolvedFunctionCache.set(cacheKey, functionSource);
+
+              return functionSource;
+            }
+          }
+
+          const importedBindingSources = getImportedBindingSources(filePath);
+          const localExportPattern = /export\s+\{([\s\S]*?)\}/g;
+
+          for (const exportMatch of sourceText.matchAll(localExportPattern)) {
+            const sourceIndex = exportMatch.index + exportMatch[0].length;
+
+            if (
+              sourceText
+                .slice(sourceIndex, sourceIndex + 6)
+                .trimStart()
+                .startsWith('from')
+            ) {
+              continue;
+            }
+
+            const matchingExport = parseNamedExports(exportMatch[1]).find(
+              (binding) => binding.exportedName === exportedName
+            );
+
+            if (!matchingExport) {
+              continue;
+            }
+
+            const importedBindingSource = importedBindingSources.get(matchingExport.importedName);
+
+            if (!importedBindingSource) {
+              continue;
+            }
+
+            const functionSource = getFunctionExportSource(
+              importedBindingSource.modulePath,
+              importedBindingSource.importedName,
+              visitedKeys
+            );
+
+            if (functionSource) {
+              resolvedFunctionCache.set(cacheKey, functionSource);
+
+              return functionSource;
+            }
+          }
+
+          resolvedFunctionCache.set(cacheKey, null);
+
+          return null;
+        };
+
+        const isInsideFolder = (filePath, folderPath) => {
+          const relativePath = path.relative(folderPath, filePath).replace(/\\/g, '/');
+
+          return relativePath === '' || (!relativePath.startsWith('../') && relativePath !== '..');
+        };
+
+        const getInitialVisibilityRoot = (functionFilePath) => {
+          const functionFolderPath = path.dirname(functionFilePath).replace(/\\/g, '/');
+          const parentFolderPath = path.dirname(functionFolderPath).replace(/\\/g, '/');
+
+          if (functionFolderPath === sourceRootPath || parentFolderPath === sourceRootPath) {
+            return functionFolderPath;
+          }
+
+          return parentFolderPath;
+        };
+
+        const isFunctionExportedByIndex = (folderPath, functionSource) => {
+          const indexPath = path.join(folderPath, 'index.ts').replace(/\\/g, '/');
+
+          if (!existsSync(indexPath)) {
+            return false;
+          }
+
+          const indexedFunctionSource = getFunctionExportSource(
+            indexPath,
+            functionSource.exportedName
+          );
+
+          return indexedFunctionSource?.filePath === functionSource.filePath;
+        };
+
+        const getVisibilityRoot = (functionSource) => {
+          let visibilityRootPath = getInitialVisibilityRoot(functionSource.filePath);
+
+          while (
+            visibilityRootPath !== sourceRootPath &&
+            isFunctionExportedByIndex(visibilityRootPath, functionSource)
+          ) {
+            visibilityRootPath = path.dirname(visibilityRootPath).replace(/\\/g, '/');
+          }
+
+          return visibilityRootPath;
+        };
+
+        const getImportedName = (specifierNode) => {
+          if (specifierNode.imported.type === 'Identifier') {
+            return specifierNode.imported.name;
+          }
+
+          return typeof specifierNode.imported.value === 'string'
+            ? specifierNode.imported.value
+            : null;
+        };
+
+        return {
+          ImportDeclaration(node) {
+            const modulePath = resolveLocalModulePath(node.source.value);
+
+            if (!modulePath) {
+              return;
+            }
+
+            for (const specifierNode of node.specifiers) {
+              if (specifierNode.type !== 'ImportSpecifier') {
+                continue;
+              }
+
+              const importedName = getImportedName(specifierNode);
+
+              if (!importedName) {
+                continue;
+              }
+
+              const functionSource = getFunctionExportSource(modulePath, importedName);
+
+              if (!functionSource) {
+                continue;
+              }
+
+              const visibilityRootPath = getVisibilityRoot(functionSource);
+
+              if (isInsideFolder(currentFilePath, visibilityRootPath)) {
+                continue;
+              }
+
+              context.report({
+                node: specifierNode,
+                message: `Function ${importedName} is not exported through enough parent index.ts files for this import. Re-export it through the parent index.ts or keep the import inside ${path.relative(projectRootPath, visibilityRootPath).replace(/\\/g, '/')}.`,
+              });
+            }
+          },
+        };
+      },
+    },
+
     'strict-file-name': {
       meta: {
         type: 'problem',
@@ -1013,6 +1503,10 @@ export default [
       'strict-structure/test-case-requires-assertion': 'error',
       'strict-structure/no-weak-test-assertions': 'error',
       'strict-structure/component-test-requires-snapshot': 'error',
+      'strict-structure/helper-modules-private-to-folder': 'error',
+      'strict-structure/single-helper-utils-level': 'error',
+      'strict-structure/barrel-files-use-index': 'error',
+      'strict-structure/function-imports-follow-index-visibility': 'error',
     },
   },
 

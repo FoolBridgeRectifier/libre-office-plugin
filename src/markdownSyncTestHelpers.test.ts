@@ -1,4 +1,4 @@
-import { createRichDocumentMapping } from './rich-documents/helpers';
+import { createRichDocumentMapping } from './rich-documents';
 import {
   createMarkdownFile,
   createMarkdownRenderer,

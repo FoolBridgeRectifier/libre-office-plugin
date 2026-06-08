@@ -1,5 +1,5 @@
 import { RibbonEditor } from './ribbon-editor/RibbonEditor';
-import { createSkippedMobileRuntimeSetupState } from './office-runtime/helpers/setup-state/setupState';
+import { createSkippedMobileRuntimeSetupState } from './office-runtime/setup-state/setupState';
 import type { AppProps } from './interfaces';
 
 export function App({

@@ -1,0 +1,120 @@
+import {
+  resolveRichDocumentConflict,
+  saveRichDocumentHtml,
+  syncMarkdownMirror,
+} from '../../richDocumentWorkspace';
+import {
+  createDefaultDesktopConversionRuntime,
+  ensureDesktopOdtSource,
+  syncDesktopOdtSave,
+} from '../../conversion/conversion';
+import {
+  getInitialRichDocumentAutosaveStatus,
+  loadRichDocumentHtmlForStore,
+} from '../../rich-html/richHtml';
+import {
+  convertMarkdownToHtmlWithObsidianRenderer,
+  renderMarkdownWithObsidian,
+} from '../../markdown-sync';
+import { collectObsidianLinkWarningsForApp } from '../../obsidian-links/resolver/resolver';
+import { secondsToMilliseconds } from '../../settings';
+import type { EditorViewOptions } from '../interfaces';
+import type { App } from 'obsidian';
+import type { RichDocumentStore } from '../../rich-documents/interfaces';
+import type {
+  LibreNoteEditorActiveSource,
+  LibreNoteEditorSettings,
+} from '../../settings/interfaces';
+
+export function createRichDocumentEditorViewOptions(
+  app: App,
+  richDocumentStore: RichDocumentStore,
+  getOfficeRuntimeSetupState: NonNullable<EditorViewOptions['getOfficeRuntimeSetupState']>,
+  getSettings: () => LibreNoteEditorSettings,
+  getActiveEditorSource: () => LibreNoteEditorActiveSource
+): EditorViewOptions {
+  const settings = getSettings();
+
+  return {
+    getActiveEditorSource,
+    getEditorMode: () => getSettings().editorMode,
+    getOfficeRuntimeSetupState,
+    getPageLayout: () => getSettings().pageLayout,
+    htmlAutosaveIntervalMs: secondsToMilliseconds(settings.autosaveIntervalSeconds),
+    markdownSyncIntervalMs: secondsToMilliseconds(settings.markdownSyncIntervalSeconds),
+    getInitialAutosaveStatus: (file) =>
+      getInitialRichDocumentAutosaveStatus(file, richDocumentStore),
+    getLinkWarnings: (markdownPath, htmlSource) =>
+      collectObsidianLinkWarningsForApp(app, markdownPath, htmlSource),
+    loadImportedHtmlSource: (file) => loadRichDocumentHtmlForStore(app, file, richDocumentStore),
+    prepareDesktopSource: async (file) => {
+      const mapping = await richDocumentStore.getMappingByMarkdownPath(file.path);
+      const runtime = await createDefaultDesktopConversionRuntime(getOfficeRuntimeSetupState());
+
+      if (!mapping || !runtime) {
+        return;
+      }
+
+      await ensureDesktopOdtSource({
+        mapping,
+        richDocumentStore,
+        runtime,
+        vaultAdapter: app.vault.adapter,
+      });
+    },
+    resolveConflict: async (markdownPath, choice) => {
+      return resolveRichDocumentConflict({
+        choice,
+        markdownPath,
+        markdownToHtmlSource: (markdownSource, sourcePath) =>
+          convertMarkdownSourceToHtml(app, markdownSource, sourcePath),
+        richDocumentStore,
+        vaultAdapter: app.vault.adapter,
+      });
+    },
+    saveHtmlSource: (markdownPath, htmlSource, previousHtmlSource) =>
+      saveRichDocumentHtml({
+        htmlSource,
+        markdownPath,
+        previousHtmlSource,
+        richDocumentStore,
+        vaultAdapter: app.vault.adapter,
+      }),
+    syncDesktopSource: async (file) => {
+      const mapping = await richDocumentStore.getMappingByMarkdownPath(file.path);
+      const runtime = await createDefaultDesktopConversionRuntime(getOfficeRuntimeSetupState());
+
+      if (!mapping || !runtime) {
+        return null;
+      }
+
+      return syncDesktopOdtSave({
+        mapping,
+        richDocumentStore,
+        runtime,
+        vaultAdapter: app.vault.adapter,
+      });
+    },
+    syncMarkdownMirror: (markdownPath, htmlSource) =>
+      syncMarkdownMirror({
+        htmlSource,
+        markdownPath,
+        richDocumentStore,
+        vaultAdapter: app.vault.adapter,
+      }),
+  };
+}
+
+async function convertMarkdownSourceToHtml(
+  app: App,
+  markdownSource: string,
+  sourcePath: string
+): Promise<string> {
+  const conversionResult = await convertMarkdownToHtmlWithObsidianRenderer(markdownSource, {
+    markdownRenderer: (bodyMarkdown, containerElement, renderedSourcePath) =>
+      renderMarkdownWithObsidian(app, bodyMarkdown, containerElement, renderedSourcePath),
+    sourcePath,
+  });
+
+  return conversionResult.htmlSource;
+}

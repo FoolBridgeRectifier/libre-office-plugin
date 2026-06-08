@@ -1,4 +1,4 @@
-import { createRichDocumentMapping } from './rich-documents/helpers';
+import { createRichDocumentMapping } from './rich-documents';
 import { mockObsidianSettingExports } from './mainObsidianSettingTestHelpers';
 import type { OfficeRuntimeSetupState } from './office-runtime/interfaces';
 
@@ -111,7 +111,7 @@ jest.mock('./markdown-sync/markdownSync', () => ({
   })),
 }));
 
-jest.mock('./markdown-sync/helpers', () => ({
+jest.mock('./markdown-sync', () => ({
   renderMarkdownWithObsidian: jest.fn(async () => undefined),
 }));
 

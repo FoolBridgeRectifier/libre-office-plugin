@@ -1,9 +1,9 @@
 import { HTML_FALLBACK_ACTIVE_SOURCE } from './constants';
-import { createSourceStates } from '../conflicts/helpers';
-import { sanitizeConvertedHtmlSourceWithReport } from '../conversion/helpers';
-import { convertMarkdownToHtmlWithObsidianRenderer } from './helpers';
-import { ensureVaultFolder } from '../rich-documents/helpers/vault/vault';
-import { createRichDocumentFilePaths } from '../rich-documents/helpers';
+import { createSourceStates } from '../conflicts';
+import { sanitizeConvertedHtmlSourceWithReport } from '../conversion';
+import { convertMarkdownToHtmlWithObsidianRenderer } from '.';
+import { ensureVaultFolder } from '../rich-documents/vault/vault';
+import { createRichDocumentFilePaths } from '../rich-documents';
 import type {
   FirstMarkdownImportResult,
   MarkdownImportOptions,

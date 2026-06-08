@@ -2,11 +2,11 @@ import { useState } from 'react';
 
 import { ConflictRecoveryPanel } from '../conflict-recovery/ConflictRecovery';
 import { HtmlEditor } from '../html-editor/HtmlEditor';
-import { createSkippedMobileRuntimeSetupState } from '../office-runtime/helpers/setup-state/setupState';
+import { createSkippedMobileRuntimeSetupState } from '../office-runtime/setup-state/setupState';
 import { DEFAULT_RIBBON_TAB_ID, RIBBON_TABS } from './constants';
-import { DesktopSourceLoader } from './helpers/desktop-source-loader/DesktopSourceLoader';
-import { StatusFooter } from './helpers/status-footer/StatusFooter';
-import { RibbonTabBar } from './helpers/tab-bar/TabBar';
+import { DesktopSourceLoader } from './desktop-source-loader/DesktopSourceLoader';
+import { StatusFooter } from './status-footer/StatusFooter';
+import { RibbonTabBar } from './tab-bar/TabBar';
 import {
   findRibbonTab,
   getAutosaveStatusText,

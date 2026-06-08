@@ -1,6 +1,6 @@
-import { createMarkdownMirrorSource } from '../autosave/helpers';
-import { createSourceSnapshot } from '../conflicts/helpers';
-import { createDefaultOfficeRuntimeDependencies } from '../office-runtime/helpers/node-runtime/nodeRuntime';
+import { createMarkdownMirrorSource } from '../autosave';
+import { createSourceSnapshot } from '../conflicts';
+import { createDefaultOfficeRuntimeDependencies } from '../office-runtime/node-runtime/nodeRuntime';
 import { DEFAULT_OPEN_TIMEOUT_MS, ODT_MIME_TYPE, ODT_PACKAGE_SIGNATURE } from './constants';
 import {
   createConversionCommand,

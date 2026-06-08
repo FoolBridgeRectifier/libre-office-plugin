@@ -3,7 +3,7 @@ import {
   createRichDocumentFilePaths,
   createStableRichDocumentId,
   isPathInsideRichDocumentsRoot,
-} from './helpers';
+} from '.';
 
 test('generates stable rich document ids with unique random segments', () => {
   const firstId = createStableRichDocumentId('2026-05-31T12:00:00.000Z', 0.1);

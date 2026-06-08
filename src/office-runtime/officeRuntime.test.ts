@@ -1,5 +1,5 @@
 import { isUnsafeOfficeRuntimePath } from './helpers';
-import { createRuntimeDependencies } from './helpers/test-runtime/testRuntime';
+import { createRuntimeDependencies } from './test-runtime/testRuntime';
 import { detectOfficeRuntime, validateOfficeRuntimePath } from './officeRuntime';
 
 test('detects bundled runtime from the plugin runtime folder', async () => {

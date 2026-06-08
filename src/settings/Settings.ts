@@ -2,7 +2,7 @@ import { PluginSettingTab, Setting } from 'obsidian';
 
 import { CONFLICT_BEHAVIOR_OPTIONS, EDITOR_MODE_OPTIONS, PAGE_LAYOUT_OPTIONS } from './constants';
 import { validateIntervalSeconds } from './helpers';
-import { addSettingsDropdown } from './helpers/dropdown/dropdown';
+import { addSettingsDropdown } from './dropdown/dropdown';
 import type {
   LibreNoteEditorConflictBehavior,
   LibreNoteEditorMode,

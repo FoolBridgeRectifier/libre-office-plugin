@@ -1,13 +1,13 @@
 import { DEFAULT_OFFICE_RUNTIME_TIMEOUT_MS } from './constants';
 import { createBundledRuntimeCandidates } from './helpers';
-import { createDefaultOfficeRuntimeDependencies } from './helpers/node-runtime/nodeRuntime';
+import { createDefaultOfficeRuntimeDependencies } from './node-runtime/nodeRuntime';
 import {
   createMissingRuntimeSetupState,
   createReadyRuntimeSetupState,
   createSkippedMobileRuntimeSetupState,
   createUnsupportedRuntimeSetupState,
-} from './helpers/setup-state/setupState';
-import { validateOfficeRuntimePath } from './helpers/validation/validation';
+} from './setup-state/setupState';
+import { validateOfficeRuntimePath } from './validation/validation';
 import type {
   OfficeRuntimeCandidate,
   OfficeRuntimeDependencies,
@@ -15,7 +15,7 @@ import type {
   OfficeRuntimeSetupState,
 } from './interfaces';
 
-export { validateOfficeRuntimePath } from './helpers/validation/validation';
+export { validateOfficeRuntimePath } from './validation/validation';
 
 export async function detectOfficeRuntime(
   options: OfficeRuntimeDetectionOptions

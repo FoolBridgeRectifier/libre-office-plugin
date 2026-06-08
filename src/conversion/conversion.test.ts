@@ -11,7 +11,7 @@ import {
   createConversionTestProcess,
   createConversionTestStore,
   createConversionTestVaultAdapter,
-} from './helpers/test-runtime/testRuntime';
+} from './test-runtime/testRuntime';
 
 test('constructs LibreOffice conversion commands without shell strings', () => {
   const command = createConversionCommand('soffice', 'document.html', 'folder', 'odt');

@@ -1,6 +1,6 @@
 import { DEFAULT_CONVERSION_TIMEOUT_MS } from './constants';
-import { createSourceStates } from '../conflicts/helpers';
-import { isPathInsideRichDocumentsRoot } from '../rich-documents/helpers';
+import { createSourceStates } from '../conflicts';
+import { isPathInsideRichDocumentsRoot } from '../rich-documents';
 import type {
   ConversionCommand,
   ConversionFormat,
@@ -14,12 +14,12 @@ export {
   sanitizeConvertedHtmlSource,
   sanitizeConvertedHtmlSourceWithReport,
   sanitizeHtmlFragmentSourceWithReport,
-} from './helpers/sanitizer/sanitizer';
+} from './sanitizer/sanitizer';
 export {
   createLibreOfficeHtmlDocument,
   getOdtConversionHtmlPath,
   getOdtConversionOutputPath,
-} from './helpers/odt-input/odtInput';
+} from './odt-input/odtInput';
 
 export function createConversionCommand(
   executablePath: string,

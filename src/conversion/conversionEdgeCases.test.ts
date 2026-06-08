@@ -9,7 +9,7 @@ import {
   createConversionTestProcess,
   createConversionTestStore,
   createConversionTestVaultAdapter,
-} from './helpers/test-runtime/testRuntime';
+} from './test-runtime/testRuntime';
 
 test('rejects conversion paths outside the rich document root', async () => {
   const files: Record<string, string> = {};

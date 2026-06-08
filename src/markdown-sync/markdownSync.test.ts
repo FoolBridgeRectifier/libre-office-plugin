@@ -1,5 +1,5 @@
 import { RICH_DOCUMENTS_ROOT_PATH } from '../rich-documents/constants';
-import { createRichDocumentMapping } from '../rich-documents/helpers';
+import { createRichDocumentMapping } from '../rich-documents';
 import { ensureFirstMarkdownImport } from './markdownSync';
 import {
   createMarkdownFile,

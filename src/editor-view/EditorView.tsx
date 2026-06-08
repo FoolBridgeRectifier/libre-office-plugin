@@ -4,16 +4,16 @@ import type { Root } from 'react-dom/client';
 import type { TFile, ViewStateResult, WorkspaceLeaf } from 'obsidian';
 
 import { LIBRE_MARKDOWN_VIEW_TYPE } from './constants';
-import { createEditorViewAutosaveController } from './helpers/autosave-controller/autosaveController';
-import { createEditorViewRoot, renderEditorViewAppElement } from './helpers/app-element/appElement';
+import { createEditorViewAutosaveController } from './autosave-controller/autosaveController';
+import { createEditorViewRoot, renderEditorViewAppElement } from './app-element/appElement';
 import {
   refreshEditorViewDesktopSourceAfterLoad,
   syncEditorViewDesktopSource,
-} from './helpers/desktop-source/desktopSource';
+} from './desktop-source/desktopSource';
 import {
   applyEditorViewConflictResolutionResult,
   resolveEditorViewConflict,
-} from './helpers/conflict/conflict';
+} from './conflict/conflict';
 import {
   applyEditorViewLoadedState,
   applyEditorViewUnloadedState,
@@ -23,8 +23,8 @@ import {
   refreshEditorViewSettingsState,
   setEditorViewAutosaveDocument,
   startEditorViewHtmlLoad,
-} from './helpers/state/state';
-import { createSkippedMobileRuntimeSetupState } from '../office-runtime/helpers/setup-state/setupState';
+} from './state/state';
+import { createSkippedMobileRuntimeSetupState } from '../office-runtime/setup-state/setupState';
 import type { AutosaveController, AutosaveStatus } from '../autosave/interfaces';
 import type { ConflictResolutionChoice } from '../conflicts/interfaces';
 import type { EditorViewOptions, EditorViewRenderTarget } from './interfaces';

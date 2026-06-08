@@ -4,8 +4,8 @@ import {
   DEFAULT_RETRY_DELAY_MS,
   FRONTMATTER_BLOCK_TEMPLATE,
 } from './constants';
-import { convertHtmlToMarkdownMirror } from './helpers/markdown/markdown';
-import { splitFrontmatter } from '../markdown-sync/helpers';
+import { convertHtmlToMarkdownMirror } from './markdown/markdown';
+import { splitFrontmatter } from '../markdown-sync';
 import type { AutosaveControllerOptions, AutosaveTimerHandle } from './interfaces';
 
 export function clearAutosaveTimer(timerHandle: AutosaveTimerHandle | null): void {

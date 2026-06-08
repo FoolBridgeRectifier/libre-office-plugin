@@ -6,8 +6,8 @@ import {
   REMOTE_ASSET_SOURCE_SELECTOR,
   REMOTE_LOADING_ELEMENT_SELECTOR,
 } from './constants';
-import { wrapTableForHorizontalScroll } from '../attachments/helpers/tables/helpers/structure/structure';
-import { sanitizeHtmlFragmentSourceWithReport } from '../conversion/helpers';
+import { wrapTableForHorizontalScroll } from '../attachments/tables/structure/structure';
+import { sanitizeHtmlFragmentSourceWithReport } from '../conversion';
 
 function isRemoteUrl(value: string | null): boolean {
   if (!value) {

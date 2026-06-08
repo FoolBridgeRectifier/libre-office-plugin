@@ -10,14 +10,14 @@ import {
   routeWorkspaceLeafToLibreEditor,
   shouldRouteFileToLibreEditor,
   shouldSkipNativeFallbackRouting,
-} from './editor-view/helpers';
-import { registerEditorViewLinkWarningRefresh } from './editor-view/helpers/link-warnings/linkWarnings';
-import { createRichDocumentEditorViewOptions } from './editor-view/helpers/options/options';
-import { flushOpenLibreEditors, registerRichDocumentMappingEvents } from './helpers';
-import { registerOpenDesktopOdtCommand } from './helpers/desktop-odt-command/desktopOdtCommand';
-import { registerNativeMarkdownFallbackCommand } from './helpers/native-markdown-command/nativeMarkdownCommand';
-import { loadRichDocumentHtmlForStore } from './helpers/rich-html/richHtml';
-import { createSkippedMobileRuntimeSetupState } from './office-runtime/helpers/setup-state/setupState';
+} from './editor-view';
+import { registerEditorViewLinkWarningRefresh } from './editor-view/link-warnings/linkWarnings';
+import { createRichDocumentEditorViewOptions } from './editor-view/options/options';
+import { flushOpenLibreEditors, registerRichDocumentMappingEvents } from './richDocumentWorkspace';
+import { registerOpenDesktopOdtCommand } from './desktop-odt-command/desktopOdtCommand';
+import { registerNativeMarkdownFallbackCommand } from './native-markdown-command/nativeMarkdownCommand';
+import { loadRichDocumentHtmlForStore } from './rich-html/richHtml';
+import { createSkippedMobileRuntimeSetupState } from './office-runtime/setup-state/setupState';
 import type { OfficeRuntimeSetupState } from './office-runtime/interfaces';
 import { createRichDocumentStore } from './rich-documents/richDocuments';
 import type { RichDocumentStore } from './rich-documents/interfaces';
@@ -28,8 +28,8 @@ import {
   loadLibreNoteEditorSettings,
   refreshOpenLibreNoteEditorViews,
   saveLibreNoteEditorSettings,
-} from './settings/helpers';
-import { detectLibreNoteEditorOfficeRuntime } from './settings/helpers/runtime/runtime';
+} from './settings';
+import { detectLibreNoteEditorOfficeRuntime } from './settings/runtime/runtime';
 import type { LibreNoteEditorSettings } from './settings/interfaces';
 import '../styles.css';
 export default class LibreNoteEditorPlugin extends Plugin {

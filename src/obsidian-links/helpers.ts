@@ -141,4 +141,4 @@ export function getObsidianBlockMarkdown(element: HTMLElement): string | null {
   return getAttributeValue(element, OBSIDIAN_TAG_SOURCE_ATTRIBUTE);
 }
 
-export { annotateObsidianLinkHtml } from './helpers/annotations/annotations';
+export { annotateObsidianLinkHtml } from './annotations/annotations';

@@ -131,4 +131,4 @@ export function shouldRoutePathToLibreEditor(filePath: string): boolean {
   return fileExtension === MARKDOWN_FILE_EXTENSIONS[0];
 }
 
-export { detachLibreMarkdownLeaves } from './helpers/unload/unload';
+export { detachLibreMarkdownLeaves } from './unload/unload';

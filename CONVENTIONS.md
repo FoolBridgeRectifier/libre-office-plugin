@@ -16,7 +16,7 @@ These rules are strict and mandatory.
 - Use full descriptive names. Do not abbreviate identifiers.
 - Prioritize readability, maintainability, and reduced redundancy.
 - If blocked, add debug instrumentation, rerun, and continue with evidence.
-- Fix implementation issues first, then verify affected Obsidian plugin behavior through Obsidian MCP before calling the work complete. If connection issues, fix connection issues. This is a hard check.
+- Fix implementation issues first, then verify affected Obsidian plugin behavior through Obsidian MCP before calling the work complete. If connection issues, fix connection issues, DO ALL YOU CAN TO CONNECT TO OBSIDIAN AND TEST. **This is a hard check**.
 - Finish development with passing format, lint, and type checks.
 
 ## Module Layout And File Limits
@@ -37,6 +37,10 @@ Required limits:
 - Each source file must stay at or below 150 lines, excluding import lines.
 - If a file would exceed 150 lines, split the logic into a subfolder and apply the same structure there.
 - If `helpers.ts` would exceed 150 lines, create a `helpers/` folder and split helper logic into helper subfolders.
+- Files or folders named `helper` or `helpers` are private to their containing feature folder. Shared feature APIs must be exposed through `index.ts` or a named module.
+- A path may contain at most one `helper`, `helpers`, or `utils` level. Promote nested helper or utility code into a named feature folder.
+- Files that only re-export other modules must be named `index.ts`.
+- Exported functions are local unless promoted through parent `index.ts` files. A function may be imported within its local folder scope; each parent `index.ts` re-export lifts that function's allowed import scope one folder higher.
 - Folder names use kebab-case.
 - React component files use PascalCase.
 - Non-React logic and helper files use camelCase.
