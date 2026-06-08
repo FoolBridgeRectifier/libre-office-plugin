@@ -14,6 +14,7 @@ test('keeps the empty editor message hidden when empty state is disabled', () =>
   render(<HtmlEditor htmlSource={null} showEmptyState={false} />);
 
   expect(screen.getByLabelText('Blank HTML editor')).toHaveClass('min-h-64');
+  expect(screen.getByLabelText('Blank HTML editor')).toHaveClass('box-border');
   expect(screen.getByLabelText('Blank HTML editor')).not.toHaveClass('border-dashed');
   expect(screen.queryByText('No rich HTML source loaded.')).toBeNull();
 });

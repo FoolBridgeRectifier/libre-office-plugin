@@ -43,9 +43,13 @@ test('marks disabled command buttons with disabled text styling', () => {
 });
 
 test('keeps page-width layout chrome desktop-only', () => {
+  const pagelessClassName = getEditorPageClassName('pageless');
   const pageWidthClassName = getEditorPageClassName('page-width');
 
-  expect(getEditorPageClassName('pageless')).toContain('max-w-full');
+  expect(pagelessClassName).toContain('box-border');
+  expect(pagelessClassName).toContain('max-w-full');
+  expect(pagelessClassName).toContain('overflow-hidden');
+
   expect(pageWidthClassName).toContain('p-0');
   expect(pageWidthClassName).toContain('libre-page-width');
 });

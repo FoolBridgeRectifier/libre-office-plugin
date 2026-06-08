@@ -4,7 +4,7 @@ exports[`renders the OneNote-style ribbon editor shell 1`] = `
 <div>
   <section
     aria-label="Libre Note Editor"
-    class="flex h-full min-h-0 flex-col overflow-hidden bg-ribbon-bg font-sans text-text-primary"
+    class="flex h-full w-full min-w-0 max-w-full flex-col overflow-hidden bg-ribbon-bg font-sans text-text-primary"
   >
     <nav
       aria-label="Ribbon tabs"
@@ -34,7 +34,7 @@ exports[`renders the OneNote-style ribbon editor shell 1`] = `
     </nav>
     <div
       aria-label="Home commands"
-      class="flex max-w-full flex-wrap gap-0 overflow-x-auto border-b border-ribbon-border bg-ribbon-bg px-2 py-2 shadow-ribbon-raised"
+      class="flex w-full min-w-0 max-w-full flex-wrap gap-0 overflow-x-auto border-b border-ribbon-border bg-ribbon-bg px-2 py-2 shadow-ribbon-raised"
     >
       <section
         aria-label="Clipboard"
@@ -102,20 +102,20 @@ exports[`renders the OneNote-style ribbon editor shell 1`] = `
       </section>
     </div>
     <main
-      class="flex min-w-0 flex-1 flex-col gap-4 overflow-auto bg-ribbon-bg px-3 py-3 text-text-primary sm:px-6 sm:py-5"
+      class="flex w-full min-w-0 max-w-full flex-1 flex-col gap-4 overflow-auto bg-ribbon-bg px-3 py-3 text-text-primary sm:px-6 sm:py-5"
     >
       <article
         aria-label="Editor surface"
-        class="relative min-h-72 w-full min-w-0 max-w-full rounded-ribbon-sm bg-ribbon-bg text-text-primary p-0"
+        class="relative box-border min-h-72 w-full min-w-0 max-w-full overflow-hidden rounded-ribbon-sm bg-ribbon-bg text-text-primary p-0"
       >
         <div
           aria-label="Empty HTML editor"
-          class="min-h-64 min-w-0 max-w-full rounded-ribbon-sm border border-dashed border-ribbon-border px-4 py-3 font-sans text-sm text-text-secondary"
+          class="box-border min-h-64 w-full min-w-0 max-w-full rounded-ribbon-sm border border-dashed border-ribbon-border px-4 py-3 font-sans text-sm text-text-secondary"
         />
       </article>
     </main>
     <footer
-      class="flex min-w-0 flex-wrap justify-between gap-2 border-t border-ribbon-border px-4 py-2 font-sans text-[11px] text-text-muted"
+      class="flex w-full min-w-0 max-w-full flex-wrap justify-between gap-2 border-t border-ribbon-border px-4 py-2 font-sans text-[11px] text-text-muted"
     >
       <span
         aria-label="HTML source status"

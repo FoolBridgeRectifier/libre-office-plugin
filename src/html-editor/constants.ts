@@ -19,12 +19,12 @@ export const HTML_EDITOR_CLASS_NAME = [
 ].join(' ');
 
 export const HTML_EDITOR_EMPTY_STATE_CLASS_NAME =
-  'min-h-64 min-w-0 max-w-full rounded-ribbon-sm border border-dashed border-ribbon-border px-4 py-3 font-sans text-sm text-text-secondary';
+  'box-border min-h-64 w-full min-w-0 max-w-full rounded-ribbon-sm border border-dashed border-ribbon-border px-4 py-3 font-sans text-sm text-text-secondary';
 
-export const HTML_EDITOR_BLANK_STATE_CLASS_NAME = 'min-h-64 w-full min-w-0 max-w-full';
+export const HTML_EDITOR_BLANK_STATE_CLASS_NAME = 'box-border min-h-64 w-full min-w-0 max-w-full';
 
 export const HTML_EDITOR_ERROR_CLASS_NAME =
-  'min-h-64 min-w-0 max-w-full rounded-ribbon-sm border border-icon-red px-4 py-3 font-sans text-sm text-text-primary';
+  'box-border min-h-64 w-full min-w-0 max-w-full rounded-ribbon-sm border border-icon-red px-4 py-3 font-sans text-sm text-text-primary';
 
 export const HTML_EDITOR_WARNING_CLASS_NAME =
   'rounded-ribbon-sm border border-icon-orange px-3 py-2 font-sans text-[12px] text-text-primary';

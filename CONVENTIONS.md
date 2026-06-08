@@ -16,6 +16,7 @@ These rules are strict and mandatory.
 - Use full descriptive names. Do not abbreviate identifiers.
 - Prioritize readability, maintainability, and reduced redundancy.
 - If blocked, add debug instrumentation, rerun, and continue with evidence.
+- Fix implementation issues first, then verify affected Obsidian plugin behavior through Obsidian MCP before calling the work complete. If connection issues, fix connection issues. This is a hard check.
 - Finish development with passing format, lint, and type checks.
 
 ## Module Layout And File Limits
@@ -155,17 +156,19 @@ Before finishing any development task:
 - Confirm any new feature folder includes `constants.ts` and `interfaces.ts`.
 - Confirm any new component styling follows `DESIGN.md` and uses Tailwind utilities.
 - Dropdown and modal tests must include behavior assertions, snapshots, and computed CSS assertions.
+- Verify affected Obsidian plugin behavior through Obsidian MCP after the fix and before the final response.
 
 ## Obsidian Plugin Workflow
 
-Before live plugin work, verify Obsidian is running in debug mode on port `9222` through the available browser or MCP tooling.
+Before live plugin work, verify Obsidian is available through Obsidian MCP and running in debug mode on port `9222`.
 
 After code changes:
 
 1. Run `npm test`.
 2. Run lint and type checks.
-3. Test live in Obsidian when the change affects plugin behavior.
+3. Test live in Obsidian through Obsidian MCP when the change affects plugin behavior.
 4. Use `npm run dev` for watch builds when manually verifying in Obsidian.
 5. Reload the plugin by disabling and enabling it before claiming live behavior is confirmed.
+6. If Obsidian MCP is unavailable or cannot complete the check, do not claim live behavior is confirmed; report the blocker and the exact verification still needed.
 
 When stuck, add targeted debug output or instrumentation, rerun, and continue from the evidence. If the issue still cannot be resolved, ask for the runtime output needed to keep going.

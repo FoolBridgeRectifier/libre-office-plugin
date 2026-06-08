@@ -1,7 +1,7 @@
 import { createRoot } from 'react-dom/client';
 
 import { App } from '../App';
-import { LIBRE_MARKDOWN_VIEW_TYPE } from './constants';
+import { LIBRE_MARKDOWN_VIEW_TYPE, LIBRE_NOTE_EDITOR_CONTENT_CLASS_NAME } from './constants';
 import { EditorView } from './EditorView';
 import { createFile } from './utils';
 import type { EditorViewOptions } from './interfaces';
@@ -193,6 +193,7 @@ test('opens and closes the React root inside the Obsidian content element', asyn
   await editorView.onLoadFile(createFile('Open.md', 'md'));
 
   expect(createRoot).toHaveBeenCalledWith(editorView.contentEl);
+  expect(editorView.contentEl).toHaveClass(LIBRE_NOTE_EDITOR_CONTENT_CLASS_NAME);
 
   expect(mockReactRoot.render).toHaveBeenLastCalledWith(
     expect.objectContaining({

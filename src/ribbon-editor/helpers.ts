@@ -50,7 +50,7 @@ export function getCommandButtonClassName(isDisabledCommand: boolean) {
 
 export function getEditorPageClassName(pageLayout: LibreNoteEditorPageLayout): string {
   return classNames(
-    'relative min-h-72 w-full min-w-0 max-w-full rounded-ribbon-sm bg-ribbon-bg',
+    'relative box-border min-h-72 w-full min-w-0 max-w-full overflow-hidden rounded-ribbon-sm bg-ribbon-bg',
     'text-text-primary',
     pageLayout === 'page-width' ? 'libre-page-width p-0' : 'p-0'
   );

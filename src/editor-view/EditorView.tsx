@@ -1,11 +1,11 @@
 import { FileView } from 'obsidian';
-import { createRoot, type Root } from 'react-dom/client';
+import type { Root } from 'react-dom/client';
 
 import type { TFile, ViewStateResult, WorkspaceLeaf } from 'obsidian';
 
 import { LIBRE_MARKDOWN_VIEW_TYPE } from './constants';
 import { createEditorViewAutosaveController } from './helpers/autosave-controller/autosaveController';
-import { renderEditorViewAppElement } from './helpers/app-element/appElement';
+import { createEditorViewRoot, renderEditorViewAppElement } from './helpers/app-element/appElement';
 import {
   refreshEditorViewDesktopSourceAfterLoad,
   syncEditorViewDesktopSource,
@@ -126,7 +126,7 @@ export class EditorView extends FileView {
   }
   protected async onOpen(): Promise<void> {
     this.contentEl.empty();
-    this.reactRoot = createRoot(this.contentEl);
+    this.reactRoot = createEditorViewRoot(this.contentEl);
     this.renderReactApp();
   }
   protected async onClose(): Promise<void> {
