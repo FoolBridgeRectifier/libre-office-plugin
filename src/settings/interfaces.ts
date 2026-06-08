@@ -18,7 +18,7 @@ export interface LibreNoteEditorSettings {
   readonly showMarkdownSourceFallback: boolean;
 }
 
-export interface LibreNoteEditorSettingsData {
+interface LibreNoteEditorSettingsData {
   readonly settings?: Partial<LibreNoteEditorSettings>;
 }
 

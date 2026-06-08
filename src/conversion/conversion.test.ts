@@ -1,6 +1,5 @@
 import {
   createConversionCommand,
-  detectOdtSaveEvent,
   ensureDesktopOdtSource,
   openDesktopOdtSource,
   sanitizeConvertedHtmlSource,
@@ -107,18 +106,6 @@ test('rejects ODT conversion when LibreOffice does not create the output file', 
   ).rejects.toThrow('conversion failed');
 
   expect(files[mapping.odtPath]).toBe(undefined);
-});
-
-test('detects ODT save events through source state checks', async () => {
-  const files: Record<string, string> = {};
-  const vaultAdapter = createConversionTestVaultAdapter(files);
-  const mapping = await createConversionTestMapping(vaultAdapter, files);
-
-  files[mapping.odtPath] = createConversionTestOdtSource('after');
-
-  await expect(detectOdtSaveEvent({ mapping, vaultAdapter })).resolves.toEqual({
-    hasSavedOdtChange: true,
-  });
 });
 
 test('opens ODT source through the visible runtime launcher', async () => {

@@ -63,7 +63,7 @@ export function createRichDocumentEditorViewOptions(
       });
     },
     resolveConflict: async (markdownPath, choice) => {
-      const result = await resolveRichDocumentConflict({
+      return resolveRichDocumentConflict({
         choice,
         markdownPath,
         markdownToHtmlSource: (markdownSource, sourcePath) =>
@@ -71,8 +71,6 @@ export function createRichDocumentEditorViewOptions(
         richDocumentStore,
         vaultAdapter: app.vault.adapter,
       });
-
-      return result.htmlSource;
     },
     saveHtmlSource: (markdownPath, htmlSource, previousHtmlSource) =>
       saveRichDocumentHtml({

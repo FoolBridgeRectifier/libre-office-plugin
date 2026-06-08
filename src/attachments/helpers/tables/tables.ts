@@ -1,29 +1,18 @@
-import {
-  TABLE_KIND_ATTRIBUTE,
-  TABLE_SCROLL_CONTAINER_CLASS,
-  TABLE_SOURCE_ATTRIBUTE,
-} from '../../constants';
+import { TABLE_KIND_ATTRIBUTE, TABLE_SOURCE_ATTRIBUTE } from '../../constants';
 import { PROTECTED_MARKER_ATTRIBUTE } from '../../../markdown-sync/constants';
 import { sanitizeElement, sanitizeHtmlSource } from './helpers/sanitizer/sanitizer';
-import { getRowCells, getTableRows, isSimpleTable } from './helpers/structure/structure';
+import {
+  getRowCells,
+  getTableRows,
+  isSimpleTable,
+  wrapTableForHorizontalScroll,
+} from './helpers/structure/structure';
 import type { InlineMarkdownReader } from '../../interfaces';
-
-function wrapTableForHorizontalScroll(tableElement: HTMLTableElement): void {
-  if (tableElement.parentElement?.classList.contains('libre-table-scroll')) {
-    return;
-  }
-
-  const wrapperElement = tableElement.ownerDocument.createElement('div');
-
-  wrapperElement.setAttribute('class', TABLE_SCROLL_CONTAINER_CLASS);
-  tableElement.replaceWith(wrapperElement);
-  wrapperElement.append(tableElement);
-}
 
 export function annotateTableHtml(htmlSource: string): string {
   const htmlDocument = new DOMParser().parseFromString(htmlSource, 'text/html');
 
-  for (const tableElement of Array.from(htmlDocument.querySelectorAll<HTMLTableElement>('table'))) {
+  htmlDocument.querySelectorAll<HTMLTableElement>('table').forEach((tableElement) => {
     const tableKind = isSimpleTable(tableElement) ? 'simple' : 'complex';
 
     if (tableKind === 'complex') {
@@ -36,7 +25,7 @@ export function annotateTableHtml(htmlSource: string): string {
     }
 
     wrapTableForHorizontalScroll(tableElement);
-  }
+  });
 
   return htmlDocument.body.innerHTML;
 }

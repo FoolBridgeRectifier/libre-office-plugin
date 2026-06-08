@@ -32,7 +32,6 @@ export interface ConflictSourceCopyRequest {
 
 export interface SourceSnapshotRequest {
   readonly path: string;
-  readonly source: RichDocumentSourceKind;
   readonly vaultAdapter: RichDocumentVaultAdapter;
 }
 
@@ -57,8 +56,4 @@ export interface ConflictResolutionOptions {
   readonly vaultAdapter: RichDocumentVaultAdapter;
 }
 
-export interface ConflictResolutionResult {
-  readonly htmlSource: string | null;
-}
-
-export type MarkdownToHtmlSource = (markdownSource: string, sourcePath: string) => Promise<string>;
+type MarkdownToHtmlSource = (markdownSource: string, sourcePath: string) => Promise<string>;

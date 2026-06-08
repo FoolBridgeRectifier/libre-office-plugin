@@ -1,6 +1,6 @@
 import type { Plugin, TFile, WorkspaceLeaf } from 'obsidian';
 
-export interface NativeMarkdownCommandTarget {
+interface NativeMarkdownCommandTarget {
   readonly app: {
     readonly workspace: {
       getActiveFile(): TFile | null;

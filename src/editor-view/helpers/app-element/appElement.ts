@@ -14,7 +14,7 @@ import type { EditorViewRenderTarget } from '../../interfaces';
 import type { Root } from 'react-dom/client';
 import type { TFile } from 'obsidian';
 
-export function createEditorViewAppElement(
+function createEditorViewAppElement(
   activeMarkdownFile: TFile | null,
   activeEditorSource: LibreNoteEditorActiveSource,
   autosaveStatus: AutosaveStatus,

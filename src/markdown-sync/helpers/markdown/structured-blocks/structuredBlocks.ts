@@ -43,7 +43,7 @@ function appendProtectedRawMarkdownFacts(
   htmlDocument: Document,
   sourceFacts: ReadonlyArray<MarkdownSourceFact>
 ): void {
-  for (const sourceFact of sourceFacts) {
+  sourceFacts.forEach((sourceFact) => {
     const rawBlockElement = htmlDocument.createElement('pre');
 
     rawBlockElement.setAttribute(PROTECTED_MARKER_ATTRIBUTE, 'raw-markdown');
@@ -52,7 +52,7 @@ function appendProtectedRawMarkdownFacts(
     rawBlockElement.textContent = sourceFact.text;
 
     htmlDocument.body.append(rawBlockElement);
-  }
+  });
 }
 
 export function annotateStructuredMarkdownHtml(

@@ -5,7 +5,7 @@ import {
 } from './helpers';
 import { createSourceStates } from './conflicts/helpers';
 import { createRichDocumentMapping } from './rich-documents/helpers';
-import { createStore, createVaultAdapter } from './markdown-sync/utils';
+import { createMarkdownSyncStore, createVaultAdapter } from './markdownSyncTestHelpers';
 import type { RichDocumentStore } from './rich-documents/interfaces';
 
 function createStoreMock(): RichDocumentStore {
@@ -80,7 +80,7 @@ test('deletes rich document mappings only for deleted markdown files', () => {
 
 test('does not blindly overwrite externally changed html source', async () => {
   const mapping = createRichDocumentMapping('Note.md', 'rich-note', '2026-06-04', 'desktop');
-  const richDocumentStore = createStore(mapping);
+  const richDocumentStore = createMarkdownSyncStore(mapping);
   const vault = createVaultAdapter(new Map([[mapping.htmlPath, '<article>External</article>']]));
 
   await expect(
@@ -111,7 +111,7 @@ test('creates conflict copies when markdown and html changed independently', asy
     sourceStates: await createSourceStates(baseMapping, vault.adapter),
   };
 
-  const richDocumentStore = createStore(mapping);
+  const richDocumentStore = createMarkdownSyncStore(mapping);
 
   vault.files.set('Note.md', 'External markdown');
 
@@ -150,7 +150,7 @@ test('does not overwrite markdown while conflict is unresolved', async () => {
     conflictState,
   };
 
-  const richDocumentStore = createStore(mapping);
+  const richDocumentStore = createMarkdownSyncStore(mapping);
   const vault = createVaultAdapter(new Map([['Note.md', 'External markdown']]));
 
   await expect(
@@ -180,7 +180,7 @@ test('stale markdown timestamps with unchanged content do not create conflict', 
     sourceStates: await createSourceStates(baseMapping, vault.adapter),
   };
 
-  const richDocumentStore = createStore(mapping);
+  const richDocumentStore = createMarkdownSyncStore(mapping);
 
   vault.modifiedTimes.set('Note.md', 500);
 
@@ -196,7 +196,7 @@ test('stale markdown timestamps with unchanged content do not create conflict', 
 
 test('syncs markdown mirror while preserving frontmatter', async () => {
   const mapping = createRichDocumentMapping('Note.md', 'rich-note', '2026-06-04', 'desktop');
-  const richDocumentStore = createStore(mapping);
+  const richDocumentStore = createMarkdownSyncStore(mapping);
 
   const vault = createVaultAdapter(new Map([['Note.md', '---\ntags: [libre]\n---\n\nOld body']]));
 

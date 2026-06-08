@@ -1,4 +1,4 @@
-import { OFFICE_RUNTIME_BUNDLED_PATHS, OFFICE_RUNTIME_SYSTEM_COMMANDS } from './constants';
+import { OFFICE_RUNTIME_BUNDLED_PATHS } from './constants';
 import type {
   OfficeRuntimeCandidate,
   OfficeRuntimeExecutionResult,
@@ -19,49 +19,12 @@ export function createBundledRuntimeCandidates(
   }));
 }
 
-export function createConfiguredRuntimeCandidate(
-  configuredPath: string | null | undefined
-): OfficeRuntimeCandidate | null {
-  const normalizedConfiguredPath = configuredPath?.trim();
-
-  return normalizedConfiguredPath
-    ? { executablePath: normalizedConfiguredPath, source: 'configured' }
-    : null;
-}
-
-export function createSystemRuntimeCandidates(
-  executablePaths: ReadonlyArray<string>
-): ReadonlyArray<OfficeRuntimeCandidate> {
-  return executablePaths.map((executablePath) => ({
-    executablePath,
-    source: 'system',
-  }));
-}
-
-export function getConfiguredOfficeRuntimePath(data: unknown): string | null {
-  const dataRecord = isRecord(data) ? data : {};
-  const settingsRecord = isRecord(dataRecord.settings) ? dataRecord.settings : {};
-  const runtimeRecord = isRecord(dataRecord.officeRuntime) ? dataRecord.officeRuntime : {};
-
-  return (
-    getString(settingsRecord.libreOfficePath) ??
-    getString(runtimeRecord.configuredPath) ??
-    getString(dataRecord.libreOfficePath)
-  );
-}
-
 export function getOfficeRuntimeVersion(result: OfficeRuntimeExecutionResult): string | null {
   const outputLines = `${result.standardOutput}\n${result.standardError}`.split(/\r?\n/);
 
   const versionLine = outputLines.find((line) => /libreoffice/i.test(line.trim()));
 
   return versionLine?.trim() ?? null;
-}
-
-export function getSystemRuntimeCommandNames(
-  operatingSystem: OfficeRuntimeOperatingSystem
-): ReadonlyArray<string> {
-  return OFFICE_RUNTIME_SYSTEM_COMMANDS[operatingSystem];
 }
 
 export function isUnsafeOfficeRuntimePath(executablePath: string): boolean {
@@ -78,14 +41,10 @@ export function isUnsafeOfficeRuntimePath(executablePath: string): boolean {
   );
 }
 
-export function joinPortablePath(basePath: string, relativePath: string): string {
+function joinPortablePath(basePath: string, relativePath: string): string {
   const separator = basePath.includes('\\') ? '\\' : '/';
 
   return `${basePath.replace(/[\\/]+$/, '')}${separator}${relativePath.replace(/[\\/]/g, separator)}`;
-}
-
-function getString(value: unknown): string | null {
-  return typeof value === 'string' && value.trim() ? value.trim() : null;
 }
 
 function isAbsoluteLocalPath(executablePath: string): boolean {
@@ -94,8 +53,4 @@ function isAbsoluteLocalPath(executablePath: string): boolean {
 
 function isNetworkPath(executablePath: string): boolean {
   return executablePath.startsWith('\\\\') || executablePath.startsWith('//');
-}
-
-function isRecord(value: unknown): value is Record<string, unknown> {
-  return typeof value === 'object' && value !== null && !Array.isArray(value);
 }

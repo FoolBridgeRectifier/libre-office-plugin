@@ -44,15 +44,6 @@ export interface DesktopConversionOptions {
   readonly vaultAdapter: RichDocumentVaultAdapter;
 }
 
-export interface OdtSaveDetectionOptions {
-  readonly mapping: RichDocumentMapping;
-  readonly vaultAdapter: RichDocumentVaultAdapter;
-}
-
-export interface OdtSaveDetectionResult {
-  readonly hasSavedOdtChange: boolean;
-}
-
 export interface HtmlSanitizationResult {
   readonly htmlSource: string;
   readonly removedUnsafeContent: boolean;

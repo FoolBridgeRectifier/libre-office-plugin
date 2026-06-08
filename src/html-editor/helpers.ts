@@ -6,7 +6,7 @@ import {
   REMOTE_ASSET_SOURCE_SELECTOR,
   REMOTE_LOADING_ELEMENT_SELECTOR,
 } from './constants';
-import { TABLE_SCROLL_CONTAINER_CLASS } from '../attachments/constants';
+import { wrapTableForHorizontalScroll } from '../attachments/helpers/tables/helpers/structure/structure';
 import { sanitizeHtmlFragmentSourceWithReport } from '../conversion/helpers';
 
 function isRemoteUrl(value: string | null): boolean {
@@ -18,58 +18,48 @@ function isRemoteUrl(value: string | null): boolean {
 }
 
 function removeRemoteLoadingElements(htmlDocument: Document): void {
-  for (const remoteLoadingElement of htmlDocument.querySelectorAll(
-    REMOTE_LOADING_ELEMENT_SELECTOR
-  )) {
+  htmlDocument.querySelectorAll(REMOTE_LOADING_ELEMENT_SELECTOR).forEach((remoteLoadingElement) => {
     remoteLoadingElement.remove();
-  }
+  });
 }
 
 function removeRemoteAssetAttributes(htmlDocument: Document): void {
-  for (const assetElement of htmlDocument.querySelectorAll<HTMLElement>(
-    REMOTE_ASSET_SOURCE_SELECTOR
-  )) {
-    if (isRemoteUrl(assetElement.getAttribute('src'))) {
-      assetElement.removeAttribute('src');
-    }
+  htmlDocument
+    .querySelectorAll<HTMLElement>(REMOTE_ASSET_SOURCE_SELECTOR)
+    .forEach((assetElement) => {
+      if (isRemoteUrl(assetElement.getAttribute('src'))) {
+        assetElement.removeAttribute('src');
+      }
 
-    if (isRemoteUrl(assetElement.getAttribute('srcset'))) {
-      assetElement.removeAttribute('srcset');
-    }
-  }
+      if (isRemoteUrl(assetElement.getAttribute('srcset'))) {
+        assetElement.removeAttribute('srcset');
+      }
+    });
 }
 
 function applyResponsiveMediaClasses(htmlDocument: Document): void {
-  for (const imageElement of htmlDocument.querySelectorAll<HTMLImageElement>('img')) {
+  htmlDocument.querySelectorAll<HTMLImageElement>('img').forEach((imageElement) => {
     imageElement.classList.add(EDITOR_CONTAINED_MEDIA_CLASS_NAME);
-  }
-}
-
-function wrapTableForEditorScroll(tableElement: HTMLTableElement): void {
-  if (tableElement.parentElement?.classList.contains('libre-table-scroll')) {
-    return;
-  }
-
-  const wrapperElement = tableElement.ownerDocument.createElement('div');
-
-  wrapperElement.className = TABLE_SCROLL_CONTAINER_CLASS;
-  tableElement.replaceWith(wrapperElement);
-  wrapperElement.append(tableElement);
+  });
 }
 
 function applyResponsiveTableWrappers(htmlDocument: Document): void {
-  for (const tableElement of Array.from(htmlDocument.querySelectorAll('table'))) {
-    wrapTableForEditorScroll(tableElement);
-  }
+  htmlDocument.querySelectorAll<HTMLTableElement>('table').forEach(wrapTableForHorizontalScroll);
 }
 
 function protectUnsupportedContent(htmlDocument: Document): void {
-  for (const protectedElement of htmlDocument.querySelectorAll<HTMLElement>(
-    PROTECTED_HTML_SELECTOR
-  )) {
-    protectedElement.setAttribute('contenteditable', 'false');
-    protectedElement.setAttribute(EDITOR_PROTECTED_ATTRIBUTE, 'true');
-    protectedElement.classList.add(EDITOR_PROTECTED_CLASS_NAME);
+  htmlDocument
+    .querySelectorAll<HTMLElement>(PROTECTED_HTML_SELECTOR)
+    .forEach((protectedElement) => {
+      protectedElement.setAttribute('contenteditable', 'false');
+      protectedElement.setAttribute(EDITOR_PROTECTED_ATTRIBUTE, 'true');
+      protectedElement.classList.add(EDITOR_PROTECTED_CLASS_NAME);
+    });
+}
+
+function removeEmptyClassAttribute(element: HTMLElement): void {
+  if (!element.getAttribute('class')) {
+    element.removeAttribute('class');
   }
 }
 
@@ -100,27 +90,21 @@ export function getHtmlSecurityWarningText(htmlSource: string): string | null {
 export function readHtmlFromEditor(editorElement: HTMLElement): string {
   const editableDocument = new DOMParser().parseFromString(editorElement.innerHTML, 'text/html');
 
-  for (const protectedElement of editableDocument.querySelectorAll<HTMLElement>(
-    `[${EDITOR_PROTECTED_ATTRIBUTE}]`
-  )) {
-    protectedElement.removeAttribute('contenteditable');
-    protectedElement.removeAttribute(EDITOR_PROTECTED_ATTRIBUTE);
-    protectedElement.classList.remove(EDITOR_PROTECTED_CLASS_NAME);
+  editableDocument
+    .querySelectorAll<HTMLElement>(`[${EDITOR_PROTECTED_ATTRIBUTE}]`)
+    .forEach((protectedElement) => {
+      protectedElement.removeAttribute('contenteditable');
+      protectedElement.removeAttribute(EDITOR_PROTECTED_ATTRIBUTE);
+      protectedElement.classList.remove(EDITOR_PROTECTED_CLASS_NAME);
+      removeEmptyClassAttribute(protectedElement);
+    });
 
-    if (!protectedElement.getAttribute('class')) {
-      protectedElement.removeAttribute('class');
-    }
-  }
-
-  for (const imageElement of editableDocument.querySelectorAll<HTMLImageElement>(
-    `.${EDITOR_CONTAINED_MEDIA_CLASS_NAME}`
-  )) {
-    imageElement.classList.remove(EDITOR_CONTAINED_MEDIA_CLASS_NAME);
-
-    if (!imageElement.getAttribute('class')) {
-      imageElement.removeAttribute('class');
-    }
-  }
+  editableDocument
+    .querySelectorAll<HTMLImageElement>(`.${EDITOR_CONTAINED_MEDIA_CLASS_NAME}`)
+    .forEach((imageElement) => {
+      imageElement.classList.remove(EDITOR_CONTAINED_MEDIA_CLASS_NAME);
+      removeEmptyClassAttribute(imageElement);
+    });
 
   return sanitizeHtmlFragmentSourceWithReport(editableDocument.body.innerHTML).htmlSource;
 }

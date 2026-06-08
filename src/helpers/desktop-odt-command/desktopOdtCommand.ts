@@ -41,9 +41,7 @@ export function registerOpenDesktopOdtCommand(options: DesktopOdtCommandOptions)
   });
 }
 
-export async function openActiveFileInDesktopOdtEditor(
-  options: DesktopOdtOpenOptions
-): Promise<void> {
+async function openActiveFileInDesktopOdtEditor(options: DesktopOdtOpenOptions): Promise<void> {
   await loadRichDocumentHtmlForStore(options.target.app, options.file, options.richDocumentStore);
 
   const mapping = await options.richDocumentStore.getOrCreateMapping(options.file.path);

@@ -46,7 +46,7 @@ export function createConversionCommand(
   };
 }
 
-export function createUserInstallationArgument(outputFolderPath: string): string {
+function createUserInstallationArgument(outputFolderPath: string): string {
   const normalizedProfilePath = `${outputFolderPath.replace(/[\\/]+$/, '')}/.libreoffice-profile`;
   const portableProfilePath = normalizedProfilePath.replace(/\\/g, '/');
 
@@ -57,7 +57,7 @@ export function createUserInstallationArgument(outputFolderPath: string): string
   return `-env:UserInstallation=${encodeURI(`file://${absoluteProfilePath}`)}`;
 }
 
-export function assertSafeDesktopConversionPaths(paths: DesktopConversionPaths): void {
+function assertSafeDesktopConversionPaths(paths: DesktopConversionPaths): void {
   if (
     !isPathInsideRichDocumentsRoot(paths.folderPath) ||
     !isPathInsideRichDocumentsRoot(paths.htmlPath) ||
@@ -71,7 +71,7 @@ export function assertSafeDesktopConversionPaths(paths: DesktopConversionPaths):
   }
 }
 
-export function getPathFolder(filePath: string): string {
+function getPathFolder(filePath: string): string {
   return filePath.split('/').slice(0, -1).join('/');
 }
 

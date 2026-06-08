@@ -11,16 +11,6 @@ export const OFFICE_RUNTIME_VERSION_ARGUMENTS = [
   '--version',
 ];
 
-export const OFFICE_RUNTIME_SYSTEM_COMMANDS: Record<
-  OfficeRuntimeOperatingSystem,
-  ReadonlyArray<string>
-> = {
-  linux: ['soffice', 'libreoffice'],
-  macos: ['soffice', 'libreoffice'],
-  unsupported: [],
-  windows: ['soffice.exe', 'libreoffice.exe', 'soffice', 'libreoffice'],
-};
-
 export const OFFICE_RUNTIME_BUNDLED_PATHS: Record<
   OfficeRuntimeOperatingSystem,
   ReadonlyArray<string>

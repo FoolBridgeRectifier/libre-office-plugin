@@ -3,14 +3,11 @@ import { MARKDOWN_IMAGE_SOURCE_PATTERN } from '../../../source-facts/constants';
 export function maskRemoteMarkdownImageSources(markdownSource: string): string {
   let placeholderIndex = 0;
 
-  return markdownSource.replace(MARKDOWN_IMAGE_SOURCE_PATTERN, (imageSource) => {
-    const target = imageSource.match(/\]\(([^)\n]+)\)$/)?.[1] ?? '';
-
+  return markdownSource.replace(MARKDOWN_IMAGE_SOURCE_PATTERN, (imageSource, altText, target) => {
     if (!isRemoteImageTarget(target)) {
       return imageSource;
     }
 
-    const altText = imageSource.match(/^!\[([^\]\n]*)\]/)?.[1] ?? '';
     const placeholderPath = `libre-note-editor-remote-image-${placeholderIndex++}.png`;
 
     return `![${altText}](${placeholderPath})`;

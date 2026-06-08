@@ -1,6 +1,6 @@
-import { resolveConflictMapping, resolveRichDocumentConflict } from './resolution';
+import { resolveRichDocumentConflict } from './resolution';
 import { createRichDocumentMapping } from '../../../rich-documents/helpers';
-import { createStore, createVaultAdapter } from '../../../markdown-sync/utils';
+import { createMarkdownSyncStore, createVaultAdapter } from '../../../markdownSyncTestHelpers';
 import type {
   RichDocumentConflictCopy,
   RichDocumentMapping,
@@ -32,23 +32,13 @@ function createConflictCopy(
   };
 }
 
-test('conflict resolution updates selected source and clears conflict state', () => {
-  const mapping = createConflictedMapping([]);
-
-  const resolvedMapping = resolveConflictMapping(mapping, 'mobile', '2026-06-06');
-
-  expect(resolvedMapping.activeSource).toBe('html');
-  expect(resolvedMapping.conflictState.status).toBe('none');
-  expect(resolvedMapping.syncTimestamps.lastSyncedAt).toBe('2026-06-06');
-});
-
 test('desktop conflict choice writes desktop html and markdown mirror', async () => {
   const mapping = createConflictedMapping([
     createConflictCopy('conflicts/desktop.html', 'desktop'),
     createConflictCopy('conflicts/html.html', 'html'),
   ]);
 
-  const richDocumentStore = createStore(mapping);
+  const richDocumentStore = createMarkdownSyncStore(mapping);
 
   const vault = createVaultAdapter(
     new Map([
@@ -69,7 +59,7 @@ test('desktop conflict choice writes desktop html and markdown mirror', async ()
 
   const updatedMapping = await richDocumentStore.getOrCreateMapping('Note.md');
 
-  expect(result.htmlSource).toBe('<article><h1>Desktop</h1></article>');
+  expect(result).toBe('<article><h1>Desktop</h1></article>');
   expect(vault.files.get(mapping.htmlPath)).toBe('<article><h1>Desktop</h1></article>');
   expect(vault.files.get('Note.md')).toBe('---\ntags: [libre]\n---\n\n# Desktop');
 
@@ -83,7 +73,7 @@ test('markdown conflict choice converts selected markdown into html source', asy
     createConflictCopy('conflicts/markdown.md', 'markdown'),
   ]);
 
-  const richDocumentStore = createStore(mapping);
+  const richDocumentStore = createMarkdownSyncStore(mapping);
 
   const vault = createVaultAdapter(
     new Map([
@@ -104,7 +94,7 @@ test('markdown conflict choice converts selected markdown into html source', asy
 
   const updatedMapping = await richDocumentStore.getOrCreateMapping('Note.md');
 
-  expect(result.htmlSource).toBe('<article># Kept markdown</article>');
+  expect(result).toBe('<article># Kept markdown</article>');
   expect(vault.files.get('Note.md')).toBe('# Kept markdown');
   expect(vault.files.get(mapping.htmlPath)).toBe('<article># Kept markdown</article>');
 

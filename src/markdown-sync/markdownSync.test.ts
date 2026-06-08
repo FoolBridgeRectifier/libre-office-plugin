@@ -4,14 +4,14 @@ import { ensureFirstMarkdownImport } from './markdownSync';
 import {
   createMarkdownFile,
   createMarkdownRenderer,
-  createStore,
+  createMarkdownSyncStore,
   createVaultAdapter,
   createVaultReader,
-} from './utils';
+} from '../markdownSyncTestHelpers';
 
 test('writes first imported html and marks mapping as html active source', async () => {
   const mapping = createRichDocumentMapping('Import.md', 'rich-import', '2026-05-31', 'desktop');
-  const richDocumentStore = createStore(mapping);
+  const richDocumentStore = createMarkdownSyncStore(mapping);
   const vault = createVaultAdapter();
 
   const result = await ensureFirstMarkdownImport({
@@ -46,7 +46,7 @@ test('uses injected Obsidian-rendered markdown import when available', async () 
     'desktop'
   );
 
-  const richDocumentStore = createStore(mapping);
+  const richDocumentStore = createMarkdownSyncStore(mapping);
   const vault = createVaultAdapter();
 
   const result = await ensureFirstMarkdownImport({
@@ -68,7 +68,7 @@ test('uses injected Obsidian-rendered markdown import when available', async () 
 
 test('sanitizes executable html during first markdown import', async () => {
   const mapping = createRichDocumentMapping('Unsafe.md', 'rich-unsafe', '2026-05-31', 'desktop');
-  const richDocumentStore = createStore(mapping);
+  const richDocumentStore = createMarkdownSyncStore(mapping);
   const vault = createVaultAdapter();
 
   const result = await ensureFirstMarkdownImport({
@@ -104,7 +104,7 @@ test('sanitizes an existing richer html source before returning it', async () =>
     'desktop'
   );
 
-  const richDocumentStore = createStore(mapping);
+  const richDocumentStore = createMarkdownSyncStore(mapping);
   const vault = createVaultAdapter(
     new Map([[mapping.htmlPath, '<article><img src="https://example.com/remote.png"></article>']])
   );
@@ -127,7 +127,7 @@ test('sanitizes an existing richer html source before returning it', async () =>
 
 test('uses protected raw markdown when no renderer is injected on first import', async () => {
   const mapping = createRichDocumentMapping('Raw.md', 'rich-raw', '2026-05-31', 'desktop');
-  const richDocumentStore = createStore(mapping);
+  const richDocumentStore = createMarkdownSyncStore(mapping);
   const vault = createVaultAdapter();
 
   const result = await ensureFirstMarkdownImport({
@@ -156,7 +156,7 @@ test('does not rewrite an existing richer html source', async () => {
   );
 
   const existingHtmlPath = `${RICH_DOCUMENTS_ROOT_PATH}/rich-existing/document.html`;
-  const richDocumentStore = createStore(mapping);
+  const richDocumentStore = createMarkdownSyncStore(mapping);
 
   const vault = createVaultAdapter(new Map([[existingHtmlPath, '<article>Existing</article>']]));
 

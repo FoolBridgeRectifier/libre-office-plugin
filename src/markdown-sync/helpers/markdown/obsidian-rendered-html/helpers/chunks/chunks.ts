@@ -3,7 +3,7 @@ export function splitMarkdownIntoRenderedChunks(bodyMarkdown: string): ReadonlyA
   const currentLines: string[] = [];
   let fenceMarker: string | null = null;
 
-  for (const line of bodyMarkdown.split(/\r?\n/)) {
+  bodyMarkdown.split(/\r?\n/).forEach((line) => {
     const fenceMatch = line.match(/^\s*(`{3,}|~{3,})/);
     const matchedFenceMarker = fenceMatch?.[1] ?? null;
     const matchedFenceCharacter = matchedFenceMarker?.[0] ?? null;
@@ -16,11 +16,11 @@ export function splitMarkdownIntoRenderedChunks(bodyMarkdown: string): ReadonlyA
 
     if (!fenceMarker && !line.trim()) {
       appendCurrentChunk(chunks, currentLines);
-      continue;
+      return;
     }
 
     currentLines.push(line);
-  }
+  });
 
   appendCurrentChunk(chunks, currentLines);
 

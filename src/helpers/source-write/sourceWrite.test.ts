@@ -1,12 +1,12 @@
 import { createSourceStates } from '../../conflicts/helpers';
 import { createRichDocumentMapping } from '../../rich-documents/helpers';
-import { createStore, createVaultAdapter } from '../../markdown-sync/utils';
+import { createMarkdownSyncStore, createVaultAdapter } from '../../markdownSyncTestHelpers';
 import { saveRichDocumentHtml, syncMarkdownMirror } from './sourceWrite';
 import type { RichDocumentMapping } from '../../rich-documents/interfaces';
 
 async function createOdtTrackedFixture(): Promise<{
   readonly mapping: RichDocumentMapping;
-  readonly richDocumentStore: ReturnType<typeof createStore>;
+  readonly richDocumentStore: ReturnType<typeof createMarkdownSyncStore>;
   readonly vault: ReturnType<typeof createVaultAdapter>;
 }> {
   const baseMapping = createRichDocumentMapping('Note.md', 'rich-note', '2026-06-04', 'desktop');
@@ -24,7 +24,7 @@ async function createOdtTrackedFixture(): Promise<{
     sourceStates: await createSourceStates(baseMapping, vault.adapter),
   };
 
-  return { mapping, richDocumentStore: createStore(mapping), vault };
+  return { mapping, richDocumentStore: createMarkdownSyncStore(mapping), vault };
 }
 
 test('creates conflict when odt changes before html save', async () => {

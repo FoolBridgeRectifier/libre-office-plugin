@@ -44,6 +44,6 @@ export interface RenderedMarkdownToHtmlOptions {
   readonly sourcePath: string;
 }
 
-export interface MarkdownVaultReader {
+interface MarkdownVaultReader {
   read(file: TFile): Promise<string>;
 }

@@ -8,12 +8,12 @@ import type { Workspace, WorkspaceLeaf } from 'obsidian';
 export async function detachLibreMarkdownLeaves(workspace: Workspace): Promise<void> {
   const restorationPromises: Promise<void>[] = [];
 
-  for (const workspaceLeaf of workspace.getLeavesOfType(LIBRE_MARKDOWN_VIEW_TYPE)) {
+  workspace.getLeavesOfType(LIBRE_MARKDOWN_VIEW_TYPE).forEach((workspaceLeaf) => {
     const workspaceFilePath = getWorkspaceLeafFilePath(workspaceLeaf);
 
     if (!workspaceFilePath || !shouldRestorePathToNativeMarkdown(workspaceFilePath)) {
       workspaceLeaf.detach();
-      continue;
+      return;
     }
 
     restorationPromises.push(
@@ -23,7 +23,7 @@ export async function detachLibreMarkdownLeaves(workspace: Workspace): Promise<v
         type: NATIVE_MARKDOWN_VIEW_TYPE,
       })
     );
-  }
+  });
 
   await Promise.all(restorationPromises);
 }

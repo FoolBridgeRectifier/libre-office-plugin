@@ -7,11 +7,9 @@ const watch = process.argv.includes('--watch');
 // --sourcemap enables source maps on a one-shot build (used by `npm run build:dev`).
 // Dev panels (EngineTestPanel, StylingEnginePanel) are rendered only when sourcemap is true,
 // so they are fully tree-shaken out of `npm run build` (production) output.
-const forceSourcmap = process.argv.includes('--sourcemap');
+const forceSourcemap = process.argv.includes('--sourcemap');
 const buildMode = watch ? 'development' : 'production';
-const sourcemap = watch || forceSourcmap ? 'inline' : false;
-// Package.json is read but not used directly - it's available for future use
-void JSON.parse(readFileSync('./package.json', 'utf8'));
+const sourcemap = watch || forceSourcemap ? 'inline' : false;
 
 // Inject CSS as inline styles into the JS bundle
 const injectCssPlugin = {
@@ -26,14 +24,14 @@ const injectCssPlugin = {
 
       return {
         contents: `
-          for (const existingStyle of document.querySelectorAll('style')) {
+          document.querySelectorAll('style').forEach((existingStyle) => {
             if (
               existingStyle.dataset.libreNoteEditorStyle === 'true' ||
               existingStyle.textContent?.includes('--ribbon-purple')
             ) {
               existingStyle.remove();
             }
-          }
+          });
 
           const style = document.createElement('style');
           style.dataset.libreNoteEditorStyle = 'true';

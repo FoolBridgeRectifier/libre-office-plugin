@@ -1,13 +1,10 @@
-export type OfficeRuntimeCandidateSource = 'bundled' | 'configured' | 'system';
-
 export interface OfficeRuntimeCandidate {
   readonly executablePath: string;
-  readonly source: OfficeRuntimeCandidateSource;
+  readonly source: 'bundled';
 }
 
 export interface OfficeRuntimeDetectionOptions {
   readonly bundledRootPath?: string | null;
-  readonly configuredPath?: string | null;
   readonly dependencies?: OfficeRuntimeDependencies;
   readonly operatingSystem: OfficeRuntimeOperatingSystem;
   readonly platform: OfficeRuntimePlatform;
@@ -39,7 +36,7 @@ export interface OfficeRuntimePlatformFlags {
   readonly isWin: boolean;
 }
 
-export interface OfficeRuntimeFileSystem {
+interface OfficeRuntimeFileSystem {
   isDirectory(executablePath: string): Promise<boolean>;
   isFile(executablePath: string): Promise<boolean>;
   pathExists(executablePath: string): Promise<boolean>;
@@ -47,9 +44,9 @@ export interface OfficeRuntimeFileSystem {
 
 export type OfficeRuntimeOperatingSystem = 'linux' | 'macos' | 'unsupported' | 'windows';
 
-export type OfficeRuntimePlatform = 'desktop' | 'mobile';
+type OfficeRuntimePlatform = 'desktop' | 'mobile';
 
-export interface OfficeRuntimeProcess {
+interface OfficeRuntimeProcess {
   executeFile(
     executablePath: string,
     argumentsList: ReadonlyArray<string>,
@@ -69,7 +66,7 @@ export type OfficeRuntimeSetupState =
       readonly message: string;
       readonly status: 'ready';
       readonly executablePath: string;
-      readonly source: OfficeRuntimeCandidateSource;
+      readonly source: 'bundled';
       readonly version: string;
     }
   | {

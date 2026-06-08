@@ -12,11 +12,7 @@ export function getHtmlSaveConflictSources(
   htmlChanged: boolean,
   localHtmlChanged: boolean
 ): ReadonlyArray<RichDocumentSourceKind> {
-  const changedSources = new Set<RichDocumentSourceKind>();
-
-  for (const sourceChange of sourceChanges) {
-    changedSources.add(sourceChange.source);
-  }
+  const changedSources = new Set(sourceChanges.map((sourceChange) => sourceChange.source));
 
   if (htmlChanged || localHtmlChanged) {
     changedSources.add('html');
@@ -28,11 +24,10 @@ export function getHtmlSaveConflictSources(
 export function getMarkdownMirrorConflictSources(
   sourceChanges: ReadonlyArray<SourceStateChange>
 ): ReadonlyArray<RichDocumentSourceKind> {
-  const changedSources = new Set<RichDocumentSourceKind>(['html']);
-
-  for (const sourceChange of sourceChanges) {
-    changedSources.add(sourceChange.source);
-  }
+  const changedSources = new Set<RichDocumentSourceKind>([
+    'html',
+    ...sourceChanges.map((sourceChange) => sourceChange.source),
+  ]);
 
   return Array.from(changedSources);
 }

@@ -25,7 +25,6 @@ test('detects LibreOffice runtime only from the plugin bundled runtime on load',
   expect(detectOfficeRuntime).toHaveBeenCalledWith(
     expect.objectContaining({
       bundledRootPath: 'C:\\Vault\\libre-note-editor/runtime',
-      configuredPath: null,
       operatingSystem: 'windows',
       platform: 'desktop',
     })

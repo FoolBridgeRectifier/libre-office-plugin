@@ -1,14 +1,11 @@
 import { getEditorViewLinkWarningCount, setEditorViewAutosaveDocument } from '../state/state';
 import type { ConflictResolutionChoice } from '../../../conflicts/interfaces';
-import type {
-  EditorViewConflictResolutionResult,
-  EditorViewConflictResolutionTarget,
-} from '../../interfaces';
+import type { EditorViewLoadedState, EditorViewSourceTarget } from '../../interfaces';
 
 export async function resolveEditorViewConflict(
-  target: EditorViewConflictResolutionTarget,
+  target: EditorViewSourceTarget,
   choice: ConflictResolutionChoice
-): Promise<EditorViewConflictResolutionResult | null> {
+): Promise<EditorViewLoadedState | null> {
   if (!target.activeMarkdownFile || target.isResolvingConflict) {
     return null;
   }
@@ -46,8 +43,8 @@ export async function resolveEditorViewConflict(
 }
 
 export function applyEditorViewConflictResolutionResult(
-  target: EditorViewConflictResolutionTarget,
-  result: EditorViewConflictResolutionResult | null
+  target: EditorViewSourceTarget,
+  result: EditorViewLoadedState | null
 ): void {
   if (result === null) {
     return;

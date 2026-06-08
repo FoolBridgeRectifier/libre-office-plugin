@@ -4,7 +4,7 @@ export function escapeHtml(text: string): string {
   return text.split('&').join('&amp;').split('<').join('&lt;').split('>').join('&gt;');
 }
 
-export function escapeHtmlAttribute(text: string): string {
+function escapeHtmlAttribute(text: string): string {
   return escapeHtml(text).split('"').join('&quot;');
 }
 

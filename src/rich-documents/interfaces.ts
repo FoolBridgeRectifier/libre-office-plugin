@@ -8,7 +8,7 @@ export interface RichDocumentConflictCopy {
 
 export type RichDocumentConflictCopySource = 'desktop' | 'html' | 'markdown' | 'mobile' | 'odt';
 
-export type RichDocumentConflictReason =
+type RichDocumentConflictReason =
   | 'manual-recovery'
   | 'missing-rich-file'
   | 'multi-source-change'
@@ -26,7 +26,7 @@ export type RichDocumentConflictState =
 
 export type RichDocumentEditorPlatform = 'desktop' | 'mobile' | 'unknown';
 
-export type RichDocumentLifecycleState = 'active' | 'archived';
+type RichDocumentLifecycleState = 'active' | 'archived';
 
 export interface RichDocumentFilePaths {
   readonly folderPath: string;
@@ -54,7 +54,7 @@ export interface RichDocumentPluginData {
   readonly version: 1;
 }
 
-export interface RichDocumentPersistenceTarget {
+interface RichDocumentPersistenceTarget {
   loadData(): Promise<unknown>;
   saveData(data: RichDocumentPluginData): Promise<void>;
 }
@@ -82,7 +82,7 @@ export interface RichDocumentStoreOptions {
   readonly vaultAdapter: RichDocumentVaultAdapter;
 }
 
-export interface RichDocumentStorePatch {
+interface RichDocumentStorePatch {
   readonly activeSource?: RichDocumentActiveSource;
   readonly conflictState?: RichDocumentConflictState;
   readonly lastEditorPlatform?: RichDocumentEditorPlatform;

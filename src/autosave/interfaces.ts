@@ -30,17 +30,17 @@ export interface AutosaveDocument {
   readonly markdownPath: string;
 }
 
-export interface AutosaveHtmlSaveRequest {
+interface AutosaveHtmlSaveRequest {
   readonly htmlSource: string;
   readonly markdownPath: string;
   readonly previousHtmlSource: string;
 }
 
-export type AutosaveHtmlSaveHandler = (request: AutosaveHtmlSaveRequest) => Promise<void>;
+type AutosaveHtmlSaveHandler = (request: AutosaveHtmlSaveRequest) => Promise<void>;
 
-export interface AutosaveMarkdownSyncRequest {
+interface AutosaveMarkdownSyncRequest {
   readonly htmlSource: string;
   readonly markdownPath: string;
 }
 
-export type AutosaveMarkdownSyncHandler = (request: AutosaveMarkdownSyncRequest) => Promise<void>;
+type AutosaveMarkdownSyncHandler = (request: AutosaveMarkdownSyncRequest) => Promise<void>;

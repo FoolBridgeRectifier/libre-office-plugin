@@ -1,26 +1,26 @@
 import { cleanRenderedMarkdownElement } from '../cleanup/cleanup';
 
 function repairEscapedHeadingEmphasis(cleanedElement: HTMLElement): void {
-  for (const headingElement of cleanedElement.querySelectorAll<HTMLElement>('h1,h2,h3,h4,h5,h6')) {
+  cleanedElement.querySelectorAll<HTMLElement>('h1,h2,h3,h4,h5,h6').forEach((headingElement) => {
     const headingSource = headingElement.getAttribute('data-heading') ?? '';
 
     if (!headingSource.includes('\\*')) {
-      continue;
+      return;
     }
 
-    for (const spanElement of headingElement.querySelectorAll<HTMLSpanElement>('span[style]')) {
+    headingElement.querySelectorAll<HTMLSpanElement>('span[style]').forEach((spanElement) => {
       const spanText = spanElement.textContent;
 
       if (spanText === null || !spanText.startsWith('*') || spanElement.children.length > 0) {
-        continue;
+        return;
       }
 
       const emphasisElement = document.createElement('em');
 
       emphasisElement.textContent = spanText.slice(1);
       spanElement.replaceChildren(emphasisElement);
-    }
-  }
+    });
+  });
 }
 
 export function mapRenderedMarkdownElementToHtml(containerElement: HTMLElement): string {

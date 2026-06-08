@@ -4,16 +4,12 @@
   "private": true,
   "scripts": {
     "build": "tsc --noEmit && node esbuild.config.mjs && node scripts/bundle-plugin.mjs",
-    "build:dev": "tsc --noEmit && node esbuild.config.mjs --sourcemap",
     "dev": "node esbuild.config.mjs --watch",
-    "format": "prettier . --write",
     "format:check": "prettier . --check",
     "lint": "eslint .",
-    "lint:fix": "eslint . --fix",
     "obsidian:dev": "start \"\" \"obsidian://open?vault=Obsidian%20Vault\"",
-    "runtime:prepare": "node scripts/prepare-runtime.mjs",
+    "release": "npm test && npm run format:check && npm run lint && npm run typecheck && npm run build",
     "test": "jest --passWithNoTests",
-    "test:markdown-sync:coverage": "jest --runInBand --coverage --collectCoverageFrom=src/markdown-sync/**/*.ts --coverageDirectory=coverage/markdown-sync",
     "typecheck": "tsc --noEmit"
   },
   "description": "Standalone rich-note editor workspace for Obsidian with a React-based custom view.",

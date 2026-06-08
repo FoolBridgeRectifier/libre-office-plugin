@@ -1,9 +1,4 @@
-export {
-  createArchiveFilePath,
-  createRichDocumentFilePaths,
-  isPathInsideRichDocumentsRoot,
-  sanitizeRichDocumentId,
-} from './helpers/paths/paths';
+export { createRichDocumentFilePaths, isPathInsideRichDocumentsRoot } from './helpers/paths/paths';
 
 export {
   createArchivedRichDocumentMapping,
@@ -14,6 +9,5 @@ export {
 export {
   createRichDocumentPluginData,
   normalizeRichDocumentPluginData,
-  parseRichDocumentMapping,
   serializeRichDocumentMapping,
 } from './helpers/plugin-data/pluginData';

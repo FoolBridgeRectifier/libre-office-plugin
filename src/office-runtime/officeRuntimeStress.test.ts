@@ -25,7 +25,7 @@ test('bundled paths with spaces validate and use only the version probe argument
   expect(OFFICE_RUNTIME_VERSION_ARGUMENTS.some((argument) => /macro/i.test(argument))).toBe(false);
 });
 
-test('invalid bundled runtime does not silently fall back to configured or system paths', async () => {
+test('invalid bundled runtime does not silently fall back to system paths', async () => {
   const bundledPath = 'C:\\Vault\\plugin\\runtime\\LibreOffice\\program\\soffice.com';
 
   const dependencies = createRuntimeDependencies({
@@ -38,7 +38,6 @@ test('invalid bundled runtime does not silently fall back to configured or syste
 
   const state = await detectOfficeRuntime({
     bundledRootPath: 'C:\\Vault\\plugin\\runtime',
-    configuredPath: 'C:\\Configured\\soffice.exe',
     dependencies,
     operatingSystem: 'windows',
     platform: 'desktop',

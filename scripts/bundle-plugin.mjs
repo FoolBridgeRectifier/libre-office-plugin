@@ -21,15 +21,17 @@ await copyPreparedRuntimeDirectories();
 console.log(`Bundled plugin build into ${DIST_DIRECTORY}/`);
 
 async function copyPluginEntryFiles() {
-  for (const fileName of PLUGIN_ENTRY_FILES) {
-    await cp(path.resolve(fileName), path.join(distPath, fileName));
-  }
+  await Promise.all(
+    PLUGIN_ENTRY_FILES.map((fileName) => cp(path.resolve(fileName), path.join(distPath, fileName)))
+  );
 }
 
 async function copyRuntimeDocumentation() {
-  for (const fileName of RUNTIME_DOCUMENTATION_FILES) {
-    await cp(path.join(runtimePath, fileName), path.join(distRuntimePath, fileName));
-  }
+  await Promise.all(
+    RUNTIME_DOCUMENTATION_FILES.map((fileName) =>
+      cp(path.join(runtimePath, fileName), path.join(distRuntimePath, fileName))
+    )
+  );
 }
 
 async function copyPreparedRuntimeDirectories() {
@@ -39,30 +41,31 @@ async function copyPreparedRuntimeDirectories() {
     fail('No prepared runtime directories were found under runtime/.');
   }
 
-  for (const runtimeName of preparedRuntimeNames) {
-    await cp(path.join(runtimePath, runtimeName), path.join(distRuntimePath, runtimeName), {
-      recursive: true,
-    });
-  }
+  await Promise.all(
+    preparedRuntimeNames.map((runtimeName) =>
+      cp(path.join(runtimePath, runtimeName), path.join(distRuntimePath, runtimeName), {
+        recursive: true,
+      })
+    )
+  );
 }
 
 async function getPreparedRuntimeNames() {
   const directoryEntries = await readdir(runtimePath, { withFileTypes: true });
-  const runtimeNames = [];
 
-  for (const directoryEntry of directoryEntries) {
-    if (shouldSkipRuntimeEntry(directoryEntry.name)) {
-      continue;
-    }
+  const runtimeNames = await Promise.all(directoryEntries.map(getPreparedRuntimeName));
 
-    const entryPath = path.join(runtimePath, directoryEntry.name);
+  return runtimeNames.filter(Boolean);
+}
 
-    if (directoryEntry.isDirectory() && (await hasRuntimeFiles(entryPath))) {
-      runtimeNames.push(directoryEntry.name);
-    }
+async function getPreparedRuntimeName(directoryEntry) {
+  if (shouldSkipRuntimeEntry(directoryEntry.name) || !directoryEntry.isDirectory()) {
+    return null;
   }
 
-  return runtimeNames;
+  const entryPath = path.join(runtimePath, directoryEntry.name);
+
+  return (await hasRuntimeFiles(entryPath)) ? directoryEntry.name : null;
 }
 
 function shouldSkipRuntimeEntry(entryName) {
@@ -73,17 +76,11 @@ function shouldSkipRuntimeEntry(entryName) {
 
 async function hasRuntimeFiles(directoryPath) {
   const directoryEntries = await readdir(directoryPath);
+  const entryStats = await Promise.all(
+    directoryEntries.map((directoryEntry) => stat(path.join(directoryPath, directoryEntry)))
+  );
 
-  for (const directoryEntry of directoryEntries) {
-    const entryPath = path.join(directoryPath, directoryEntry);
-    const entryStat = await stat(entryPath);
-
-    if (entryStat.isDirectory() || entryStat.isFile()) {
-      return true;
-    }
-  }
-
-  return false;
+  return entryStats.some((entryStat) => entryStat.isDirectory() || entryStat.isFile());
 }
 
 function fail(message) {

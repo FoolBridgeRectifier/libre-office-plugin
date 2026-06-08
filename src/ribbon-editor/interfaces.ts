@@ -7,7 +7,7 @@ import type {
   LibreNoteEditorPageLayout,
 } from '../settings/interfaces';
 
-export interface RibbonCommandDefinition {
+interface RibbonCommandDefinition {
   readonly description: string;
   readonly disabled?: boolean;
   readonly future?: boolean;
@@ -16,7 +16,7 @@ export interface RibbonCommandDefinition {
   readonly label: string;
 }
 
-export interface RibbonCommandGroupDefinition {
+interface RibbonCommandGroupDefinition {
   readonly commands: ReadonlyArray<RibbonCommandDefinition>;
   readonly id: string;
   readonly label: string;

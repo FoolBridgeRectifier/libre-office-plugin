@@ -17,7 +17,6 @@ export function detectLibreNoteEditorOfficeRuntime(
       getPluginManifestDirectory(target),
       target.app.vault.adapter
     ),
-    configuredPath: null,
     operatingSystem: getCurrentOfficeRuntimeOperatingSystem(Platform),
     platform: Platform.isMobile ? 'mobile' : 'desktop',
   });

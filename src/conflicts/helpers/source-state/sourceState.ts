@@ -40,13 +40,12 @@ export async function createSourceStates(
   vaultAdapter: SourceSnapshotRequest['vaultAdapter']
 ): Promise<RichDocumentSourceStates> {
   return {
-    html: await createSourceSnapshot({ path: mapping.htmlPath, source: 'html', vaultAdapter }),
+    html: await createSourceSnapshot({ path: mapping.htmlPath, vaultAdapter }),
     markdown: await createSourceSnapshot({
       path: mapping.markdownPath,
-      source: 'markdown',
       vaultAdapter,
     }),
-    odt: await createSourceSnapshot({ path: mapping.odtPath, source: 'odt', vaultAdapter }),
+    odt: await createSourceSnapshot({ path: mapping.odtPath, vaultAdapter }),
   };
 }
 

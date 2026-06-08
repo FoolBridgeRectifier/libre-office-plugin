@@ -2,14 +2,7 @@ import { NATIVE_MARKDOWN_VIEW_TYPE } from './editor-view/constants';
 import { createMetadataCacheMock } from './mainMetadataCacheTestHelpers';
 import type { TFile, WorkspaceLeaf } from 'obsidian';
 
-export function createMarkdownFile(path: string): TFile {
-  return {
-    basename: path.replace(/\.md$/i, ''),
-    extension: 'md',
-    name: path.split('/').pop() ?? path,
-    path,
-  } as TFile;
-}
+export { createMarkdownFile } from './testFileHelpers';
 
 export function createLeaf(
   file: TFile | null,

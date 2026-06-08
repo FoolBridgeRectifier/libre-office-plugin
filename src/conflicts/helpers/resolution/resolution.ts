@@ -7,39 +7,16 @@ import {
   writeDuplicateConflictCopy,
   writeHtmlResolutionSources,
 } from './helpers';
-import type {
-  ConflictResolutionChoice,
-  ConflictResolutionOptions,
-  ConflictResolutionResult,
-} from '../../interfaces';
-import type { RichDocumentMapping } from '../../../rich-documents/interfaces';
-
-export function resolveConflictMapping(
-  mapping: RichDocumentMapping,
-  choice: ConflictResolutionChoice,
-  resolvedAt: string
-): RichDocumentMapping {
-  const activeSource = getActiveSourceForChoice(choice);
-
-  return {
-    ...mapping,
-    activeSource,
-    conflictState: { status: 'none' },
-    syncTimestamps: {
-      ...mapping.syncTimestamps,
-      lastSyncedAt: resolvedAt,
-    },
-  };
-}
+import type { ConflictResolutionOptions } from '../../interfaces';
 
 export async function resolveRichDocumentConflict(
   options: ConflictResolutionOptions
-): Promise<ConflictResolutionResult> {
+): Promise<string | null> {
   const mapping = await options.richDocumentStore.getOrCreateMapping(options.markdownPath);
   const resolvedAt = options.getCurrentTimestamp?.() ?? new Date().toISOString();
 
   if (mapping.conflictState.status !== 'conflicted') {
-    return { htmlSource: await readOptionalSource(options, mapping.htmlPath) };
+    return readOptionalSource(options, mapping.htmlPath);
   }
 
   if (options.choice === 'duplicate-conflict-copy') {
@@ -72,5 +49,5 @@ export async function resolveRichDocumentConflict(
 
   await options.richDocumentStore.updateMapping(options.markdownPath, mappingPatch);
 
-  return { htmlSource };
+  return htmlSource;
 }

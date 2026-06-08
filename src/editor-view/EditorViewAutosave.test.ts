@@ -1,6 +1,7 @@
 import type { TFile, WorkspaceLeaf } from 'obsidian';
 
 import { EditorView } from './EditorView';
+import { createMarkdownFile } from '../testFileHelpers';
 import type { EditorViewOptions } from './interfaces';
 
 const mockReactRoot = {
@@ -36,15 +37,6 @@ jest.mock('../App', () => ({
 beforeEach(() => {
   jest.clearAllMocks();
 });
-
-function createMarkdownFile(path: string): TFile {
-  return {
-    basename: path.replace(/\.md$/i, ''),
-    extension: 'md',
-    name: path.replace(/^.*\//, ''),
-    path,
-  } as TFile;
-}
 
 function createEditorViewOptions(): EditorViewOptions {
   return {

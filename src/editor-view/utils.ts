@@ -1,13 +1,6 @@
 import type { TFile, Workspace, WorkspaceLeaf } from 'obsidian';
 
-export function createFile(path: string, extension: string): TFile {
-  return {
-    basename: path.replace(/\.[^.]+$/, ''),
-    extension,
-    name: path.split('/').pop() ?? path,
-    path,
-  } as TFile;
-}
+export { createFile } from '../testFileHelpers';
 
 export function createLeaf(viewType: string, file: TFile | null): WorkspaceLeaf {
   const workspaceLeaf = {} as WorkspaceLeaf;
@@ -43,9 +36,7 @@ export function createWorkspace(
   workspace.getMostRecentLeaf = jest.fn(() => mostRecentLeaf);
 
   workspace.iterateAllLeaves = jest.fn((callback: (workspaceLeaf: WorkspaceLeaf) => void) => {
-    for (const workspaceLeaf of leaves) {
-      callback(workspaceLeaf);
-    }
+    leaves.forEach(callback);
   });
 
   return workspace;

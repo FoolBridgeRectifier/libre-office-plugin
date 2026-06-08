@@ -18,7 +18,6 @@ test('captures source existence hash and modified time', async () => {
 
   const sourceState = await createSourceSnapshot({
     path: 'Note.md',
-    source: 'markdown',
     vaultAdapter: vault.adapter,
   });
 

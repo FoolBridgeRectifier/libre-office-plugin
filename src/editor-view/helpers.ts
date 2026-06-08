@@ -43,7 +43,7 @@ export function getWorkspaceLeafViewType(workspaceLeaf: WorkspaceLeaf) {
   return typeof fileTrackingView.getViewType === 'function' ? fileTrackingView.getViewType() : null;
 }
 
-export async function openFileInLibreEditor(workspaceLeaf: WorkspaceLeaf, file: TFile) {
+async function openFileInLibreEditor(workspaceLeaf: WorkspaceLeaf, file: TFile) {
   if (!shouldRouteFileToLibreEditor(file)) {
     return false;
   }

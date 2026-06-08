@@ -1,4 +1,4 @@
-import { getConfiguredOfficeRuntimePath, isUnsafeOfficeRuntimePath } from './helpers';
+import { isUnsafeOfficeRuntimePath } from './helpers';
 import { createRuntimeDependencies } from './helpers/test-runtime/testRuntime';
 import { detectOfficeRuntime, validateOfficeRuntimePath } from './officeRuntime';
 
@@ -22,7 +22,7 @@ test('detects bundled runtime from the plugin runtime folder', async () => {
   expect(dependencies.process.findExecutable).not.toHaveBeenCalled();
 });
 
-test('ignores configured and system LibreOffice paths on desktop', async () => {
+test('ignores system LibreOffice paths on desktop', async () => {
   const bundledPath = '/vault/plugin/runtime/LibreOffice-linux/program/soffice';
 
   const dependencies = createRuntimeDependencies({
@@ -32,7 +32,6 @@ test('ignores configured and system LibreOffice paths on desktop', async () => {
 
   const state = await detectOfficeRuntime({
     bundledRootPath: '/vault/plugin/runtime',
-    configuredPath: '/configured/soffice',
     dependencies,
     operatingSystem: 'linux',
     platform: 'desktop',
@@ -167,16 +166,6 @@ test('returns setup state messages for missing bundled and unsupported desktop m
   );
 
   expect(unsupportedState.message).toBe('LibreOffice desktop detection is not supported here.');
-});
-
-test('extracts configured path only for legacy migration compatibility', () => {
-  expect(getConfiguredOfficeRuntimePath({ settings: { libreOfficePath: '/opt/soffice' } })).toBe(
-    '/opt/soffice'
-  );
-
-  expect(
-    getConfiguredOfficeRuntimePath({ officeRuntime: { configuredPath: '/app/soffice' } })
-  ).toBe('/app/soffice');
 });
 
 test('runtime module exposes pure helpers without filesystem side effects', () => {

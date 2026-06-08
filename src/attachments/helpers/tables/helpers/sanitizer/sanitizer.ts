@@ -7,29 +7,33 @@ export function sanitizeHtmlSource(htmlSource: string): string {
 }
 
 export function sanitizeElement(rootElement: Element): void {
-  for (const unsafeElement of rootElement.querySelectorAll('iframe,object,script')) {
+  rootElement.querySelectorAll('iframe,object,script').forEach((unsafeElement) => {
     unsafeElement.remove();
-  }
+  });
 
   if (rootElement instanceof HTMLElement) {
     removeUnsafeAttributes(rootElement);
   }
 
-  for (const element of rootElement.querySelectorAll<HTMLElement>('*')) {
+  rootElement.querySelectorAll<HTMLElement>('*').forEach((element) => {
     removeUnsafeAttributes(element);
-  }
+  });
 }
 
 function removeUnsafeAttributes(element: HTMLElement): void {
-  for (const attribute of Array.from(element.attributes)) {
-    if (
-      /^on/i.test(attribute.name) ||
-      attribute.name.startsWith('data-libre-') ||
-      isDangerousAttribute(attribute.name, attribute.value)
-    ) {
+  Array.from(element.attributes).forEach((attribute) => {
+    if (isUnsafeAttribute(attribute)) {
       element.removeAttribute(attribute.name);
     }
-  }
+  });
+}
+
+function isUnsafeAttribute(attribute: Attr): boolean {
+  return (
+    /^on/i.test(attribute.name) ||
+    attribute.name.startsWith('data-libre-') ||
+    isDangerousAttribute(attribute.name, attribute.value)
+  );
 }
 
 function isDangerousAttribute(attributeName: string, attributeValue: string): boolean {

@@ -90,26 +90,26 @@ function appendMissingSourceFacts(
   sourceFacts: ReadonlyArray<ObsidianSourceFact>,
   attributeName: string
 ): void {
-  for (const sourceFact of sourceFacts) {
+  sourceFacts.forEach((sourceFact) => {
     const sourceFactElement = htmlDocument.createElement('span');
 
     sourceFactElement.setAttribute(attributeName, sourceFact.text);
     sourceFactElement.textContent = sourceFact.text;
     htmlDocument.body.append(sourceFactElement);
-  }
+  });
 }
 
 function appendMissingBlockIds(
   htmlDocument: Document,
   blockIdFacts: ReadonlyArray<ObsidianSourceFact>
 ): void {
-  for (const blockIdFact of blockIdFacts) {
+  blockIdFacts.forEach((blockIdFact) => {
     const blockIdElement = htmlDocument.createElement('span');
 
     blockIdElement.setAttribute(OBSIDIAN_BLOCK_ID_SOURCE_ATTRIBUTE, blockIdFact.text.trim());
     blockIdElement.textContent = blockIdFact.text.trim();
     htmlDocument.body.append(blockIdElement);
-  }
+  });
 }
 
 function isWikiLinkFact(sourceFact: ObsidianSourceFact): boolean {

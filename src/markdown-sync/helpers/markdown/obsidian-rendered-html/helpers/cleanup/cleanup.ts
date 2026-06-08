@@ -17,11 +17,11 @@ function findContentRoot(containerElement: HTMLElement): HTMLElement {
 }
 
 function removeGeneratedUiElements(rootElement: HTMLElement): void {
-  for (const generatedUiSelector of GENERATED_UI_SELECTORS) {
-    for (const generatedUiElement of rootElement.querySelectorAll(generatedUiSelector)) {
+  GENERATED_UI_SELECTORS.forEach((generatedUiSelector) => {
+    rootElement.querySelectorAll(generatedUiSelector).forEach((generatedUiElement) => {
       generatedUiElement.remove();
-    }
-  }
+    });
+  });
 }
 
 function shouldKeepHiddenElement(element: Element): boolean {
@@ -29,13 +29,13 @@ function shouldKeepHiddenElement(element: Element): boolean {
 }
 
 function removeHiddenElements(rootElement: HTMLElement): void {
-  for (const hiddenElement of rootElement.querySelectorAll(HIDDEN_GENERATED_UI_SELECTORS)) {
+  rootElement.querySelectorAll(HIDDEN_GENERATED_UI_SELECTORS).forEach((hiddenElement) => {
     if (shouldKeepHiddenElement(hiddenElement)) {
-      continue;
+      return;
     }
 
     hiddenElement.remove();
-  }
+  });
 }
 
 export function cleanRenderedMarkdownElement(containerElement: HTMLElement): HTMLElement {

@@ -48,20 +48,7 @@ export interface EditorViewLoadedStateTarget {
   renderReactApp(): void;
 }
 
-export interface EditorViewConflictResolutionResult {
-  readonly autosaveStatus: AutosaveStatus;
-  readonly htmlSource: string | null;
-  readonly linkWarningCount: number;
-}
-
-export interface EditorViewConflictResolutionTarget extends EditorViewLoadedStateTarget {
-  activeMarkdownFile: TFile | null;
-  readonly autosaveController: AutosaveController;
-  readonly editorViewOptions: EditorViewOptions;
-  renderReactApp(): void;
-}
-
-export interface EditorViewHtmlSourceChangeTarget extends EditorViewLoadedStateTarget {
+export interface EditorViewSourceTarget extends EditorViewLoadedStateTarget {
   readonly autosaveController: AutosaveController;
   readonly editorViewOptions: EditorViewOptions;
 }
@@ -83,16 +70,8 @@ export interface EditorViewRenderTarget {
   handleResolveConflict(choice: ConflictResolutionChoice): void;
 }
 
-export interface EditorViewDesktopSourceTarget {
-  activeMarkdownFile: TFile | null;
+export interface EditorViewDesktopSourceTarget extends EditorViewSourceTarget {
   activeEditorSource: LibreNoteEditorActiveSource;
-  autosaveStatus: AutosaveStatus;
-  desktopSourceStatus: 'idle' | 'loading' | 'error';
-  importedHtmlSource: string | null;
-  linkWarningCount: number;
-  readonly autosaveController: AutosaveController;
-  readonly editorViewOptions: EditorViewOptions;
-  renderReactApp(): void;
 }
 
 export interface FileTrackingView {

@@ -14,12 +14,7 @@ import {
   sanitizeConvertedHtmlSource,
   updateDesktopMapping,
 } from './helpers';
-import type {
-  DesktopConversionOptions,
-  DesktopConversionRuntime,
-  OdtSaveDetectionOptions,
-  OdtSaveDetectionResult,
-} from './interfaces';
+import type { DesktopConversionOptions, DesktopConversionRuntime } from './interfaces';
 import type { OfficeRuntimeSetupState } from '../office-runtime/interfaces';
 
 export { createConversionCommand, sanitizeConvertedHtmlSource };
@@ -83,12 +78,9 @@ export async function openDesktopOdtSource(options: DesktopConversionOptions): P
   void runtime.process.executeFile(runtime.executablePath, [localOdtPath], DEFAULT_OPEN_TIMEOUT_MS);
 }
 
-export async function detectOdtSaveEvent(
-  options: OdtSaveDetectionOptions
-): Promise<OdtSaveDetectionResult> {
+async function detectOdtSaveEvent(options: DesktopConversionOptions) {
   const currentOdtState = await createSourceSnapshot({
     path: options.mapping.odtPath,
-    source: 'odt',
     vaultAdapter: options.vaultAdapter,
   });
 

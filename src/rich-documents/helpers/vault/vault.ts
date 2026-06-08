@@ -55,7 +55,7 @@ export async function recoverMappingsFromSidecars(
   return recoveredMappings.filter((mapping) => mapping !== null);
 }
 
-export async function archiveVaultFileIfPresent(
+async function archiveVaultFileIfPresent(
   vaultAdapter: RichDocumentVaultAdapter,
   filePath: string,
   timestamp: string

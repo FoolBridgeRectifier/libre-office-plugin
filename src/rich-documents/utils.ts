@@ -23,10 +23,10 @@ export function createVaultAdapter(initialFiles: ReadonlyMap<string, string> = n
   const mkdirCalls: string[] = [];
   const renameCalls: Array<readonly [string, string]> = [];
 
-  for (const filePath of files.keys()) {
+  Array.from(files.keys()).forEach((filePath) => {
     addFolderParents(folders, filePath);
     modifiedTimes.set(filePath, 1);
-  }
+  });
 
   const adapter: RichDocumentVaultAdapter = {
     exists: jest.fn(
@@ -86,10 +86,10 @@ function addFolderParents(folders: Set<string>, filePath: string): void {
   const pathParts = filePath.split('/').slice(0, -1);
   let folderPath = '';
 
-  for (const pathPart of pathParts) {
+  pathParts.forEach((pathPart) => {
     folderPath = folderPath ? `${folderPath}/${pathPart}` : pathPart;
     folders.add(folderPath);
-  }
+  });
 }
 
 function getDirectChildren(pathValues: Iterable<string>, parentPath: string): string[] {

@@ -3,13 +3,13 @@ import type { AutosaveController } from '../../../autosave/interfaces';
 import type {
   EditorViewLoadedState,
   EditorViewLoadedStateTarget,
-  EditorViewHtmlSourceChangeTarget,
   EditorViewOptions,
   EditorViewRenderTarget,
+  EditorViewSourceTarget,
 } from '../../interfaces';
 import type { TFile } from 'obsidian';
 
-export async function loadEditorViewHtmlSource(editorViewOptions: EditorViewOptions, file: TFile) {
+async function loadEditorViewHtmlSource(editorViewOptions: EditorViewOptions, file: TFile) {
   if (!shouldRouteFileToLibreEditor(file)) {
     return null;
   }
@@ -71,7 +71,7 @@ export function applyEditorViewUnloadedState(target: EditorViewLoadedStateTarget
 }
 
 export function applyEditorViewHtmlSourceChange(
-  target: EditorViewHtmlSourceChangeTarget,
+  target: EditorViewSourceTarget,
   htmlSource: string
 ): void {
   target.importedHtmlSource = htmlSource;

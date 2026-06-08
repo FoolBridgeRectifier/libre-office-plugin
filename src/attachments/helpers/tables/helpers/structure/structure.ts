@@ -1,4 +1,7 @@
-import { UNSUPPORTED_CELL_CONTENT_SELECTOR } from '../../../../constants';
+import {
+  TABLE_SCROLL_CONTAINER_CLASS,
+  UNSUPPORTED_CELL_CONTENT_SELECTOR,
+} from '../../../../constants';
 
 export function getTableRows(tableElement: HTMLTableElement): HTMLTableRowElement[] {
   return Array.from(tableElement.querySelectorAll('tr'));
@@ -30,4 +33,16 @@ export function isSimpleTable(tableElement: HTMLTableElement): boolean {
     !hasUnsupportedCellContent(tableElement) &&
     rows.every((rowElement) => getRowCells(rowElement).length === firstCellCount)
   );
+}
+
+export function wrapTableForHorizontalScroll(tableElement: HTMLTableElement): void {
+  if (tableElement.parentElement?.classList.contains('libre-table-scroll')) {
+    return;
+  }
+
+  const wrapperElement = tableElement.ownerDocument.createElement('div');
+
+  wrapperElement.className = TABLE_SCROLL_CONTAINER_CLASS;
+  tableElement.replaceWith(wrapperElement);
+  wrapperElement.append(tableElement);
 }

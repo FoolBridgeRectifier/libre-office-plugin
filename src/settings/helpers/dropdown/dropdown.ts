@@ -15,9 +15,7 @@ export function addSettingsDropdown<Value extends string>(options: {
   }
 
   setting.addDropdown((dropdown) => {
-    for (const option of options.options) {
-      dropdown.addOption(option.value, option.label);
-    }
+    options.options.forEach((option) => dropdown.addOption(option.value, option.label));
 
     dropdown.setValue(options.currentValue).onChange((value) => options.onChange(value as Value));
 
