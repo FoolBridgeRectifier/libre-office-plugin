@@ -5,16 +5,12 @@ import {
   PROTECTED_HTML_SELECTOR,
   REMOTE_ASSET_SOURCE_SELECTOR,
   REMOTE_LOADING_ELEMENT_SELECTOR,
-} from './constants';
-import { wrapTableForHorizontalScroll } from '../attachments/tables/structure/structure';
-import { sanitizeHtmlFragmentSourceWithReport } from '../conversion';
+} from '../../constants';
+import { wrapTableForHorizontalScroll } from '../../../attachments/tables/structure/structure';
+import { sanitizeHtmlFragmentSourceWithReport } from '../../../conversion';
 
 function isRemoteUrl(value: string | null): boolean {
-  if (!value) {
-    return false;
-  }
-
-  return /^(?:https?:)?\/\//i.test(value.trim());
+  return value ? /^(?:https?:)?\/\//i.test(value.trim()) : false;
 }
 
 function removeRemoteLoadingElements(htmlDocument: Document): void {
@@ -63,6 +59,43 @@ function removeEmptyClassAttribute(element: HTMLElement): void {
   }
 }
 
+function unwrapLexicalTextElement(element: HTMLElement): void {
+  element.replaceWith(...Array.from(element.childNodes));
+}
+
+function unwrapLexicalWhitespaceSpan(element: HTMLElement): void {
+  const styleAttribute = element.getAttribute('style') ?? '';
+
+  const isLexicalWhitespaceSpan =
+    element.tagName.toLowerCase() === 'span' &&
+    element.attributes.length === 1 &&
+    styleAttribute.replace(/\s/g, '').toLowerCase() === 'white-space:pre-wrap;';
+
+  if (isLexicalWhitespaceSpan) {
+    unwrapLexicalTextElement(element);
+  }
+}
+
+function removeLexicalEditorArtifacts(htmlDocument: Document): void {
+  htmlDocument
+    .querySelectorAll<HTMLElement>('[data-lexical-text]')
+    .forEach(unwrapLexicalTextElement);
+
+  htmlDocument.querySelectorAll<HTMLElement>('span[style]').forEach(unwrapLexicalWhitespaceSpan);
+
+  htmlDocument.querySelectorAll<HTMLElement>('*').forEach((element) => {
+    Array.from(element.attributes).forEach((attribute) => {
+      if (attribute.name.startsWith('data-lexical-')) {
+        element.removeAttribute(attribute.name);
+      }
+    });
+
+    if (element.getAttribute('dir') === 'auto') {
+      element.removeAttribute('dir');
+    }
+  });
+}
+
 function createEditorDocument(htmlSource: string): Document {
   const sanitizedHtmlSource = sanitizeHtmlFragmentSourceWithReport(htmlSource).htmlSource;
   const htmlDocument = new DOMParser().parseFromString(sanitizedHtmlSource, 'text/html');
@@ -89,6 +122,8 @@ export function getHtmlSecurityWarningText(htmlSource: string): string | null {
 
 export function readHtmlFromEditor(editorElement: HTMLElement): string {
   const editableDocument = new DOMParser().parseFromString(editorElement.innerHTML, 'text/html');
+
+  removeLexicalEditorArtifacts(editableDocument);
 
   editableDocument
     .querySelectorAll<HTMLElement>(`[${EDITOR_PROTECTED_ATTRIBUTE}]`)

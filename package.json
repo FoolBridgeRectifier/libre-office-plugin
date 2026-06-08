@@ -15,8 +15,12 @@
   "description": "Standalone rich-note editor workspace for Obsidian with a React-based custom view.",
   "dependencies": {
     "@fluentui/react-icons": "^2.0.328",
+    "@lexical/history": "^0.45.0",
+    "@lexical/html": "^0.45.0",
+    "@lexical/react": "^0.45.0",
     "classnames": "^2.5.1",
     "gray-matter": "^4.0.3",
+    "lexical": "^0.45.0",
     "obsidian": "latest",
     "react": "^18.3.0",
     "react-dom": "^18.3.0"
@@ -32,7 +36,7 @@
     "@types/node": "^20.0.0",
     "@types/react": "^18.3.0",
     "@types/react-dom": "^18.3.0",
-    "esbuild": "^0.20.0",
+    "esbuild": "^0.28.0",
     "eslint": "^9.29.0",
     "eslint-config-prettier": "^10.1.8",
     "eslint-import-resolver-typescript": "^4.4.4",

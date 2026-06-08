@@ -15,18 +15,29 @@ exports[`snapshots narrow editor rendering without a fixed page canvas 1`] = `
     aria-label="Local HTML editor"
     class="libre-html-editor markdown-preview-view min-h-64 w-full min-w-0 max-w-full box-border overflow-x-hidden rounded-ribbon-sm bg-ribbon-bg p-0 font-sans text-text-primary outline-none [overflow-wrap:anywhere] focus-visible:outline focus-visible:outline-2 focus-visible:outline-button-focus-ring [&_.libre-contained-editor-media]:h-auto [&_.libre-contained-editor-media]:max-w-full [&_.libre-contained-editor-media]:object-contain [&_.libre-protected-html-block]:max-w-full [&_.libre-protected-html-block]:overflow-x-auto [&_.libre-table-scroll]:max-w-full [&_.libre-table-scroll]:overflow-x-auto [&_pre]:max-w-full [&_pre]:overflow-x-auto"
     contenteditable="true"
+    data-lexical-editor="true"
     role="textbox"
+    spellcheck="true"
+    style="user-select: text; white-space: pre-wrap; word-break: break-word;"
     tabindex="0"
   >
-    <article>
+    <article
+      dir="auto"
+    >
       <p>
-        Narrow body
+        <span
+          data-lexical-text="true"
+        >
+          Narrow body
+        </span>
       </p>
       <img
         alt="Wide"
         class="libre-contained-editor-media"
+        data-lexical-decorator="true"
         src="wide.png"
       />
+      <br />
     </article>
   </div>
 </div>

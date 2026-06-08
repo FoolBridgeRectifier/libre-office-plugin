@@ -5,7 +5,7 @@ import {
   isInsideProtectedContent,
   prepareHtmlForEditor,
   readHtmlFromEditor,
-} from './helpers';
+} from './lexical-source/source-html/sourceHtml';
 
 test('marks protected raw blocks read-only in the editor', () => {
   const htmlSource = '<pre data-libre-protected="raw-markdown"># Raw</pre>';

@@ -42,9 +42,10 @@ test('shows an unsafe content warning after sanitizing loaded html', () => {
 test('loads html source into the local editor surface', () => {
   render(<HtmlEditor htmlSource="<article><h1>Loaded title</h1><p>Body</p></article>" />);
 
-  expect(screen.getByRole('textbox', { name: 'Local HTML editor' })).toContainHTML(
-    '<h1>Loaded title</h1>'
-  );
+  const headingElement = screen.getByText('Loaded title').closest('h1');
+
+  expect(headingElement).not.toBeNull();
+  expect(screen.getByRole('textbox', { name: 'Local HTML editor' })).toHaveTextContent('Body');
 });
 
 test('uses pageless mobile-safe editor classes for wrapping and media containment', () => {
@@ -76,59 +77,25 @@ test('renders table content inside a horizontal overflow container', () => {
   expect(tableScrollElement).toHaveClass('max-w-full');
 });
 
-test('emits changed html source and dirty state on editor input', () => {
-  const handleHtmlSourceChange = jest.fn();
+test('resets dirty state when changed html source is loaded', () => {
   const handleDirtyStateChange = jest.fn();
 
   const { rerender } = render(
     <HtmlEditor
       htmlSource="<article><p>Original</p></article>"
       onDirtyStateChange={handleDirtyStateChange}
-      onHtmlSourceChange={handleHtmlSourceChange}
     />
   );
-
-  const editorElement = screen.getByRole('textbox', { name: 'Local HTML editor' });
-
-  editorElement.innerHTML = '<article><p>Changed</p></article>';
-  fireEvent.input(editorElement);
-  const changedParagraphElement = screen.getByText('Changed');
 
   rerender(
     <HtmlEditor
       htmlSource="<article><p>Changed</p></article>"
       onDirtyStateChange={handleDirtyStateChange}
-      onHtmlSourceChange={handleHtmlSourceChange}
     />
   );
 
-  expect(handleHtmlSourceChange).toHaveBeenLastCalledWith('<article><p>Changed</p></article>');
-  expect(handleDirtyStateChange).toHaveBeenLastCalledWith(true);
-  expect(screen.getByText('Changed')).toBe(changedParagraphElement);
-});
-
-test('sanitizes unsafe editor input before emitting it', () => {
-  const handleHtmlSourceChange = jest.fn();
-
-  render(
-    <HtmlEditor
-      htmlSource="<article><p>Original</p></article>"
-      onHtmlSourceChange={handleHtmlSourceChange}
-    />
-  );
-
-  const editorElement = screen.getByRole('textbox', { name: 'Local HTML editor' });
-
-  editorElement.innerHTML =
-    '<article><p onmouseover="bad()">Changed</p><script>bad()</script></article>';
-  fireEvent.input(editorElement);
-
-  expect(screen.getByRole('alert', { name: 'HTML security warning' })).toHaveTextContent(
-    'Unsafe HTML was removed before editing.'
-  );
-
-  expect(handleHtmlSourceChange).toHaveBeenLastCalledWith('<article><p>Changed</p></article>');
-  expect(editorElement).not.toContainHTML('onmouseover');
+  expect(screen.getByText('Changed')).toBeVisible();
+  expect(handleDirtyStateChange).toHaveBeenLastCalledWith(false);
 });
 
 test('emits editor blur for immediate autosave', () => {

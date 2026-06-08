@@ -1,0 +1,63 @@
+export const HTML_ELEMENT_NODE_TYPE = 'libre-html-element';
+export const LOCKED_HTML_NODE_TYPE = 'libre-locked-html';
+export const LOCKED_HTML_PLACEHOLDER_ATTRIBUTE = 'data-libre-lexical-locked-html';
+
+export const INLINE_HTML_TAG_NAMES = [
+  'a',
+  'abbr',
+  'b',
+  'cite',
+  'code',
+  'del',
+  'em',
+  'i',
+  'ins',
+  'kbd',
+  'mark',
+  'small',
+  'span',
+  'strong',
+  'sub',
+  'sup',
+  'u',
+].join(',');
+
+export const IMPORTED_HTML_TAG_NAMES = [
+  'article',
+  'blockquote',
+  'br',
+  'caption',
+  'code',
+  'col',
+  'colgroup',
+  'dd',
+  'div',
+  'dl',
+  'dt',
+  'figcaption',
+  'figure',
+  'h1',
+  'h2',
+  'h3',
+  'h4',
+  'h5',
+  'h6',
+  'hr',
+  'img',
+  'li',
+  'ol',
+  'p',
+  'pre',
+  'table',
+  'tbody',
+  'td',
+  'template',
+  'tfoot',
+  'th',
+  'thead',
+  'tr',
+  'ul',
+  ...INLINE_HTML_TAG_NAMES.split(','),
+];
+
+export const VOID_HTML_TAG_NAMES = ['br', 'col', 'hr', 'img', 'input', 'source', 'wbr'];
