@@ -16,7 +16,7 @@ These rules are strict and mandatory.
 - Use full descriptive names. Do not abbreviate identifiers.
 - Prioritize readability, maintainability, and reduced redundancy.
 - If blocked, add debug instrumentation, rerun, and continue with evidence.
-- Fix implementation issues first, then verify affected Obsidian plugin behavior through Obsidian MCP before calling the work complete. If connection issues, fix connection issues, DO ALL YOU CAN TO CONNECT TO OBSIDIAN AND TEST. **This is a hard check**.
+- Fix implementation issues first, then verify affected Obsidian plugin behavior through Obsidian MCP before calling the work complete. If connection issues, fix connection issues, DO ALL YOU CAN TO CONNECT TO OBSIDIAN AND TEST. **This is a hard blocker**, cannot proceed without this.
 - Finish development with passing format, lint, and type checks.
 
 ## Module Layout And File Limits
