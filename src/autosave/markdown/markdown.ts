@@ -38,6 +38,14 @@ function getInlineMarkdown(node: Node): string {
     return `*${childMarkdown}*`;
   }
 
+  if (node.matches('del,s')) {
+    return `~~${childMarkdown}~~`;
+  }
+
+  if (node.matches('mark')) {
+    return `==${childMarkdown}==`;
+  }
+
   if (node.matches('code')) {
     return `\`${childMarkdown}\``;
   }

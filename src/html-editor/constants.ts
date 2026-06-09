@@ -14,11 +14,16 @@ export const REMOTE_ASSET_SOURCE_SELECTOR = 'audio,img,source,video';
 export const REMOTE_LOADING_ELEMENT_SELECTOR = 'embed,iframe,object,script,link[rel="stylesheet"]';
 
 export const HTML_EDITOR_CLASS_NAME = [
-  'libre-html-editor markdown-preview-view min-h-64 w-full min-w-0 max-w-full box-border',
+  'libre-html-editor libre-markdown-text-surface markdown-preview-view min-h-64 w-full min-w-0 max-w-full box-border',
   'm-2 overflow-x-hidden rounded-ribbon-sm bg-editor-bg p-0 font-sans text-editor-text',
   'max-w-[calc(100%-1rem)] [caret-color:var(--editor-caret)]',
   'outline-none [overflow-wrap:anywhere] focus-visible:outline focus-visible:outline-2',
   'focus-visible:outline-button-focus-ring',
+  '[&_h1]:text-editor-text [&_h2]:text-editor-text [&_h3]:text-editor-text',
+  '[&_blockquote]:border-editor-quote-border [&_mark]:bg-editor-mark-bg',
+  '[&_mark]:text-editor-mark-text [&_code]:text-editor-code-text',
+  '[&_pre]:bg-editor-code-bg [&_pre]:text-editor-code-text',
+  '[&_th]:bg-editor-table-header-bg [&_hr]:border-editor-hr',
   '[&_.libre-contained-editor-media]:h-auto [&_.libre-contained-editor-media]:max-w-full',
   '[&_.libre-contained-editor-media]:object-contain',
   '[&_.libre-protected-html-block]:max-w-full',

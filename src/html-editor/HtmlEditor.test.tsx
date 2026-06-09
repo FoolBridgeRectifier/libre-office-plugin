@@ -72,6 +72,25 @@ test('uses pageless mobile-safe editor classes for wrapping and media containmen
   expect(editorElement.className).toContain('[&_.libre-contained-editor-media]:max-w-full');
 });
 
+test('scopes markdown text styling utilities to the local editor surface', () => {
+  render(
+    <HtmlEditor htmlSource="<article><h1>Title</h1><p><mark>Marked</mark> <code>inline</code></p><blockquote><p>Quote</p></blockquote><pre><code>long code line</code></pre><table><tr><th>Head</th></tr><tr><td>Cell</td></tr></table><hr></article>" />
+  );
+
+  const editorElement = screen.getByRole('textbox', { name: 'Local HTML editor' });
+
+  expect(editorElement).toHaveClass('libre-markdown-text-surface');
+  expect(editorElement.className).toContain('[&_h1]:text-editor-text');
+  expect(editorElement.className).toContain('[&_code]:text-editor-code-text');
+  expect(editorElement.className).toContain('[&_pre]:bg-editor-code-bg');
+
+  expect(editorElement.className).toContain('[&_blockquote]:border-editor-quote-border');
+  expect(editorElement.className).toContain('[&_mark]:bg-editor-mark-bg');
+  expect(editorElement.className).toContain('[&_th]:bg-editor-table-header-bg');
+
+  expect(screen.getByText('Cell').closest('.libre-table-scroll')).toHaveClass('overflow-x-auto');
+});
+
 test('keeps editor tokens computable for theme-sensitive styles', () => {
   document.documentElement.style.setProperty('--editor-caret', '#1f1f1f');
   document.documentElement.style.setProperty('--editor-bg', '#ffffff');
@@ -370,4 +389,15 @@ test('snapshots narrow editor rendering without a fixed page canvas', () => {
   } finally {
     Object.defineProperty(window, 'innerWidth', { configurable: true, value: originalInnerWidth });
   }
+});
+
+test('snapshots mixed markdown text constructs in the editor', () => {
+  const { container } = render(
+    <HtmlEditor htmlSource="<article><h1>Heading</h1><p>Text <strong>bold</strong> <em>italic</em> <del>gone</del> <mark>highlight</mark> <code>inline</code></p><blockquote><p>Quoted text</p></blockquote><ol><li>First<ul><li>Nested</li></ul></li></ol><pre data-libre-protected='raw-markdown'>%% raw %%</pre><table><tr><th>Name</th></tr><tr><td>Alpha</td></tr></table><hr></article>" />
+  );
+
+  expect(screen.getByRole('textbox', { name: 'Local HTML editor' })).toHaveTextContent(
+    'Quoted text'
+  );
+  expect(container).toMatchSnapshot();
 });

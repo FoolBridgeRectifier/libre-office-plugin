@@ -26,6 +26,18 @@ test('exports supported html blocks to exact markdown', () => {
   );
 });
 
+test('exports highlight and strikethrough marks to markdown mirror syntax', () => {
+  const htmlSource = [
+    '<article>',
+    '<p><mark>Highlighted <strong>bold</strong></mark> <del>Deleted</del> <s>Struck</s></p>',
+    '</article>',
+  ].join('');
+
+  expect(convertHtmlToMarkdownMirror(htmlSource)).toBe(
+    '==Highlighted **bold**== ~~Deleted~~ ~~Struck~~'
+  );
+});
+
 test('preserves frontmatter above generated markdown body', () => {
   const markdownSource = '---\ntitle: Alpha\ntags: [demo]\n---\n\nOld body';
   const htmlSource = '<article><p>New body</p></article>';
@@ -210,4 +222,27 @@ test('exports edited complex tables from current html instead of stale source', 
 
 test('does not emit empty markdown headings', () => {
   expect(convertHtmlToMarkdownMirror('<article><h2></h2><p>Body</p></article>')).toBe('Body');
+});
+
+test('stress exports repeated mixed markdown text constructs without dropping blocks', () => {
+  const repeatedSections = Array.from({ length: 75 }, (_unusedValue, sectionIndex) =>
+    [
+      `<h3>Section ${sectionIndex}</h3>`,
+      `<p><mark>Highlight ${sectionIndex}</mark> <del>Gone ${sectionIndex}</del> <code>code-${sectionIndex}</code></p>`,
+      `<blockquote><p>Quote ${sectionIndex}</p></blockquote>`,
+      `<pre><code class="language-ts">const value${sectionIndex} = true;</code></pre>`,
+      `<table><tr><th>Name</th><th>Value</th></tr><tr><td>Row ${sectionIndex}</td><td>A|B</td></tr></table>`,
+    ].join('')
+  ).join('');
+
+  const markdownMirrorSource = convertHtmlToMarkdownMirror(
+    `<article>${repeatedSections}</article>`
+  );
+
+  expect(markdownMirrorSource.match(/^### Section /gm)).toHaveLength(75);
+  expect(markdownMirrorSource.match(/==Highlight \d+==/g)).toHaveLength(75);
+  expect(markdownMirrorSource.match(/~~Gone \d+~~/g)).toHaveLength(75);
+
+  expect(markdownMirrorSource.match(/```ts/g)).toHaveLength(75);
+  expect(markdownMirrorSource).toContain('| Row 74 | A\\|B |');
 });

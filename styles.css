@@ -27,6 +27,13 @@
   --editor-caret-dark: var(--text-normal, #f5f5f5);
   --editor-caret: var(--editor-caret-light);
   --editor-selection: var(--text-selection, rgb(0 120 212 / 24%));
+  --editor-code-bg: var(--code-background, var(--background-secondary-alt, #f6f5f4));
+  --editor-code-text: var(--code-normal, var(--text-normal, #201f1e));
+  --editor-mark-bg: rgb(255 225 0 / 35%);
+  --editor-mark-text: var(--text-normal, #201f1e);
+  --editor-quote-border: var(--blockquote-border-color, var(--background-modifier-border, #d0ccc7));
+  --editor-table-header-bg: var(--background-secondary, #f7f6f5);
+  --editor-hr: var(--background-modifier-border, #e1dfdd);
   --shadow-ribbon: var(--shadow-s, 0 2px 8px rgb(0 0 0 / 12%));
   --transition-fast: 150ms ease-out;
   --transition-mid: 200ms ease-out;
@@ -41,21 +48,55 @@
 }
 
 .theme-dark {
+  --ribbon-bg: var(--background-primary, #1e1e1e);
+  --ribbon-border: var(--background-modifier-border, #3f3f3f);
+  --btn-hover-bg: var(--background-modifier-hover, #2a2826);
+  --btn-hover-border: var(--background-modifier-border-hover, #5a5651);
+  --btn-active-bg: var(--interactive-accent, #6b4aa0);
+  --btn-active-border: var(--interactive-accent-hover, #8764c8);
+  --text-primary: var(--text-normal, #dadada);
+  --text-secondary: var(--text-muted, #b3b3b3);
+  --text-muted: var(--text-faint, #8f8f8f);
+  --text-disabled: var(--text-faint, #707070);
   --editor-bg: var(--background-primary, #1e1e1e);
   --editor-text: var(--text-normal, #dadada);
   --editor-muted: var(--text-muted, #b3b3b3);
   --editor-border: var(--background-modifier-border, #3f3f3f);
   --editor-caret: var(--editor-caret-dark);
   --editor-selection: var(--text-selection, rgb(125 180 255 / 32%));
+  --editor-code-bg: var(--code-background, var(--background-secondary-alt, #2a2a2a));
+  --editor-code-text: var(--code-normal, var(--text-normal, #f0f0f0));
+  --editor-mark-bg: rgb(255 213 77 / 18%);
+  --editor-mark-text: var(--text-normal, #f5f5f5);
+  --editor-quote-border: var(--blockquote-border-color, var(--background-modifier-border, #5a5651));
+  --editor-table-header-bg: var(--background-secondary, #262626);
+  --editor-hr: var(--background-modifier-border, #3f3f3f);
 }
 
 .theme-light {
+  --ribbon-bg: var(--background-primary, #ffffff);
+  --ribbon-border: var(--background-modifier-border, #e1dfdd);
+  --btn-hover-bg: var(--background-modifier-hover, #f0eeec);
+  --btn-hover-border: var(--background-modifier-border-hover, #c8c6c4);
+  --btn-active-bg: var(--interactive-accent, #c7e0f4);
+  --btn-active-border: var(--interactive-accent-hover, #90c2e8);
+  --text-primary: var(--text-normal, #201f1e);
+  --text-secondary: var(--text-muted, #484644);
+  --text-muted: var(--text-faint, #605e5c);
+  --text-disabled: var(--text-faint, #a19f9d);
   --editor-bg: var(--background-primary, #ffffff);
   --editor-text: var(--text-normal, #201f1e);
   --editor-muted: var(--text-muted, #605e5c);
   --editor-border: var(--background-modifier-border, #e1dfdd);
   --editor-caret: var(--editor-caret-light);
   --editor-selection: var(--text-selection, rgb(0 120 212 / 24%));
+  --editor-code-bg: var(--code-background, var(--background-secondary-alt, #f6f5f4));
+  --editor-code-text: var(--code-normal, var(--text-normal, #201f1e));
+  --editor-mark-bg: rgb(255 225 0 / 35%);
+  --editor-mark-text: var(--text-normal, #201f1e);
+  --editor-quote-border: var(--blockquote-border-color, var(--background-modifier-border, #d0ccc7));
+  --editor-table-header-bg: var(--background-secondary, #f7f6f5);
+  --editor-hr: var(--background-modifier-border, #e1dfdd);
 }
 
 @theme inline {
@@ -77,6 +118,13 @@
   --color-editor-text: var(--editor-text);
   --color-editor-muted: var(--editor-muted);
   --color-editor-border: var(--editor-border);
+  --color-editor-code-bg: var(--editor-code-bg);
+  --color-editor-code-text: var(--editor-code-text);
+  --color-editor-mark-bg: var(--editor-mark-bg);
+  --color-editor-mark-text: var(--editor-mark-text);
+  --color-editor-quote-border: var(--editor-quote-border);
+  --color-editor-table-header-bg: var(--editor-table-header-bg);
+  --color-editor-hr: var(--editor-hr);
   --color-icon-default: var(--icon-color);
   --color-icon-purple: var(--icon-purple);
   --color-icon-blue: var(--icon-blue);
@@ -132,6 +180,140 @@
     min-width: 0;
   }
 
+  .libre-html-editor p {
+    line-height: 1.6;
+    margin-block: 0.45rem;
+  }
+
+  .libre-html-editor h1,
+  .libre-html-editor h2,
+  .libre-html-editor h3,
+  .libre-html-editor h4,
+  .libre-html-editor h5,
+  .libre-html-editor h6 {
+    color: var(--editor-text);
+    font-weight: 700;
+    line-height: 1.25;
+    margin-block: 0.85rem 0.35rem;
+  }
+
+  .libre-html-editor h1 {
+    font-size: 1.65em;
+  }
+
+  .libre-html-editor h2 {
+    font-size: 1.45em;
+  }
+
+  .libre-html-editor h3 {
+    font-size: 1.25em;
+  }
+
+  .libre-html-editor h4 {
+    font-size: 1.1em;
+  }
+
+  .libre-html-editor h5,
+  .libre-html-editor h6 {
+    font-size: 1em;
+  }
+
+  .libre-html-editor strong,
+  .libre-html-editor b {
+    color: var(--editor-text);
+    font-weight: 700;
+  }
+
+  .libre-html-editor em,
+  .libre-html-editor i {
+    font-style: italic;
+  }
+
+  .libre-html-editor del,
+  .libre-html-editor s {
+    text-decoration-color: currentColor;
+    text-decoration-line: line-through;
+    text-decoration-thickness: from-font;
+  }
+
+  .libre-html-editor mark {
+    background: var(--editor-mark-bg);
+    border-radius: var(--radius-sm);
+    color: var(--editor-mark-text);
+    padding-inline: 0.08em;
+  }
+
+  .libre-html-editor :not(pre) > code {
+    background: var(--editor-code-bg);
+    border-radius: var(--radius-sm);
+    color: var(--editor-code-text);
+    font-family: var(--font-monospace), 'Cascadia Code', Consolas, monospace;
+    font-size: 0.9em;
+    padding: 0.1em 0.28em;
+  }
+
+  .libre-html-editor pre {
+    background: var(--editor-code-bg);
+    border: 1px solid var(--editor-border);
+    border-radius: var(--radius-sm);
+    color: var(--editor-code-text);
+    font-family: var(--font-monospace), 'Cascadia Code', Consolas, monospace;
+    font-size: 0.92em;
+    line-height: 1.5;
+    margin-block: 0.65rem;
+    padding: 0.75rem 0.9rem;
+    white-space: pre;
+  }
+
+  .libre-html-editor pre code {
+    background: transparent;
+    border: 0;
+    color: inherit;
+    font: inherit;
+    padding: 0;
+  }
+
+  .libre-html-editor blockquote {
+    border-inline-start: 4px solid var(--editor-quote-border);
+    color: var(--editor-muted);
+    margin-block: 0.65rem;
+    margin-inline: 0;
+    padding-block: 0.05rem;
+    padding-inline: 0.85rem 0;
+  }
+
+  .libre-html-editor hr {
+    border: 0;
+    border-top: 1px solid var(--editor-hr);
+    margin-block: 1rem;
+  }
+
+  .libre-html-editor table {
+    border-collapse: collapse;
+    color: var(--editor-text);
+    margin-block: 0.65rem;
+    min-width: max-content;
+  }
+
+  .libre-html-editor th,
+  .libre-html-editor td {
+    border: 1px solid var(--editor-border);
+    padding: 0.35rem 0.55rem;
+    vertical-align: top;
+  }
+
+  .libre-html-editor th {
+    background: var(--editor-table-header-bg);
+    font-weight: 600;
+  }
+
+  .libre-html-editor [data-libre-protected='raw-markdown'] {
+    background: var(--editor-code-bg);
+    border-style: dashed;
+    color: var(--editor-muted);
+    white-space: pre-wrap;
+  }
+
   @media (min-width: 768px) {
     .libre-page-width {
       border: 1px solid var(--ribbon-border);
@@ -144,7 +326,9 @@
 
   .libre-html-editor ul,
   .libre-html-editor ol {
-    list-style-position: inside;
+    line-height: 1.55;
+    list-style-position: outside;
+    margin-block: 0.45rem;
     max-width: 100%;
     min-width: 0;
     overflow-wrap: anywhere;
@@ -159,6 +343,7 @@
   }
 
   .libre-html-editor li {
+    margin-block: 0.15rem;
     margin-inline-start: 0 !important;
     min-width: 0;
     overflow-wrap: anywhere;
