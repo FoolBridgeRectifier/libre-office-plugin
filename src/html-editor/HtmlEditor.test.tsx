@@ -353,6 +353,102 @@ test('renders callout pseudo-icon hooks while preserving legacy icon markup', ()
   expect(legacyIconElement).toHaveTextContent('icon');
 });
 
+test('clicking callout fold control updates state and emitted html', () => {
+  const handleHtmlSourceChange = jest.fn();
+
+  render(
+    <HtmlEditor
+      htmlSource='<article><div class="callout" data-callout="warning" data-callout-fold="+"><div class="callout-title"><div class="callout-icon">icon</div><div class="callout-title-inner">Careful</div></div><div class="callout-content"><p>Body</p></div></div></article>'
+      onHtmlSourceChange={handleHtmlSourceChange}
+    />
+  );
+
+  const foldControlElement = screen.getByRole('button', { name: 'Toggle callout fold' });
+  const calloutElement = screen.getByText('Careful').closest('.callout');
+  const titleInnerElement = screen.getByText('Careful').closest('.callout-title-inner');
+
+  fireEvent.click(foldControlElement);
+
+  expect(foldControlElement.previousElementSibling).toBe(titleInnerElement);
+  expect(foldControlElement.querySelector('.libre-callout-fold-icon-collapsed')).not.toBeNull();
+  expect(foldControlElement.querySelector('.libre-callout-fold-icon-expanded')).not.toBeNull();
+
+  expect(calloutElement).toHaveAttribute('data-callout-fold', '-');
+  expect(calloutElement).toHaveClass('is-collapsed');
+  expect(calloutElement).toHaveAttribute('data-libre-callout-folded');
+  expect(foldControlElement).toHaveAttribute('aria-expanded', 'false');
+
+  expect(handleHtmlSourceChange).toHaveBeenLastCalledWith(
+    expect.stringContaining('data-callout-fold="-"')
+  );
+
+  expect(handleHtmlSourceChange).toHaveBeenLastCalledWith(
+    expect.not.stringContaining('data-libre-editor-callout-fold-control')
+  );
+});
+
+test('keyboard activation toggles callout folding', () => {
+  const handleHtmlSourceChange = jest.fn();
+
+  render(
+    <HtmlEditor
+      htmlSource='<article><div class="callout" data-callout="tip" data-callout-fold="-"><div class="callout-title"><div class="callout-title-inner">Hint</div></div><div class="callout-content"><p>Hidden</p></div></div></article>'
+      onHtmlSourceChange={handleHtmlSourceChange}
+    />
+  );
+
+  const foldControlElement = screen.getByRole('button', { name: 'Toggle callout fold' });
+  const calloutElement = screen.getByText('Hint').closest('.callout');
+  const titleInnerElement = screen.getByText('Hint').closest('.callout-title-inner');
+
+  fireEvent.keyDown(foldControlElement, { key: 'Enter' });
+
+  expect(foldControlElement.previousElementSibling).toBe(titleInnerElement);
+
+  expect(calloutElement).toHaveAttribute('data-callout-fold', '+');
+  expect(calloutElement).not.toHaveClass('is-collapsed');
+  expect(calloutElement).not.toHaveAttribute('data-libre-callout-folded');
+  expect(foldControlElement).toHaveAttribute('aria-expanded', 'true');
+
+  expect(handleHtmlSourceChange).toHaveBeenLastCalledWith(
+    expect.stringContaining('data-callout-fold="+"')
+  );
+});
+
+test('nested callouts fold independently', () => {
+  render(
+    <HtmlEditor htmlSource='<article><div class="callout" data-callout="note" data-callout-fold="+"><div class="callout-title"><div class="callout-title-inner">Outer</div></div><div class="callout-content"><div class="callout" data-callout="note" data-callout-fold="+"><div class="callout-title"><div class="callout-title-inner">Inner</div></div><div class="callout-content"><p>Nested body</p></div></div></div></div></article>' />
+  );
+
+  const foldControlElements = screen.getAllByRole('button', { name: 'Toggle callout fold' });
+  const outerCalloutElement = screen.getByText('Outer').closest('.callout');
+  const innerCalloutElement = screen.getByText('Inner').closest('.callout');
+
+  fireEvent.click(foldControlElements[1] as HTMLButtonElement);
+
+  expect(outerCalloutElement).toHaveAttribute('data-callout-fold', '+');
+  expect(innerCalloutElement).toHaveAttribute('data-callout-fold', '-');
+});
+
+test('snapshots callout rendering with known custom and dark-compatible states', () => {
+  document.body.classList.add('theme-dark');
+
+  try {
+    const { container } = render(
+      <HtmlEditor htmlSource='<article><div class="callout" data-callout="success" data-callout-fold="+"><div class="callout-title"><div class="callout-title-inner">Done</div></div><div class="callout-content"><p>Body</p></div></div><div class="callout" data-callout="custom-kind" data-callout-fold="-"><div class="callout-title"><div class="callout-title-inner"></div></div><div class="callout-content"><p>Custom body</p></div></div></article>' />
+    );
+
+    expect(document.querySelector('.callout[data-callout="custom-kind"]')).toHaveAttribute(
+      'data-callout-fold',
+      '-'
+    );
+
+    expect(container).toMatchSnapshot();
+  } finally {
+    document.body.classList.remove('theme-dark');
+  }
+});
+
 test('snapshots dark-mode compatible editor rendering', () => {
   document.body.classList.add('theme-dark');
 

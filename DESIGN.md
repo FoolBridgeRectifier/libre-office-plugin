@@ -41,45 +41,46 @@ Allowed exceptions:
 
 Preferred tokens:
 
-| Token                      | Role                               |
-| -------------------------- | ---------------------------------- |
-| `--ribbon-purple`          | Fixed OneNote-style tab bar anchor |
-| `--ribbon-purple-mid`      | Tab bar hover state                |
-| `--ribbon-bg`              | Ribbon body background             |
-| `--ribbon-border`          | Group dividers and button borders  |
-| `--btn-hover-bg`           | Warm button hover fill             |
-| `--btn-hover-border`       | Warm button hover border           |
-| `--btn-active-bg`          | Pressed or active button fill      |
-| `--btn-active-border`      | Pressed or active button border    |
-| `--btn-focus-ring`         | Keyboard focus outline             |
-| `--text-primary`           | Primary body text                  |
-| `--text-secondary`         | Secondary text                     |
-| `--text-muted`             | Muted labels and group headers     |
-| `--text-disabled`          | Disabled text                      |
-| `--editor-bg`              | Editable Markdown surface          |
-| `--editor-text`            | Editable Markdown body text        |
-| `--editor-muted`           | Muted Markdown editor text         |
-| `--editor-border`          | Editor-only structure borders      |
-| `--editor-caret`           | Current theme caret color          |
-| `--editor-selection`       | Editor selection background        |
-| `--editor-code-bg`         | Inline and fenced code background  |
-| `--editor-code-text`       | Inline and fenced code text        |
-| `--editor-mark-bg`         | Markdown highlight background      |
-| `--editor-mark-text`       | Markdown highlight text            |
-| `--editor-quote-border`    | Blockquote leading border          |
-| `--editor-table-header-bg` | Table header background            |
-| `--editor-hr`              | Horizontal rule border             |
-| `--shadow-ribbon`          | Ribbon shadow                      |
-| `--transition-fast`        | Button hover transitions           |
-| `--transition-mid`         | Dropdown and panel transitions     |
-| `--radius-sm`              | Small shared radius                |
-| `--icon-color`             | Default icon stroke                |
-| `--icon-purple`            | Purple accent icons                |
-| `--icon-blue`              | Informational icons                |
-| `--icon-green`             | Success icons                      |
-| `--icon-orange`            | Warning icons                      |
-| `--icon-red`               | Destructive icons                  |
-| `--icon-teal`              | Secondary accent icons             |
+| Token                      | Role                                |
+| -------------------------- | ----------------------------------- |
+| `--ribbon-purple`          | Fixed OneNote-style tab bar anchor  |
+| `--ribbon-purple-mid`      | Tab bar hover state                 |
+| `--ribbon-bg`              | Ribbon body background              |
+| `--ribbon-border`          | Group dividers and button borders   |
+| `--btn-hover-bg`           | Warm button hover fill              |
+| `--btn-hover-border`       | Warm button hover border            |
+| `--btn-active-bg`          | Pressed or active button fill       |
+| `--btn-active-border`      | Pressed or active button border     |
+| `--btn-focus-ring`         | Keyboard focus outline              |
+| `--text-primary`           | Primary body text                   |
+| `--text-secondary`         | Secondary text                      |
+| `--text-muted`             | Muted labels and group headers      |
+| `--text-disabled`          | Disabled text                       |
+| `--editor-bg`              | Editable Markdown surface           |
+| `--editor-text`            | Editable Markdown body text         |
+| `--editor-muted`           | Muted Markdown editor text          |
+| `--editor-border`          | Editor-only structure borders       |
+| `--editor-caret`           | Current theme caret color           |
+| `--editor-selection`       | Editor selection background         |
+| `--editor-code-bg`         | Inline and fenced code background   |
+| `--editor-code-text`       | Inline and fenced code text         |
+| `--editor-mark-bg`         | Markdown highlight background       |
+| `--editor-mark-text`       | Markdown highlight text             |
+| `--editor-quote-border`    | Blockquote leading border           |
+| `--editor-table-header-bg` | Table header background             |
+| `--editor-hr`              | Horizontal rule border              |
+| `--editor-callout-*`       | Type-aware Markdown callout accents |
+| `--shadow-ribbon`          | Ribbon shadow                       |
+| `--transition-fast`        | Button hover transitions            |
+| `--transition-mid`         | Dropdown and panel transitions      |
+| `--radius-sm`              | Small shared radius                 |
+| `--icon-color`             | Default icon stroke                 |
+| `--icon-purple`            | Purple accent icons                 |
+| `--icon-blue`              | Informational icons                 |
+| `--icon-green`             | Success icons                       |
+| `--icon-orange`            | Warning icons                       |
+| `--icon-red`               | Destructive icons                   |
+| `--icon-teal`              | Secondary accent icons              |
 
 ### 3. Warm, Never Cool
 

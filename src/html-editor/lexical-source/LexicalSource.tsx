@@ -10,6 +10,11 @@ import {
   syncTaskCheckboxColorHooks,
 } from './source-html';
 import {
+  handleCalloutFoldClick,
+  handleCalloutFoldKeyDown,
+  handleCalloutFoldMouseDown,
+} from './callout/callout';
+import {
   handleTaskCheckboxClick,
   handleTaskCheckboxKeyDown,
   handleTaskCheckboxMouseDown,
@@ -103,10 +108,19 @@ export function LexicalSource({
       className={HTML_EDITOR_CLASS_NAME}
       contentEditable
       onBlur={onEditorBlur}
-      onClickCapture={(event) => handleTaskCheckboxClick(event, { emitEditorChange })}
+      onClickCapture={(event) => {
+        handleCalloutFoldClick(event, { emitEditorChange });
+        handleTaskCheckboxClick(event, { emitEditorChange });
+      }}
       onInputCapture={handleEditorInput}
-      onKeyDownCapture={(event) => handleTaskCheckboxKeyDown(event, { emitEditorChange })}
-      onMouseDownCapture={handleTaskCheckboxMouseDown}
+      onKeyDownCapture={(event) => {
+        handleCalloutFoldKeyDown(event, { emitEditorChange });
+        handleTaskCheckboxKeyDown(event, { emitEditorChange });
+      }}
+      onMouseDownCapture={(event) => {
+        handleCalloutFoldMouseDown(event);
+        handleTaskCheckboxMouseDown(event);
+      }}
       ref={editorElementRef}
       role="textbox"
       suppressContentEditableWarning

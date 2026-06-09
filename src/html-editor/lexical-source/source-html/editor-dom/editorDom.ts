@@ -1,24 +1,9 @@
 import {
-  EDITOR_CALLOUT_ICON_ATTRIBUTE,
   READ_ONLY_PROTECTED_HTML_SELECTOR,
   TASK_CHECKBOX_COLOR_PROPERTY,
   TASK_LIST_ITEM_CHECKBOX_SELECTOR,
   TASK_LIST_ITEM_SELECTOR,
 } from '../../../constants';
-
-export function applyCalloutIconHooks(htmlDocument: Document): void {
-  htmlDocument.querySelectorAll<HTMLElement>('.callout .callout-title').forEach((titleElement) => {
-    titleElement.setAttribute(EDITOR_CALLOUT_ICON_ATTRIBUTE, 'true');
-  });
-}
-
-export function removeCalloutIconHooks(htmlDocument: Document): void {
-  htmlDocument
-    .querySelectorAll<HTMLElement>(`[${EDITOR_CALLOUT_ICON_ATTRIBUTE}]`)
-    .forEach((titleElement) => {
-      titleElement.removeAttribute(EDITOR_CALLOUT_ICON_ATTRIBUTE);
-    });
-}
 
 export function removeEmptyClassAttribute(element: HTMLElement): void {
   if (!element.getAttribute('class')) {

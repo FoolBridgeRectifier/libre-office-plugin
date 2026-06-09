@@ -1,4 +1,14 @@
 import '@testing-library/jest-dom';
+import { createElement as mockCreateElement } from 'react';
+import { TextDecoder, TextEncoder } from 'util';
+
+if (typeof globalThis.TextEncoder === 'undefined') {
+  Object.defineProperty(globalThis, 'TextEncoder', { value: TextEncoder });
+}
+
+if (typeof globalThis.TextDecoder === 'undefined') {
+  Object.defineProperty(globalThis, 'TextDecoder', { value: TextDecoder });
+}
 
 jest.mock(
   'obsidian',
@@ -47,13 +57,18 @@ jest.mock(
 );
 
 jest.mock('@fluentui/react-icons', () => {
-  function createMockFluentIcon() {
-    return function MockFluentIcon() {
-      return null;
+  function createMockFluentIcon(shouldRenderSvg = false) {
+    return function MockFluentIcon(props: {
+      readonly 'aria-hidden'?: boolean;
+      readonly className?: string;
+    }) {
+      return shouldRenderSvg ? mockCreateElement('svg', props) : null;
     };
   }
 
   return {
+    CaretDown16Regular: createMockFluentIcon(true),
+    CaretRight16Regular: createMockFluentIcon(true),
     ClipboardPaste24Regular: createMockFluentIcon(),
     Eye24Regular: createMockFluentIcon(),
     Image24Regular: createMockFluentIcon(),

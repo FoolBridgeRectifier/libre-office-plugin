@@ -8,12 +8,8 @@ import {
 } from '../../constants';
 import { wrapTableForHorizontalScroll } from '../../../attachments/tables/structure/structure';
 import { sanitizeHtmlFragmentSourceWithReport } from '../../../conversion';
-import {
-  applyCalloutIconHooks,
-  removeCalloutIconHooks,
-  removeEmptyClassAttribute,
-  removeTaskCheckboxColorHooks,
-} from './editor-dom/editorDom';
+import { applyCalloutEditorHooks, removeCalloutEditorHooks } from '../callout/callout';
+import { removeEmptyClassAttribute, removeTaskCheckboxColorHooks } from './editor-dom/editorDom';
 
 function isRemoteUrl(value: string | null): boolean {
   return value ? /^(?:https?:)?\/\//i.test(value.trim()) : false;
@@ -105,7 +101,7 @@ function createEditorDocument(htmlSource: string): Document {
   applyResponsiveMediaClasses(htmlDocument);
   applyResponsiveTableWrappers(htmlDocument);
   protectUnsupportedContent(htmlDocument);
-  applyCalloutIconHooks(htmlDocument);
+  applyCalloutEditorHooks(htmlDocument);
 
   return htmlDocument;
 }
@@ -140,7 +136,7 @@ export function readHtmlFromEditor(editorElement: HTMLElement): string {
       removeEmptyClassAttribute(imageElement);
     });
 
-  removeCalloutIconHooks(editableDocument);
+  removeCalloutEditorHooks(editableDocument);
   removeTaskCheckboxColorHooks(editableDocument);
 
   return sanitizeHtmlFragmentSourceWithReport(editableDocument.body.innerHTML).htmlSource;

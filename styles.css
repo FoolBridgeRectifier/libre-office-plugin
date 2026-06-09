@@ -34,6 +34,14 @@
   --editor-quote-border: var(--blockquote-border-color, var(--background-modifier-border, #d0ccc7));
   --editor-table-header-bg: var(--background-secondary, #f7f6f5);
   --editor-hr: var(--background-modifier-border, #e1dfdd);
+  --editor-callout-default: var(--color-blue-rgb, 8, 109, 221);
+  --editor-callout-blue: var(--color-blue-rgb, 8, 109, 221);
+  --editor-callout-green: var(--color-green-rgb, 0, 135, 85);
+  --editor-callout-orange: var(--color-orange-rgb, 236, 117, 0);
+  --editor-callout-red: var(--color-red-rgb, 224, 49, 49);
+  --editor-callout-purple: var(--color-purple-rgb, 120, 82, 238);
+  --editor-callout-cyan: var(--color-cyan-rgb, 0, 159, 183);
+  --editor-callout-gray: var(--mono-rgb-100, 110, 110, 110);
   --shadow-ribbon: var(--shadow-s, 0 2px 8px rgb(0 0 0 / 12%));
   --transition-fast: 150ms ease-out;
   --transition-mid: 200ms ease-out;
@@ -388,10 +396,78 @@
     width: 0.72em !important;
   }
 
+  .libre-html-editor .callout {
+    --libre-callout-color: var(--callout-color, var(--editor-callout-default));
+
+    background: rgba(var(--libre-callout-color), 0.08);
+    border: 1px solid rgba(var(--libre-callout-color), 0.22);
+    border-inline-start: 4px solid rgba(var(--libre-callout-color), 0.8);
+    border-radius: var(--radius-sm);
+    color: var(--editor-text);
+    margin-block: 0.75rem;
+    padding: 0.65rem 0.75rem;
+    position: relative;
+  }
+
+  .libre-html-editor .callout[data-callout='note'],
+  .libre-html-editor .callout[data-callout='info'] {
+    --libre-callout-color: var(--editor-callout-blue);
+  }
+
+  .libre-html-editor .callout[data-callout='todo'],
+  .libre-html-editor .callout[data-callout='tip'],
+  .libre-html-editor .callout[data-callout='hint'],
+  .libre-html-editor .callout[data-callout='important'] {
+    --libre-callout-color: var(--editor-callout-cyan);
+  }
+
+  .libre-html-editor .callout[data-callout='success'],
+  .libre-html-editor .callout[data-callout='check'],
+  .libre-html-editor .callout[data-callout='done'] {
+    --libre-callout-color: var(--editor-callout-green);
+  }
+
+  .libre-html-editor .callout[data-callout='question'],
+  .libre-html-editor .callout[data-callout='help'],
+  .libre-html-editor .callout[data-callout='faq'],
+  .libre-html-editor .callout[data-callout='warning'],
+  .libre-html-editor .callout[data-callout='caution'],
+  .libre-html-editor .callout[data-callout='attention'] {
+    --libre-callout-color: var(--editor-callout-orange);
+  }
+
+  .libre-html-editor .callout[data-callout='failure'],
+  .libre-html-editor .callout[data-callout='fail'],
+  .libre-html-editor .callout[data-callout='missing'],
+  .libre-html-editor .callout[data-callout='danger'],
+  .libre-html-editor .callout[data-callout='error'],
+  .libre-html-editor .callout[data-callout='bug'] {
+    --libre-callout-color: var(--editor-callout-red);
+  }
+
+  .libre-html-editor .callout[data-callout='abstract'],
+  .libre-html-editor .callout[data-callout='summary'],
+  .libre-html-editor .callout[data-callout='tldr'],
+  .libre-html-editor .callout[data-callout='example'] {
+    --libre-callout-color: var(--editor-callout-purple);
+  }
+
+  .libre-html-editor .callout[data-callout='quote'],
+  .libre-html-editor .callout[data-callout='cite'] {
+    --libre-callout-color: var(--editor-callout-gray);
+  }
+
   .libre-html-editor .callout-title[data-libre-editor-callout-icon='true'] {
     align-items: center !important;
+    box-sizing: border-box;
+    color: rgba(var(--libre-callout-color), 1);
     display: flex;
     gap: 0.35rem;
+    min-height: 1.4em;
+    padding-inline-end: 1.35em !important;
+    padding-right: 1.35em !important;
+    position: relative;
+    width: 100%;
   }
 
   .libre-html-editor .callout-title[data-libre-editor-callout-icon='true']::before {
@@ -407,6 +483,84 @@
     mask: url('data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 20 20%22%3E%3Cpath d=%22M10 2a8 8 0 1 0 0 16 8 8 0 0 0 0-16Zm0 3.5a.75.75 0 1 1 0 1.5.75.75 0 0 1 0-1.5Zm1 8.75a.75.75 0 0 1-1.5 0V9a.75.75 0 0 1 1.5 0v5.25Z%22/%3E%3C/svg%3E')
       center / contain no-repeat;
     width: 1em;
+  }
+
+  .libre-html-editor .libre-callout-fold {
+    appearance: none;
+    background: none !important;
+    background-color: transparent !important;
+    border: 0 !important;
+    border-radius: var(--radius-sm);
+    box-shadow: none !important;
+    color: inherit !important;
+    cursor: pointer;
+    display: inline-grid !important;
+    flex: 0 0 1em;
+    font: inherit !important;
+    height: 1em !important;
+    line-height: 1 !important;
+    margin: 0;
+    min-height: 1em !important;
+    min-width: 1em !important;
+    padding: 0 !important;
+    place-content: center;
+    position: absolute;
+    inset-block-start: 0.2em;
+    inset-inline-end: 0;
+    width: 1em !important;
+  }
+
+  .libre-html-editor .libre-callout-fold:hover,
+  .libre-html-editor .libre-callout-fold:active,
+  .libre-html-editor .libre-callout-fold:focus {
+    background: none !important;
+    background-color: transparent !important;
+    box-shadow: none !important;
+  }
+
+  .libre-html-editor .libre-callout-fold svg {
+    color: inherit !important;
+    display: block !important;
+    flex: 0 0 1em;
+    height: 1em !important;
+    min-width: 1em;
+    width: 1em !important;
+  }
+
+  .libre-html-editor .libre-callout-fold[aria-expanded='true'] .libre-callout-fold-icon-collapsed,
+  .libre-html-editor .libre-callout-fold[aria-expanded='false'] .libre-callout-fold-icon-expanded {
+    display: none !important;
+  }
+
+  .libre-html-editor .libre-callout-fold:focus-visible {
+    outline: 2px solid var(--btn-focus-ring);
+    outline-offset: 1px;
+  }
+
+  .libre-html-editor .callout.is-collapsed > .callout-content,
+  .libre-html-editor .callout[data-callout-fold='-'] > .callout-content {
+    display: none;
+  }
+
+  .libre-html-editor .callout-title-inner {
+    flex: 0 1 auto;
+    min-width: 0;
+  }
+
+  .libre-html-editor .callout-title > .callout-fold {
+    display: none !important;
+  }
+
+  .libre-html-editor .callout-content {
+    margin-block-start: 0.35rem;
+  }
+
+  .libre-html-editor .callout-content > :first-child {
+    margin-block-start: 0;
+  }
+
+  .libre-html-editor .callout-content > :last-child {
+    margin-block-end: 0;
   }
 
   .libre-html-editor .callout-title[data-libre-editor-callout-icon='true'] .callout-icon {

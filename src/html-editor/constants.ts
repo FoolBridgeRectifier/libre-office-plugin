@@ -1,6 +1,8 @@
 export const EDITOR_PROTECTED_ATTRIBUTE = 'data-libre-editor-protected';
 export const EDITOR_CALLOUT_ICON_ATTRIBUTE = 'data-libre-editor-callout-icon';
+export const EDITOR_CALLOUT_FOLD_CONTROL_ATTRIBUTE = 'data-libre-editor-callout-fold-control';
 export const EDITOR_PROTECTED_CLASS_NAME = 'libre-protected-html-block';
+export const EDITOR_CALLOUT_FOLD_CONTROL_CLASS_NAME = 'libre-callout-fold';
 export const EDITOR_CONTAINED_MEDIA_CLASS_NAME = 'libre-contained-editor-media';
 export const TASK_LIST_ITEM_CHECKBOX_SELECTOR = 'input.task-list-item-checkbox';
 export const TASK_CHECKBOX_COLOR_PROPERTY = '--libre-task-checkbox-color';

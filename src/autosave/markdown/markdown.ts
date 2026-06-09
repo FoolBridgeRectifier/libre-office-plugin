@@ -1,6 +1,7 @@
 import { getObsidianBlockMarkdown, getObsidianInlineMarkdown } from '../../obsidian-links';
 import { getAttachmentMarkdown, getTableMarkdown } from '../../attachments';
 import { getStructuredMarkdownSource } from '../../markdown-sync/markdown/structured-blocks/structuredBlocks';
+import { getCalloutMarkdown } from './callout';
 import { getCodeFenceMarkdown, getListMarkdown } from './utils';
 
 function getInlineMarkdown(node: Node): string {
@@ -80,6 +81,15 @@ function getBlockMarkdown(element: HTMLElement): string {
   }
 
   const tagName = element.tagName.toLowerCase();
+
+  if (element.matches('.callout[data-callout]')) {
+    return getCalloutMarkdown(
+      element,
+      structuredMarkdownSource,
+      getBlockMarkdown,
+      getInlineMarkdown
+    );
+  }
 
   if (tagName === 'pre') {
     return element.dataset.libreProtected === 'raw-markdown'

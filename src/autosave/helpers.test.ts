@@ -139,6 +139,66 @@ test('exports structured markdown sources and current edited code fence html', (
   );
 });
 
+test('exports callout fold state from current dom while preserving source body', () => {
+  const htmlSource = [
+    '<article>',
+    '<div class="callout" data-callout="todo" data-callout-fold="-" data-libre-structured-markdown-source="&gt; [!todo]+ Custom&#10;&gt; Body" data-libre-structured-markdown-type="callout">',
+    '<div class="callout-title"><div class="callout-title-inner">Custom</div></div>',
+    '<div class="callout-content"><p>Body</p></div>',
+    '</div>',
+    '</article>',
+  ].join('');
+
+  expect(convertHtmlToMarkdownMirror(htmlSource)).toBe('> [!todo]- Custom\n> Body');
+});
+
+test('exports edited custom and empty title callouts from current html', () => {
+  const htmlSource = [
+    '<article>',
+    '<div class="callout" data-callout="custom-kind" data-callout-fold="+">',
+    '<div class="callout-title"><div class="callout-title-inner"></div></div>',
+    '<div class="callout-content"><ul><li>Listed</li></ul></div>',
+    '</div>',
+    '</article>',
+  ].join('');
+
+  expect(convertHtmlToMarkdownMirror(htmlSource)).toBe('> [!custom-kind]+\n> - Listed');
+});
+
+test('preserves imported empty callout title when Obsidian renders a default title', () => {
+  const htmlSource = [
+    '<article>',
+    '<div class="callout" data-callout="tip" data-callout-fold="+" data-libre-structured-markdown-source="&gt; [!tip]+&#10;&gt; Empty title body." data-libre-structured-markdown-type="callout">',
+    '<div class="callout-title"><div class="callout-title-inner">Tip</div></div>',
+    '<div class="callout-content"><p>Empty title body.</p></div>',
+    '</div>',
+    '</article>',
+  ].join('');
+
+  expect(convertHtmlToMarkdownMirror(htmlSource)).toBe('> [!tip]+\n> Empty title body.');
+});
+
+test('exports nested callouts without flattening child source', () => {
+  const htmlSource = [
+    '<article>',
+    '<div class="callout" data-callout="note" data-callout-fold="+">',
+    '<div class="callout-title"><div class="callout-title-inner">Outer</div></div>',
+    '<div class="callout-content">',
+    '<p>Before</p>',
+    '<div class="callout" data-callout="warning" data-callout-fold="-">',
+    '<div class="callout-title"><div class="callout-title-inner">Inner</div></div>',
+    '<div class="callout-content"><p>Nested body</p></div>',
+    '</div>',
+    '</div>',
+    '</div>',
+    '</article>',
+  ].join('');
+
+  expect(convertHtmlToMarkdownMirror(htmlSource)).toBe(
+    ['> [!note]+ Outer', '> Before', '>', '> > [!warning]- Inner', '> > Nested body'].join('\n')
+  );
+});
+
 test('exports edited protected code fences from current html instead of stale source', () => {
   const htmlSource = [
     '<article>',
@@ -320,4 +380,28 @@ test('stress exports repeated nested task lists with stable checkbox states', ()
   expect(markdownMirrorSource.match(/^- \[x\] Done /gm)).toHaveLength(80);
   expect(markdownMirrorSource.match(/^ {2}- \[ \] Nested /gm)).toHaveLength(80);
   expect(markdownMirrorSource).toContain('- [x] Done 79\n  - [ ] Nested 79');
+});
+
+test('stress exports repeated folded callouts with tables and code', () => {
+  const repeatedCallouts = Array.from({ length: 60 }, (_unusedValue, sectionIndex) =>
+    [
+      `<div class="callout" data-callout="info" data-callout-fold="${sectionIndex % 2 ? '-' : '+'}">`,
+      `<div class="callout-title"><div class="callout-title-inner">Callout ${sectionIndex}</div></div>`,
+      '<div class="callout-content">',
+      `<p>Body ${sectionIndex}</p>`,
+      `<pre><code class="language-ts">const value${sectionIndex} = true;</code></pre>`,
+      `<table><tr><th>Name</th></tr><tr><td>Row ${sectionIndex}</td></tr></table>`,
+      '</div>',
+      '</div>',
+    ].join('')
+  ).join('');
+
+  const markdownMirrorSource = convertHtmlToMarkdownMirror(
+    `<article>${repeatedCallouts}</article>`
+  );
+
+  expect(markdownMirrorSource.match(/^> \[!info\][+-] Callout /gm)).toHaveLength(60);
+  expect(markdownMirrorSource.match(/^> ```ts/gm)).toHaveLength(60);
+  expect(markdownMirrorSource.match(/^> \| Row /gm)).toHaveLength(60);
+  expect(markdownMirrorSource).toContain('> [!info]- Callout 59');
 });

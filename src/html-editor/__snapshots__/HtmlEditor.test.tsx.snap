@@ -9,6 +9,101 @@ exports[`shows an empty editor state without html source 1`] = `
 </div>
 `;
 
+exports[`snapshots callout rendering with known custom and dark-compatible states 1`] = `
+<div>
+  <div
+    aria-label="Local HTML editor"
+    class="libre-html-editor libre-markdown-text-surface markdown-preview-view min-h-64 w-full min-w-0 max-w-full box-border m-2 overflow-x-hidden rounded-ribbon-sm bg-editor-bg p-0 font-sans text-editor-text max-w-[calc(100%-1rem)] [caret-color:var(--editor-caret)] outline-none [overflow-wrap:anywhere] focus-visible:outline focus-visible:outline-2 focus-visible:outline-button-focus-ring [&_h1]:text-editor-text [&_h2]:text-editor-text [&_h3]:text-editor-text [&_blockquote]:border-editor-quote-border [&_mark]:bg-editor-mark-bg [&_mark]:text-editor-mark-text [&_code]:text-editor-code-text [&_pre]:bg-editor-code-bg [&_pre]:text-editor-code-text [&_th]:bg-editor-table-header-bg [&_hr]:border-editor-hr [&_.libre-contained-editor-media]:h-auto [&_.libre-contained-editor-media]:max-w-full [&_.libre-contained-editor-media]:object-contain [&_.libre-protected-html-block]:max-w-full [&_.libre-protected-html-block]:overflow-x-auto [&_.libre-table-scroll]:max-w-full [&_.libre-table-scroll]:overflow-x-auto [&_pre]:max-w-full [&_pre]:overflow-x-auto"
+    contenteditable="true"
+    role="textbox"
+    tabindex="0"
+  >
+    <article>
+      <div
+        class="callout"
+        data-callout="success"
+        data-callout-fold="+"
+      >
+        <div
+          class="callout-title"
+          data-libre-editor-callout-icon="true"
+        >
+          <div
+            class="callout-title-inner"
+          >
+            Done
+          </div>
+          <button
+            aria-expanded="true"
+            aria-label="Toggle callout fold"
+            class="libre-callout-fold"
+            contenteditable="false"
+            data-libre-editor-callout-fold-control="true"
+            type="button"
+          >
+            <svg
+              aria-hidden="true"
+              class="libre-callout-fold-icon-collapsed"
+            />
+            <svg
+              aria-hidden="true"
+              class="libre-callout-fold-icon-expanded"
+            />
+          </button>
+        </div>
+        <div
+          class="callout-content"
+        >
+          <p>
+            Body
+          </p>
+        </div>
+      </div>
+      <div
+        class="callout is-collapsed"
+        data-callout="custom-kind"
+        data-callout-fold="-"
+        data-libre-callout-folded=""
+      >
+        <div
+          class="callout-title"
+          data-libre-editor-callout-icon="true"
+        >
+          <div
+            class="callout-title-inner"
+          />
+          <button
+            aria-expanded="false"
+            aria-label="Toggle callout fold"
+            class="libre-callout-fold"
+            contenteditable="false"
+            data-libre-editor-callout-fold-control="true"
+            type="button"
+          >
+            <svg
+              aria-hidden="true"
+              class="libre-callout-fold-icon-collapsed"
+            />
+            <svg
+              aria-hidden="true"
+              class="libre-callout-fold-icon-expanded"
+            />
+          </button>
+        </div>
+        <div
+          class="callout-content"
+          style="display: none;"
+        >
+          <p>
+            Custom body
+          </p>
+        </div>
+      </div>
+    </article>
+  </div>
+</div>
+`;
+
 exports[`snapshots dark-mode compatible editor rendering 1`] = `
 <div>
   <div
