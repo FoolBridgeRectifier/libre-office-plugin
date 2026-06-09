@@ -1,6 +1,8 @@
-import type { MutableRefObject } from 'react';
+import type { KeyboardEvent, MouseEvent, MutableRefObject } from 'react';
 
-export interface LexicalSourceProps {
+import type { EditorNavigationHandlers } from '../../editor-navigation/interfaces';
+
+export interface LexicalSourceProps extends EditorNavigationHandlers {
   readonly htmlSource: string;
   readonly onEditorBlur?: () => void;
   readonly onDirtyStateChange?: (isDirty: boolean) => void;
@@ -18,4 +20,17 @@ export interface HtmlSourcePluginProps {
   readonly onHtmlSourceChange?: (htmlSource: string) => void;
   readonly onInitializationError?: (message: string) => void;
   readonly onSecurityWarningChange?: (warningText: string | null) => void;
+}
+
+export type EmitLexicalSourceChange = (editorElement: HTMLElement) => void;
+
+export interface LexicalSourceInteractionInputs extends EditorNavigationHandlers {
+  readonly emitEditorChange: EmitLexicalSourceChange;
+  readonly skipNextClickNavigationUrlRef: MutableRefObject<string | null>;
+}
+
+export interface LexicalSourceInteractionHandlers {
+  readonly onClickCapture: (event: MouseEvent<HTMLDivElement>) => void;
+  readonly onKeyDownCapture: (event: KeyboardEvent<HTMLDivElement>) => void;
+  readonly onMouseDownCapture: (event: MouseEvent<HTMLDivElement>) => void;
 }

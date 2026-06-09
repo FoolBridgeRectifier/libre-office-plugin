@@ -1,82 +1,9 @@
 import { OBSIDIAN_LINK_SOURCE_ATTRIBUTE } from '../constants';
 import { parseObsidianWikiLinkSource } from '../helpers';
+import { createObsidianLinkWarnings } from './helpers';
 import { PROTECTED_MARKER_ATTRIBUTE } from '../../markdown-sync/constants';
 import type { MarkdownSourceFacts } from '../../markdown-sync/markdown/source-facts/interfaces';
-import type {
-  ObsidianLinkTargetResolver,
-  ObsidianLinkWarning,
-  ObsidianWikiLinkParts,
-} from '../interfaces';
-
-function parseHeadingTarget(target: string) {
-  if (!target.includes('#') || target.includes('#^')) {
-    return null;
-  }
-
-  const [targetNote, targetHeading] = target.split('#');
-
-  return targetHeading ? { targetHeading, targetNote: targetNote ?? '' } : null;
-}
-
-function parseBlockTarget(target: string) {
-  if (!target.includes('#^')) {
-    return null;
-  }
-
-  const [targetNote, targetBlockId] = target.split('#^');
-
-  return targetBlockId ? { targetBlockId, targetNote: targetNote ?? '' } : null;
-}
-
-function createHeadingWarning(
-  linkText: string,
-  linkParts: ObsidianWikiLinkParts,
-  resolver: ObsidianLinkTargetResolver
-): ObsidianLinkWarning | null {
-  const headingTarget = parseHeadingTarget(linkParts.target);
-
-  if (!headingTarget) {
-    return null;
-  }
-
-  const targetCache = resolver.resolveTarget(headingTarget.targetNote);
-
-  if (!targetCache || targetCache.headings.includes(headingTarget.targetHeading)) {
-    return null;
-  }
-
-  return {
-    linkText,
-    targetNote: headingTarget.targetNote,
-    targetValue: headingTarget.targetHeading,
-    type: 'missing-heading-target',
-  };
-}
-
-function createBlockWarning(
-  linkText: string,
-  linkParts: ObsidianWikiLinkParts,
-  resolver: ObsidianLinkTargetResolver
-): ObsidianLinkWarning | null {
-  const blockTarget = parseBlockTarget(linkParts.target);
-
-  if (!blockTarget) {
-    return null;
-  }
-
-  const targetCache = resolver.resolveTarget(blockTarget.targetNote);
-
-  if (!targetCache || targetCache.blockIds.includes(blockTarget.targetBlockId)) {
-    return null;
-  }
-
-  return {
-    linkText,
-    targetNote: blockTarget.targetNote,
-    targetValue: blockTarget.targetBlockId,
-    type: 'missing-block-target',
-  };
-}
+import type { ObsidianLinkTargetResolver, ObsidianLinkWarning } from '../interfaces';
 
 function collectLinkSources(htmlSource: string): string[] {
   const htmlDocument = new DOMParser().parseFromString(htmlSource, 'text/html');
@@ -131,9 +58,6 @@ export function collectObsidianLinkWarnings(
       return [];
     }
 
-    return [
-      createHeadingWarning(linkText, linkParts, resolver),
-      createBlockWarning(linkText, linkParts, resolver),
-    ].filter((warning): warning is ObsidianLinkWarning => warning !== null);
+    return createObsidianLinkWarnings(linkText, linkParts, resolver);
   });
 }

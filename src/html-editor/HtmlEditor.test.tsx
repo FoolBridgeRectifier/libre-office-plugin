@@ -430,6 +430,288 @@ test('nested callouts fold independently', () => {
   expect(innerCalloutElement).toHaveAttribute('data-callout-fold', '-');
 });
 
+test('internal links navigate with preserved Obsidian targets', () => {
+  const handleInternalLinkNavigate = jest.fn();
+
+  render(
+    <HtmlEditor
+      htmlSource='<article><p><a class="internal-link" data-href="Wrong" data-libre-obsidian-link-source="[[Folder/Note#Heading|Alias]]">Alias</a></p></article>'
+      onInternalLinkNavigate={handleInternalLinkNavigate}
+    />
+  );
+
+  fireEvent.click(screen.getByText('Alias'));
+
+  expect(handleInternalLinkNavigate).toHaveBeenCalledWith('Folder/Note#Heading');
+});
+
+test('tags navigate with exact preserved tag text', () => {
+  const handleTagNavigate = jest.fn();
+
+  render(
+    <HtmlEditor
+      htmlSource='<article><p><a class="tag" href="#parent/child" data-libre-obsidian-tag-source="#parent/child">Readable tag</a></p></article>'
+      onTagNavigate={handleTagNavigate}
+    />
+  );
+
+  fireEvent.click(screen.getByText('Readable tag'));
+
+  expect(handleTagNavigate).toHaveBeenCalledWith('#parent/child');
+});
+
+test('external links open only safe URL schemes', () => {
+  const handleExternalLinkNavigate = jest.fn();
+
+  render(
+    <HtmlEditor
+      htmlSource='<article><p><a href="https://example.com/page">Safe</a> <a href="javascript:alert(1)">Unsafe</a></p></article>'
+      onExternalLinkNavigate={handleExternalLinkNavigate}
+    />
+  );
+
+  fireEvent.click(screen.getByText('Safe'));
+  fireEvent.click(screen.getByText('Unsafe'));
+
+  expect(handleExternalLinkNavigate).toHaveBeenCalledTimes(1);
+  expect(handleExternalLinkNavigate).toHaveBeenCalledWith('https://example.com/page');
+});
+
+test('external links navigate from mouse down without repeating on paired click', async () => {
+  const handleExternalLinkNavigate = jest.fn();
+
+  render(
+    <HtmlEditor
+      htmlSource='<article><p><a href="https://example.com/mouse-down">Mouse down link</a></p></article>'
+      onExternalLinkNavigate={handleExternalLinkNavigate}
+    />
+  );
+
+  const linkElement = screen.getByText('Mouse down link');
+
+  const mouseDownEvent = new MouseEvent('mousedown', {
+    bubbles: true,
+    cancelable: true,
+  });
+
+  expect(fireEvent(linkElement, mouseDownEvent)).toBe(false);
+
+  await new Promise((resolve) => setTimeout(resolve, 20));
+
+  fireEvent.click(linkElement);
+  fireEvent.click(linkElement);
+
+  expect(handleExternalLinkNavigate).toHaveBeenCalledTimes(2);
+  expect(handleExternalLinkNavigate).toHaveBeenCalledWith('https://example.com/mouse-down');
+});
+
+test('external mouse down navigation keeps unsafe and local link targets blocked', () => {
+  const handleExternalLinkNavigate = jest.fn();
+
+  render(
+    <HtmlEditor
+      htmlSource='<article><p><a href="http://example.com">Http</a> <a href="mailto:editor@example.com">Mail</a> <a href="/relative">Relative</a> <a href="javascript:alert(1)">Script</a> <a class="internal-link" data-href="Note" href="https://example.com/internal">Internal</a> <a class="tag" href="#tag">Tag</a></p></article>'
+      onExternalLinkNavigate={handleExternalLinkNavigate}
+    />
+  );
+
+  fireEvent.mouseDown(screen.getByText('Http'));
+  fireEvent.mouseDown(screen.getByText('Mail'));
+  fireEvent.mouseDown(screen.getByText('Relative'));
+  fireEvent.mouseDown(screen.getByText('Script'));
+
+  fireEvent.mouseDown(screen.getByText('Internal'));
+  fireEvent.mouseDown(screen.getByText('Tag'));
+
+  expect(handleExternalLinkNavigate).toHaveBeenCalledTimes(2);
+  expect(handleExternalLinkNavigate).toHaveBeenNthCalledWith(1, 'http://example.com/');
+  expect(handleExternalLinkNavigate).toHaveBeenNthCalledWith(2, 'mailto:editor@example.com');
+});
+
+test('repeated external mouse down and click pairs navigate once per link', () => {
+  const handleExternalLinkNavigate = jest.fn();
+  const linkCount = 75;
+
+  const linkHtml = Array.from(
+    { length: linkCount },
+    (_, linkIndex) => `<a href="https://example.com/stress-${linkIndex}">Stress ${linkIndex}</a>`
+  ).join(' ');
+
+  render(
+    <HtmlEditor
+      htmlSource={`<article><p>${linkHtml}</p></article>`}
+      onExternalLinkNavigate={handleExternalLinkNavigate}
+    />
+  );
+
+  for (const linkElement of screen.getAllByText(/^Stress \d+$/)) {
+    fireEvent.mouseDown(linkElement);
+    fireEvent.click(linkElement);
+  }
+
+  expect(handleExternalLinkNavigate).toHaveBeenCalledTimes(linkCount);
+  expect(handleExternalLinkNavigate).toHaveBeenNthCalledWith(1, 'https://example.com/stress-0');
+
+  expect(handleExternalLinkNavigate).toHaveBeenNthCalledWith(
+    linkCount,
+    'https://example.com/stress-74'
+  );
+});
+
+test('links inside protected and code content do not navigate', () => {
+  const handleInternalLinkNavigate = jest.fn();
+  const handleExternalLinkNavigate = jest.fn();
+
+  render(
+    <HtmlEditor
+      htmlSource='<article><pre data-libre-protected="raw-markdown"><a class="internal-link" data-href="Protected">Protected</a></pre><p><code><a href="https://example.com">Code link</a></code></p></article>'
+      onExternalLinkNavigate={handleExternalLinkNavigate}
+      onInternalLinkNavigate={handleInternalLinkNavigate}
+    />
+  );
+
+  fireEvent.mouseDown(screen.getByText('Protected'));
+  fireEvent.mouseDown(screen.getByText('Code link'));
+  fireEvent.click(screen.getByText('Protected'));
+  fireEvent.click(screen.getByText('Code link'));
+
+  expect(handleInternalLinkNavigate).not.toHaveBeenCalled();
+  expect(handleExternalLinkNavigate).not.toHaveBeenCalled();
+});
+
+test('footnote references focus matching definitions inside the editor', () => {
+  const scrollIntoView = jest.fn();
+
+  Object.defineProperty(HTMLElement.prototype, 'scrollIntoView', {
+    configurable: true,
+    value: scrollIntoView,
+  });
+
+  render(
+    <HtmlEditor htmlSource='<article><p>Body<sup class="footnote-ref"><a href="#fn-1" id="fnref-1">1</a></sup></p><section class="footnotes"><ol><li id="fn-1">Definition <a class="footnote-backref" href="#fnref-1">back</a></li></ol></section></article>' />
+  );
+
+  fireEvent.click(screen.getByText('1'));
+
+  expect(document.activeElement).toBe(document.getElementById('fn-1'));
+  expect(scrollIntoView).toHaveBeenCalledWith({ block: 'center', inline: 'nearest' });
+});
+
+test('heading collapse hides content until the next same-or-higher heading', () => {
+  render(
+    <HtmlEditor htmlSource="<article><h1>Top</h1><p>Top body</p><h2>Nested</h2><p>Nested body</p><h1>Next</h1><p>Next body</p></article>" />
+  );
+
+  const collapseButtons = screen.getAllByRole('button', { name: 'Toggle heading collapse' });
+
+  fireEvent.click(collapseButtons[0] as HTMLButtonElement);
+
+  expect(screen.getByText('Top body')).toHaveClass('libre-heading-collapse-hidden');
+  expect(screen.getByText('Nested')).toHaveClass('libre-heading-collapse-hidden');
+  expect(screen.getByText('Nested body')).toHaveClass('libre-heading-collapse-hidden');
+
+  expect(screen.getByText('Next')).not.toHaveClass('libre-heading-collapse-hidden');
+  expect(screen.getByText('Next body')).not.toHaveClass('libre-heading-collapse-hidden');
+});
+
+test('heading collapse follows Obsidian rendered block wrappers', () => {
+  render(
+    <HtmlEditor htmlSource='<article><div class="el-h2"><h2>Wrapped</h2></div><div class="el-p"><p>Wrapped body</p></div><div class="el-h3"><h3>Wrapped child</h3></div><div class="el-p"><p>Child body</p></div><div class="el-h2"><h2>Wrapped peer</h2></div><div class="el-p"><p>Peer body</p></div></article>' />
+  );
+
+  const collapseButton = screen.getAllByRole('button', { name: 'Toggle heading collapse' })[0];
+
+  if (!collapseButton) {
+    throw new Error('Expected wrapped heading collapse control.');
+  }
+
+  fireEvent.click(collapseButton);
+
+  expect(screen.getByText('Wrapped body').closest('.el-p')).toHaveClass(
+    'libre-heading-collapse-hidden'
+  );
+
+  expect(screen.getByText('Wrapped child').closest('.el-h3')).toHaveClass(
+    'libre-heading-collapse-hidden'
+  );
+
+  expect(screen.getByText('Wrapped peer').closest('.el-h2')).not.toHaveClass(
+    'libre-heading-collapse-hidden'
+  );
+
+  expect(screen.getByText('Peer body').closest('.el-p')).not.toHaveClass(
+    'libre-heading-collapse-hidden'
+  );
+});
+
+test('heading collapse controls are keyboard accessible', () => {
+  render(<HtmlEditor htmlSource="<article><h2>Keyboard</h2><p>Keyboard body</p></article>" />);
+
+  const collapseButton = screen.getByRole('button', { name: 'Toggle heading collapse' });
+
+  fireEvent.keyDown(collapseButton, { key: 'Enter' });
+
+  expect(collapseButton).toHaveAttribute('aria-expanded', 'false');
+  expect(screen.getByText('Keyboard body')).toHaveClass('libre-heading-collapse-hidden');
+});
+
+test('navigation and heading collapse interactions do not emit source changes', () => {
+  const handleHtmlSourceChange = jest.fn();
+  const handleInternalLinkNavigate = jest.fn();
+
+  render(
+    <HtmlEditor
+      htmlSource='<article><p><a class="internal-link" data-href="Target">Target</a></p><h2>Section</h2><p>Body</p></article>'
+      onHtmlSourceChange={handleHtmlSourceChange}
+      onInternalLinkNavigate={handleInternalLinkNavigate}
+    />
+  );
+
+  fireEvent.click(screen.getByText('Target'));
+  fireEvent.click(screen.getByRole('button', { name: 'Toggle heading collapse' }));
+
+  expect(handleInternalLinkNavigate).toHaveBeenCalledWith('Target');
+  expect(handleHtmlSourceChange).not.toHaveBeenCalled();
+});
+
+test('autosave cleanup preserves content while heading content is collapsed', () => {
+  const handleHtmlSourceChange = jest.fn();
+
+  render(
+    <HtmlEditor
+      htmlSource="<article><h2>Section</h2><p>Hidden body</p><h2>Next</h2><p>Visible body</p></article>"
+      onHtmlSourceChange={handleHtmlSourceChange}
+    />
+  );
+
+  const collapseButton = screen.getAllByRole('button', { name: 'Toggle heading collapse' })[0];
+
+  if (!collapseButton) {
+    throw new Error('Expected heading collapse control.');
+  }
+
+  fireEvent.click(collapseButton);
+
+  fireEvent.input(screen.getByRole('textbox', { name: 'Local HTML editor' }));
+
+  expect(handleHtmlSourceChange).toHaveBeenLastCalledWith(
+    '<article><h2>Section</h2><p>Hidden body</p><h2>Next</h2><p>Visible body</p></article>'
+  );
+});
+
+test('snapshots link, tag, footnote, and heading collapse rendering', () => {
+  const { container } = render(
+    <HtmlEditor htmlSource='<article><h2>Section</h2><p><a class="internal-link" data-href="Note#Heading" data-libre-obsidian-link-source="[[Note#Heading|Alias]]">Alias</a> <a class="tag" href="#parent/child" data-libre-obsidian-tag-source="#parent/child">#parent/child</a> <sup class="footnote-ref"><a href="#fn-1" id="fnref-1">1</a></sup></p><section class="footnotes"><ol><li id="fn-1">Definition</li></ol></section></article>' />
+  );
+
+  expect(screen.getByRole('button', { name: 'Toggle heading collapse' })).toHaveAttribute(
+    'aria-expanded',
+    'true'
+  );
+
+  expect(container).toMatchSnapshot();
+});
+
 test('snapshots callout rendering with known custom and dark-compatible states', () => {
   document.body.classList.add('theme-dark');
 

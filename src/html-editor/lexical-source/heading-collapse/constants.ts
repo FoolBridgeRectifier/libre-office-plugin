@@ -1,0 +1,11 @@
+export const HEADING_COLLAPSE_ACTIVATION_KEYS = ['Enter', ' '] as const;
+export const HEADING_COLLAPSE_BUTTON_ATTRIBUTE = 'data-libre-heading-collapse-control';
+export const HEADING_COLLAPSE_BUTTON_CLASS_NAME = 'libre-heading-collapse';
+export const HEADING_COLLAPSE_COLLAPSED_ATTRIBUTE = 'data-libre-heading-collapsed';
+export const HEADING_COLLAPSE_HIDDEN_ATTRIBUTE = 'data-libre-heading-collapse-hidden';
+export const HEADING_COLLAPSE_HIDDEN_CLASS_NAME = 'libre-heading-collapse-hidden';
+export const HEADING_COLLAPSE_HEADING_ATTRIBUTE = 'data-libre-heading-collapse-heading';
+export const HEADING_COLLAPSE_ICON_COLLAPSED_CLASS_NAME = 'libre-heading-collapse-icon-collapsed';
+export const HEADING_COLLAPSE_ICON_EXPANDED_CLASS_NAME = 'libre-heading-collapse-icon-expanded';
+export const HEADING_BLOCK_SELECTOR = '.el-h1,.el-h2,.el-h3,.el-h4,.el-h5,.el-h6';
+export const HEADING_SELECTOR = 'h1,h2,h3,h4,h5,h6';

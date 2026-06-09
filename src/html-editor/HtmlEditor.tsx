@@ -15,7 +15,10 @@ export function HtmlEditor({
   showEmptyState = true,
   onEditorBlur,
   onDirtyStateChange,
+  onExternalLinkNavigate,
   onHtmlSourceChange,
+  onInternalLinkNavigate,
+  onTagNavigate,
 }: HtmlEditorProps) {
   const [internalInitializationError, setInternalInitializationError] = useState<string | null>(
     null
@@ -72,7 +75,10 @@ export function HtmlEditor({
         onSecurityWarningChange={setSecurityWarningText}
         {...(onEditorBlur ? { onEditorBlur } : {})}
         {...(onDirtyStateChange ? { onDirtyStateChange } : {})}
+        {...(onExternalLinkNavigate ? { onExternalLinkNavigate } : {})}
         {...(onHtmlSourceChange ? { onHtmlSourceChange } : {})}
+        {...(onInternalLinkNavigate ? { onInternalLinkNavigate } : {})}
+        {...(onTagNavigate ? { onTagNavigate } : {})}
       />
     </>
   );

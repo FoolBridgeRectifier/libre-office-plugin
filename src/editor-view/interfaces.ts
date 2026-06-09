@@ -20,6 +20,9 @@ export interface EditorViewOptions {
   getInitialAutosaveStatus?(file: TFile): Promise<AutosaveStatus>;
   getLinkWarnings(markdownPath: string, htmlSource: string): ReadonlyArray<ObsidianLinkWarning>;
   loadImportedHtmlSource(file: TFile): Promise<string | null>;
+  navigateInternalLink?(target: string, sourcePath: string): void;
+  navigateTag?(tagText: string): void;
+  openExternalLink?(url: string): void;
   prepareDesktopSource?(file: TFile): Promise<void>;
   saveHtmlSource(
     markdownPath: string,
@@ -66,8 +69,11 @@ export interface EditorViewRenderTarget {
   pageLayout: LibreNoteEditorPageLayout;
   readonly showHtmlEmptyState: boolean;
   handleEditorBlur(): void;
+  handleExternalLinkNavigate(url: string): void;
   handleHtmlSourceChange(htmlSource: string): void;
+  handleInternalLinkNavigate(target: string): void;
   handleResolveConflict(choice: ConflictResolutionChoice): void;
+  handleTagNavigate(tagText: string): void;
 }
 
 export interface EditorViewDesktopSourceTarget extends EditorViewSourceTarget {

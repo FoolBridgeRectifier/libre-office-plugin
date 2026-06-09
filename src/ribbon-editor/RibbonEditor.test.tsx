@@ -169,3 +169,19 @@ test('emits changed html source from the local editor', () => {
 
   expect(handleHtmlSourceChange).toHaveBeenCalledWith('<article><p>Changed body</p></article>');
 });
+
+test('passes tag navigation through to the local editor', () => {
+  const handleTagNavigate = jest.fn();
+
+  render(
+    <RibbonEditor
+      activeFilePath="Tags.md"
+      importedHtmlSource='<article><p><a class="tag" href="#parent/child" data-libre-obsidian-tag-source="#parent/child">#parent/child</a></p></article>'
+      onTagNavigate={handleTagNavigate}
+    />
+  );
+
+  fireEvent.click(screen.getByText('#parent/child'));
+
+  expect(handleTagNavigate).toHaveBeenCalledWith('#parent/child');
+});

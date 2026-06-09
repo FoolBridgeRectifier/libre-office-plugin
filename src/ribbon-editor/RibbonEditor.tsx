@@ -30,8 +30,11 @@ export function RibbonEditor({
   pageLayout = 'pageless',
   showHtmlEmptyState = activeFilePath === null,
   onEditorBlur,
+  onExternalLinkNavigate,
   onHtmlSourceChange,
+  onInternalLinkNavigate,
   onResolveConflict,
+  onTagNavigate,
 }: RibbonEditorProps) {
   const [activeRibbonTabId, setActiveRibbonTabId] = useState(DEFAULT_RIBBON_TAB_ID);
 
@@ -121,7 +124,10 @@ export function RibbonEditor({
             htmlSource={importedHtmlSource}
             showEmptyState={showHtmlEmptyState}
             {...(onEditorBlur ? { onEditorBlur } : {})}
+            {...(onExternalLinkNavigate ? { onExternalLinkNavigate } : {})}
             {...(onHtmlSourceChange ? { onHtmlSourceChange } : {})}
+            {...(onInternalLinkNavigate ? { onInternalLinkNavigate } : {})}
+            {...(onTagNavigate ? { onTagNavigate } : {})}
           />
         </article>
       </main>

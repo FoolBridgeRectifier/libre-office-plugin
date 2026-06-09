@@ -35,8 +35,11 @@ function createEditorViewAppElement(
   pageLayout: LibreNoteEditorPageLayout,
   showHtmlEmptyState: boolean,
   onEditorBlur: () => void,
+  onExternalLinkNavigate: (url: string) => void,
   onHtmlSourceChange: (htmlSource: string) => void,
-  onResolveConflict: (choice: ConflictResolutionChoice) => void
+  onInternalLinkNavigate: (target: string) => void,
+  onResolveConflict: (choice: ConflictResolutionChoice) => void,
+  onTagNavigate: (tagText: string) => void
 ) {
   const activeFilePath = shouldRouteFileToLibreEditor(activeMarkdownFile)
     ? activeMarkdownFile.path
@@ -55,8 +58,11 @@ function createEditorViewAppElement(
     pageLayout,
     showHtmlEmptyState,
     onEditorBlur,
+    onExternalLinkNavigate,
     onHtmlSourceChange,
+    onInternalLinkNavigate,
     onResolveConflict,
+    onTagNavigate,
   });
 }
 
@@ -78,8 +84,11 @@ export function renderEditorViewAppElement(
       target.pageLayout,
       target.showHtmlEmptyState,
       target.handleEditorBlur,
+      target.handleExternalLinkNavigate,
       target.handleHtmlSourceChange,
-      target.handleResolveConflict
+      target.handleInternalLinkNavigate,
+      target.handleResolveConflict,
+      target.handleTagNavigate
     )
   );
 }

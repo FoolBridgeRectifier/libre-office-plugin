@@ -49,6 +49,22 @@ test('passes conflict recovery choices through to the ribbon editor', () => {
   expect(handleResolveConflict).toHaveBeenCalledWith('duplicate-conflict-copy');
 });
 
+test('passes internal link navigation through to the editor surface', () => {
+  const handleInternalLinkNavigate = jest.fn();
+
+  render(
+    <App
+      activeFilePath="Links.md"
+      importedHtmlSource='<article><p><a class="internal-link" data-href="Target">Target</a></p></article>'
+      onInternalLinkNavigate={handleInternalLinkNavigate}
+    />
+  );
+
+  fireEvent.click(screen.getByText('Target'));
+
+  expect(handleInternalLinkNavigate).toHaveBeenCalledWith('Target');
+});
+
 test('renders imported html without showing preserved frontmatter as text', () => {
   render(
     <App

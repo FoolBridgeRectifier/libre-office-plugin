@@ -18,12 +18,13 @@ import {
   applyEditorViewLoadedState,
   applyEditorViewUnloadedState,
   applyEditorViewHtmlSourceChange,
-  getEditorViewLinkWarningCount,
   loadEditorViewLoadedState,
+  refreshEditorViewLinkWarnings,
   refreshEditorViewSettingsState,
   setEditorViewAutosaveDocument,
   startEditorViewHtmlLoad,
 } from './state/state';
+import * as editorViewNavigation from './navigation/navigation';
 import { createSkippedMobileRuntimeSetupState } from '../office-runtime/setup-state/setupState';
 import type { AutosaveController, AutosaveStatus } from '../autosave/interfaces';
 import type { ConflictResolutionChoice } from '../conflicts/interfaces';
@@ -108,17 +109,7 @@ export class EditorView extends FileView {
     await this.autosaveController.flushAll();
   };
   refreshLinkWarnings(): void {
-    if (!this.activeMarkdownFile || this.importedHtmlSource === null) {
-      return;
-    }
-
-    this.linkWarningCount = getEditorViewLinkWarningCount(
-      this.editorViewOptions,
-      this.activeMarkdownFile,
-      this.importedHtmlSource
-    );
-
-    this.renderReactApp();
+    refreshEditorViewLinkWarnings(this);
   }
   async setState(state: unknown, result: ViewStateResult): Promise<void> {
     await super.setState(state, result);
@@ -136,13 +127,19 @@ export class EditorView extends FileView {
     this.contentEl.empty();
   }
   handleEditorBlur = () => void syncEditorViewDesktopSource(this);
+  handleExternalLinkNavigate = (url: string) =>
+    editorViewNavigation.navigateEditorViewExternalLink(this, url);
   handleHtmlSourceChange = (htmlSource: string) =>
     applyEditorViewHtmlSourceChange(this, htmlSource);
+  handleInternalLinkNavigate = (target: string) =>
+    editorViewNavigation.navigateEditorViewInternalLink(this, target);
   handleResolveConflict = async (choice: ConflictResolutionChoice) => {
     const result = await resolveEditorViewConflict(this, choice);
 
     applyEditorViewConflictResolutionResult(this, result);
   };
+  handleTagNavigate = (tagText: string) =>
+    editorViewNavigation.navigateEditorViewTag(this, tagText);
   renderReactApp = () => {
     refreshEditorViewSettingsState(this);
     renderEditorViewAppElement(this.reactRoot, this);

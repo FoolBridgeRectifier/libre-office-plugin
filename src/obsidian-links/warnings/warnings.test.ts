@@ -61,10 +61,24 @@ test('does not duplicate warnings when attributes and source facts contain the s
   expect(collectObsidianLinkWarnings(htmlSource, createResolver())).toHaveLength(1);
 });
 
-test('does not warn for missing notes or duplicate headings that still exist', () => {
+test('warns when linked note target is missing', () => {
+  const htmlSource =
+    '<article><span data-libre-obsidian-link-source="[[Missing Note#Heading]]"></span></article>';
+
+  expect(collectObsidianLinkWarnings(htmlSource, createResolver())).toEqual([
+    {
+      linkText: '[[Missing Note#Heading]]',
+      targetNote: 'Missing Note',
+      targetValue: 'Missing Note',
+      type: 'missing-note-target',
+    },
+  ]);
+});
+
+test('does not warn for current-note heading links or duplicate headings that still exist', () => {
   const htmlSource = [
     '<article>',
-    '<span data-libre-obsidian-link-source="[[Missing Note#Heading]]"></span>',
+    '<span data-libre-obsidian-link-source="[[#Existing Heading]]"></span>',
     '<span data-libre-obsidian-link-source="[[Note#Duplicate Heading]]"></span>',
     '</article>',
   ].join('');

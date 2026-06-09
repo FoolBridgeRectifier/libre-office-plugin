@@ -18,6 +18,7 @@ import {
 } from '../../markdown-sync';
 import { collectObsidianLinkWarningsForApp } from '../../obsidian-links/resolver/resolver';
 import { secondsToMilliseconds } from '../../settings';
+import { openExternalUrl, openInternalLinkTarget, openTagSearch } from './helpers';
 import type { EditorViewOptions } from '../interfaces';
 import type { App } from 'obsidian';
 import type { RichDocumentStore } from '../../rich-documents/interfaces';
@@ -47,6 +48,13 @@ export function createRichDocumentEditorViewOptions(
     getLinkWarnings: (markdownPath, htmlSource) =>
       collectObsidianLinkWarningsForApp(app, markdownPath, htmlSource),
     loadImportedHtmlSource: (file) => loadRichDocumentHtmlForStore(app, file, richDocumentStore),
+    navigateInternalLink: (target, sourcePath) => {
+      void openInternalLinkTarget(app, target, sourcePath);
+    },
+    navigateTag: (tagText) => openTagSearch(app, tagText),
+    openExternalLink: (url) => {
+      void openExternalUrl(url);
+    },
     prepareDesktopSource: async (file) => {
       const mapping = await richDocumentStore.getMappingByMarkdownPath(file.path);
       const runtime = await createDefaultDesktopConversionRuntime(getOfficeRuntimeSetupState());

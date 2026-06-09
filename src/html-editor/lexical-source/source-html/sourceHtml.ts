@@ -9,6 +9,10 @@ import {
 import { wrapTableForHorizontalScroll } from '../../../attachments/tables/structure/structure';
 import { sanitizeHtmlFragmentSourceWithReport } from '../../../conversion';
 import { applyCalloutEditorHooks, removeCalloutEditorHooks } from '../callout/callout';
+import {
+  applyHeadingCollapseEditorHooks,
+  removeHeadingCollapseEditorHooks,
+} from '../heading-collapse/headingCollapse';
 import { removeEmptyClassAttribute, removeTaskCheckboxColorHooks } from './editor-dom/editorDom';
 
 function isRemoteUrl(value: string | null): boolean {
@@ -95,13 +99,16 @@ function removeLexicalEditorArtifacts(htmlDocument: Document): void {
 function createEditorDocument(htmlSource: string): Document {
   const sanitizedHtmlSource = sanitizeHtmlFragmentSourceWithReport(htmlSource).htmlSource;
   const htmlDocument = new DOMParser().parseFromString(sanitizedHtmlSource, 'text/html');
+
   removeRemoteLoadingElements(htmlDocument);
   removeRemoteAssetAttributes(htmlDocument);
 
   applyResponsiveMediaClasses(htmlDocument);
   applyResponsiveTableWrappers(htmlDocument);
   protectUnsupportedContent(htmlDocument);
+
   applyCalloutEditorHooks(htmlDocument);
+  applyHeadingCollapseEditorHooks(htmlDocument);
 
   return htmlDocument;
 }
@@ -137,7 +144,7 @@ export function readHtmlFromEditor(editorElement: HTMLElement): string {
     });
 
   removeCalloutEditorHooks(editableDocument);
+  removeHeadingCollapseEditorHooks(editableDocument);
   removeTaskCheckboxColorHooks(editableDocument);
-
   return sanitizeHtmlFragmentSourceWithReport(editableDocument.body.innerHTML).htmlSource;
 }

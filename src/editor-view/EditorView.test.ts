@@ -186,6 +186,31 @@ test('passes unresolved link warning count to the React app', async () => {
   );
 });
 
+test('passes navigation callbacks to the React app and delegates through options', async () => {
+  const navigateInternalLink = jest.fn();
+  const navigateTag = jest.fn();
+  const openExternalLink = jest.fn();
+
+  const editorView = createEditorView(undefined, undefined, undefined, undefined, {
+    navigateInternalLink,
+    navigateTag,
+    openExternalLink,
+  });
+
+  await (editorView as EditorView & { onOpen(): Promise<void> }).onOpen();
+  await editorView.onLoadFile(createFile('Source.md', 'md'));
+
+  const appProps = mockReactRoot.render.mock.calls.at(-1)?.[0].props;
+
+  appProps.onInternalLinkNavigate('Target#Heading');
+  appProps.onTagNavigate('#parent/child');
+  appProps.onExternalLinkNavigate('https://example.com/');
+
+  expect(navigateInternalLink).toHaveBeenCalledWith('Target#Heading', 'Source.md');
+  expect(navigateTag).toHaveBeenCalledWith('#parent/child');
+  expect(openExternalLink).toHaveBeenCalledWith('https://example.com/');
+});
+
 test('opens and closes the React root inside the Obsidian content element', async () => {
   const editorView = createEditorView();
 

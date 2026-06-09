@@ -9,30 +9,26 @@ import {
   readHtmlFromEditor,
   syncTaskCheckboxColorHooks,
 } from './source-html';
-import {
-  handleCalloutFoldClick,
-  handleCalloutFoldKeyDown,
-  handleCalloutFoldMouseDown,
-} from './callout/callout';
-import {
-  handleTaskCheckboxClick,
-  handleTaskCheckboxKeyDown,
-  handleTaskCheckboxMouseDown,
-} from './task-list/taskList';
+import { createLexicalSourceInteractionHandlers } from './helpers';
 import type { LexicalSourceProps } from './interfaces';
 
 export function LexicalSource({
   htmlSource,
   onEditorBlur,
   onDirtyStateChange,
+  onExternalLinkNavigate,
   onHtmlSourceChange,
+  onInternalLinkNavigate,
   onInitializationError,
   onSecurityWarningChange,
+  onTagNavigate,
 }: LexicalSourceProps) {
   const editorElementRef = useRef<HTMLDivElement | null>(null);
   const initialHtmlSourceRef = useRef('');
   const isApplyingHtmlSourceRef = useRef(false);
   const loadedHtmlSourceRef = useRef<string | null>(null);
+
+  const skipNextClickNavigationUrlRef = useRef<string | null>(null);
 
   const emitEditorChange = (editorElement: HTMLElement) => {
     syncTaskCheckboxColorHooks(editorElement);
@@ -46,15 +42,11 @@ export function LexicalSource({
   };
 
   useEffect(() => {
-    if (loadedHtmlSourceRef.current === htmlSource) {
-      return;
-    }
+    if (loadedHtmlSourceRef.current === htmlSource) return;
 
     const editorElement = editorElementRef.current;
 
-    if (!editorElement) {
-      return;
-    }
+    if (!editorElement) return;
 
     isApplyingHtmlSourceRef.current = true;
     onSecurityWarningChange?.(getHtmlSecurityWarningText(htmlSource));
@@ -102,25 +94,24 @@ export function LexicalSource({
     emitEditorChange(event.currentTarget);
   };
 
+  const interactionHandlers = createLexicalSourceInteractionHandlers({
+    emitEditorChange,
+    ...(onExternalLinkNavigate ? { onExternalLinkNavigate } : {}),
+    ...(onInternalLinkNavigate ? { onInternalLinkNavigate } : {}),
+    ...(onTagNavigate ? { onTagNavigate } : {}),
+    skipNextClickNavigationUrlRef,
+  });
+
   return (
     <div
       aria-label="Local HTML editor"
       className={HTML_EDITOR_CLASS_NAME}
       contentEditable
       onBlur={onEditorBlur}
-      onClickCapture={(event) => {
-        handleCalloutFoldClick(event, { emitEditorChange });
-        handleTaskCheckboxClick(event, { emitEditorChange });
-      }}
+      onClickCapture={interactionHandlers.onClickCapture}
       onInputCapture={handleEditorInput}
-      onKeyDownCapture={(event) => {
-        handleCalloutFoldKeyDown(event, { emitEditorChange });
-        handleTaskCheckboxKeyDown(event, { emitEditorChange });
-      }}
-      onMouseDownCapture={(event) => {
-        handleCalloutFoldMouseDown(event);
-        handleTaskCheckboxMouseDown(event);
-      }}
+      onKeyDownCapture={interactionHandlers.onKeyDownCapture}
+      onMouseDownCapture={interactionHandlers.onMouseDownCapture}
       ref={editorElementRef}
       role="textbox"
       suppressContentEditableWarning

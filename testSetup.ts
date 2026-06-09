@@ -67,7 +67,9 @@ jest.mock('@fluentui/react-icons', () => {
   }
 
   return {
+    CaretDown16Filled: createMockFluentIcon(true),
     CaretDown16Regular: createMockFluentIcon(true),
+    CaretRight16Filled: createMockFluentIcon(true),
     CaretRight16Regular: createMockFluentIcon(true),
     ClipboardPaste24Regular: createMockFluentIcon(),
     Eye24Regular: createMockFluentIcon(),

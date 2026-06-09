@@ -8,7 +8,7 @@ function createRenderedContainer(htmlSource: string): HTMLDivElement {
   return containerElement;
 }
 
-test('cleans Obsidian preview chrome while preserving rendered style hooks', () => {
+test('cleans Obsidian preview chrome and generated heading controls', () => {
   const containerElement = createRenderedContainer(`
     <div class="markdown-preview-view">
       <div class="markdown-preview-section">
@@ -30,7 +30,7 @@ test('cleans Obsidian preview chrome while preserving rendered style hooks', () 
   expect(cleanedElement.textContent).toContain('Heading');
   expect(cleanedElement.textContent).not.toContain('Title UI');
   expect(cleanedElement.textContent).not.toContain('Properties UI');
-  expect(cleanedElement.querySelector('.heading-collapse-indicator')).toBeInstanceOf(HTMLElement);
+  expect(cleanedElement.querySelector('.heading-collapse-indicator')).toBeNull();
 });
 
 test('removes hidden generated content outside callout bodies', () => {

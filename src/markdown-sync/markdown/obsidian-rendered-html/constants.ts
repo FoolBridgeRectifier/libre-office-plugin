@@ -9,6 +9,7 @@ export const GENERATED_UI_SELECTORS = [
   '.metadata-container',
   '.metadata-add-button',
   '.mod-frontmatter',
+  '.heading-collapse-indicator',
   '.markdown-preview-pusher',
   '.copy-code-button',
 ];

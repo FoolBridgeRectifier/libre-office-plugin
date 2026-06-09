@@ -15,8 +15,11 @@ export function App({
   pageLayout = 'pageless',
   showHtmlEmptyState = activeFilePath === null,
   onEditorBlur,
+  onExternalLinkNavigate,
   onHtmlSourceChange,
+  onInternalLinkNavigate,
   onResolveConflict,
+  onTagNavigate,
 }: AppProps) {
   return (
     <RibbonEditor
@@ -32,8 +35,11 @@ export function App({
       pageLayout={pageLayout}
       showHtmlEmptyState={showHtmlEmptyState}
       {...(onEditorBlur ? { onEditorBlur } : {})}
+      {...(onExternalLinkNavigate ? { onExternalLinkNavigate } : {})}
       {...(onHtmlSourceChange ? { onHtmlSourceChange } : {})}
+      {...(onInternalLinkNavigate ? { onInternalLinkNavigate } : {})}
       {...(onResolveConflict ? { onResolveConflict } : {})}
+      {...(onTagNavigate ? { onTagNavigate } : {})}
     />
   );
 }

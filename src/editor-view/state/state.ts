@@ -87,6 +87,20 @@ export function applyEditorViewHtmlSourceChange(
   target.autosaveController.handleHtmlSourceChange(htmlSource);
 }
 
+export function refreshEditorViewLinkWarnings(target: EditorViewSourceTarget): void {
+  if (!target.activeMarkdownFile || target.importedHtmlSource === null) {
+    return;
+  }
+
+  target.linkWarningCount = getEditorViewLinkWarningCount(
+    target.editorViewOptions,
+    target.activeMarkdownFile,
+    target.importedHtmlSource
+  );
+
+  target.renderReactApp();
+}
+
 export function refreshEditorViewSettingsState(
   target: EditorViewRenderTarget & { readonly editorViewOptions: EditorViewOptions }
 ): void {

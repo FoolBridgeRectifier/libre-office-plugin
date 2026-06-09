@@ -1,4 +1,5 @@
 import { createRichDocumentMapping } from '../../rich-documents';
+import { openExternalUrl } from './helpers';
 import { createRichDocumentEditorViewOptions } from './options';
 import {
   createDefaultDesktopConversionRuntime,
@@ -73,6 +74,109 @@ test('prepares desktop ODT source headlessly without opening LibreOffice on note
   });
 
   expect(openDesktopOdtSource).not.toHaveBeenCalled();
+});
+
+test('creates Obsidian navigation delegates for links, tags, and external urls', () => {
+  const linkedFile = { extension: 'md', path: 'Target.md' };
+  const getFirstLinkpathDest = jest.fn(() => linkedFile);
+  const openFile = jest.fn();
+
+  const openGlobalSearch = jest.fn();
+  const revealLeaf = jest.fn();
+  const setQuery = jest.fn();
+
+  const openExternalUrl = jest.fn();
+  const originalOpen = globalThis.open;
+
+  Object.defineProperty(globalThis, 'open', { configurable: true, value: openExternalUrl });
+
+  try {
+    const options = createRichDocumentEditorViewOptions(
+      {
+        internalPlugins: {
+          getPluginById: jest.fn(() => ({ instance: { openGlobalSearch } })),
+        },
+        metadataCache: { getFirstLinkpathDest },
+        vault: { adapter: {}, getAbstractFileByPath: jest.fn() },
+        workspace: {
+          getLeaf: jest.fn(() => ({ openFile })),
+          getLeavesOfType: jest.fn(() => [{ view: { setQuery } }]),
+          revealLeaf,
+        },
+      } as never,
+      { getMappingByMarkdownPath: jest.fn() } as never,
+      () => createReadyRuntimeState(),
+      () => ({
+        autosaveIntervalSeconds: 5,
+        conflictBehavior: 'manual',
+        editorMode: 'automatic',
+        libreOfficePath: '',
+        markdownSyncIntervalSeconds: 30,
+        pageLayout: 'pageless',
+        showMarkdownSourceFallback: true,
+      }),
+      () => 'desktop-odt'
+    );
+
+    options.navigateInternalLink?.('Target#Heading', 'Source.md');
+
+    options.navigateTag?.('#parent/child');
+
+    options.openExternalLink?.('https://example.com/');
+
+    expect(getFirstLinkpathDest).toHaveBeenCalledWith('Target', 'Source.md');
+
+    expect(openFile).toHaveBeenCalledWith(linkedFile);
+
+    expect(openGlobalSearch).toHaveBeenCalledWith('tag:parent/child');
+
+    expect(setQuery).toHaveBeenCalledWith('tag:parent/child');
+
+    expect(revealLeaf).toHaveBeenCalledWith({ view: { setQuery } });
+
+    expect(openExternalUrl).toHaveBeenCalledWith(
+      'https://example.com/',
+      '_blank',
+      'noopener,noreferrer'
+    );
+  } finally {
+    Object.defineProperty(globalThis, 'open', { configurable: true, value: originalOpen });
+  }
+});
+
+test('opens external urls through Electron shell when available', async () => {
+  const openExternal = jest.fn(async () => undefined);
+  const browserOpen = jest.fn();
+  const runtimeRequire = jest.fn(() => ({ shell: { openExternal } }));
+
+  await openExternalUrl(
+    'https://example.com/native',
+    runtimeRequire as unknown as NodeJS.Require,
+    browserOpen
+  );
+
+  expect(runtimeRequire).toHaveBeenCalledWith('electron');
+  expect(openExternal).toHaveBeenCalledWith('https://example.com/native');
+  expect(browserOpen).not.toHaveBeenCalled();
+});
+
+test('falls back to browser open when Electron shell is unavailable', async () => {
+  const browserOpen = jest.fn();
+  const runtimeRequire = jest.fn(() => {
+    throw new Error('electron unavailable');
+  });
+
+  await openExternalUrl(
+    'https://example.com/fallback',
+    runtimeRequire as unknown as NodeJS.Require,
+    browserOpen
+  );
+
+  expect(browserOpen).toHaveBeenCalledWith(
+    'https://example.com/fallback',
+    '_blank',
+    'noopener,noreferrer'
+  );
 });
 
 function createRuntime(): DesktopConversionRuntime {

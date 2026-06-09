@@ -22,5 +22,5 @@ export interface ObsidianLinkWarning {
   readonly linkText: string;
   readonly targetNote: string;
   readonly targetValue: string;
-  readonly type: 'missing-block-target' | 'missing-heading-target';
+  readonly type: 'missing-block-target' | 'missing-heading-target' | 'missing-note-target';
 }

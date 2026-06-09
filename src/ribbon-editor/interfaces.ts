@@ -1,5 +1,6 @@
 import type { AutosaveStatus } from '../autosave/interfaces';
 import type { ConflictResolutionChoice } from '../conflicts/interfaces';
+import type { EditorNavigationHandlers } from '../editor-navigation/interfaces';
 import type { OfficeRuntimeSetupState } from '../office-runtime/interfaces';
 import type {
   LibreNoteEditorActiveSource,
@@ -28,7 +29,7 @@ export interface RibbonTabDefinition {
   readonly label: string;
 }
 
-export interface RibbonEditorProps {
+export interface RibbonEditorProps extends EditorNavigationHandlers {
   readonly activeFilePath?: string | null;
   readonly activeEditorSource?: LibreNoteEditorActiveSource;
   readonly autosaveStatus?: AutosaveStatus;

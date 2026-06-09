@@ -3,6 +3,7 @@ import type { App as ObsidianApp, EventRef, TAbstractFile, TFile } from 'obsidia
 import type { AutosaveStatus } from './autosave/interfaces';
 import type { ConflictResolutionChoice } from './conflicts/interfaces';
 import type { OfficeRuntimeSetupState } from './office-runtime/interfaces';
+import type { EditorNavigationHandlers } from './editor-navigation/interfaces';
 import type { RichDocumentStore, RichDocumentVaultAdapter } from './rich-documents/interfaces';
 import type {
   LibreNoteEditorActiveSource,
@@ -10,7 +11,7 @@ import type {
   LibreNoteEditorPageLayout,
 } from './settings/interfaces';
 
-export interface AppProps {
+export interface AppProps extends EditorNavigationHandlers {
   readonly activeFilePath?: string | null;
   readonly activeEditorSource?: LibreNoteEditorActiveSource;
   readonly autosaveStatus?: AutosaveStatus;
