@@ -73,6 +73,27 @@ test('does not overwrite markdown when odt changes before mirror sync', async ()
   expect(updatedMapping.conflictState.status).toBe('conflicted');
 });
 
+test('does not overwrite externally changed markdown task state during mirror sync', async () => {
+  const { mapping, richDocumentStore, vault } = await createOdtTrackedFixture();
+
+  vault.files.set('Note.md', '- [x] External task state');
+
+  await expect(
+    syncMarkdownMirror({
+      htmlSource:
+        '<article><ul><li class="task-list-item" data-task=" "><input class="task-list-item-checkbox" type="checkbox">Local task state</li></ul></article>',
+      markdownPath: 'Note.md',
+      richDocumentStore,
+      vaultAdapter: vault.adapter,
+    })
+  ).rejects.toThrow('Libre Note Editor conflict detected.');
+
+  const updatedMapping = await richDocumentStore.getOrCreateMapping('Note.md');
+
+  expect(vault.files.get(mapping.markdownPath)).toBe('- [x] External task state');
+  expect(updatedMapping.conflictState.status).toBe('conflicted');
+});
+
 test('skips source writes after a markdown note has been archived and deleted', async () => {
   const { mapping, richDocumentStore, vault } = await createOdtTrackedFixture();
 

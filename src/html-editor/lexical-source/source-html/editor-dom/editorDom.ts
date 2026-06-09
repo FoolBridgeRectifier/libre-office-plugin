@@ -73,21 +73,41 @@ export function syncTaskCheckboxColorHooks(editorElement: HTMLElement): void {
     });
 }
 
-export function updateTaskCheckboxState(eventTarget: EventTarget | null): HTMLElement | null {
+export function updateTaskCheckboxState(
+  eventTarget: EventTarget | null,
+  nextCheckedState?: boolean
+): HTMLElement | null {
   if (!isTaskCheckboxTarget(eventTarget)) {
     return null;
   }
 
-  if (eventTarget.checked) {
+  if (isInsideProtectedContent(eventTarget)) {
+    eventTarget.checked = eventTarget.hasAttribute('checked');
+
+    return null;
+  }
+
+  const checkedState = nextCheckedState ?? eventTarget.checked;
+  eventTarget.checked = checkedState;
+
+  if (checkedState) {
     eventTarget.setAttribute('checked', '');
   } else {
     eventTarget.removeAttribute('checked');
   }
 
-  eventTarget.setAttribute('aria-checked', String(eventTarget.checked));
+  eventTarget.setAttribute('aria-checked', String(checkedState));
 
   const taskListItemElement = eventTarget.closest(TASK_LIST_ITEM_SELECTOR);
-  taskListItemElement?.setAttribute('data-task', eventTarget.checked ? 'x' : ' ');
+  taskListItemElement?.setAttribute('data-task', checkedState ? 'x' : ' ');
 
   return eventTarget.closest('[contenteditable="true"]');
+}
+
+export function toggleTaskCheckboxState(eventTarget: EventTarget | null): HTMLElement | null {
+  if (!isTaskCheckboxTarget(eventTarget)) {
+    return null;
+  }
+
+  return updateTaskCheckboxState(eventTarget, !eventTarget.checked);
 }

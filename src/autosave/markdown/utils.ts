@@ -45,6 +45,58 @@ export function getCodeFenceMarkdown(element: HTMLElement, preservedSource: stri
   return currentMarkdown;
 }
 
+function getListItemTaskPrefix(element: HTMLElement): string {
+  const checkboxElement = element.querySelector<HTMLInputElement>(
+    ':scope > input.task-list-item-checkbox'
+  );
+
+  const isTaskItem =
+    element.hasAttribute('data-task') ||
+    element.classList.contains('task-list-item') ||
+    checkboxElement !== null;
+
+  if (!isTaskItem) {
+    return '';
+  }
+
+  const checkedState = element.getAttribute('data-task') === 'x' || checkboxElement?.checked;
+
+  return checkedState ? '[x] ' : '[ ] ';
+}
+
+function getListItemInlineMarkdown(
+  element: HTMLElement,
+  readInlineMarkdown: (node: Node) => string
+): string {
+  return Array.from(element.childNodes)
+    .filter((childNode) => {
+      const isNestedList =
+        childNode instanceof HTMLElement && ['ol', 'ul'].includes(childNode.tagName.toLowerCase());
+
+      return !isNestedList;
+    })
+    .map(readInlineMarkdown)
+    .join('')
+    .trim();
+}
+
+function getNestedListMarkdown(
+  element: HTMLElement,
+  readInlineMarkdown: (node: Node) => string
+): string {
+  return Array.from(element.children)
+    .filter((childElement): childElement is HTMLElement => childElement instanceof HTMLElement)
+    .filter((childElement) => childElement.matches('ul,ol'))
+    .map((childElement) =>
+      getListMarkdown(childElement, childElement.tagName.toLowerCase() === 'ol', readInlineMarkdown)
+    )
+    .join('\n')
+    .split('\n')
+    .filter((line) => line.length > 0)
+    .map((line) => `  ${line}`)
+    .join('\n');
+}
+
 export function getListMarkdown(
   element: HTMLElement,
   isOrdered: boolean,
@@ -54,9 +106,13 @@ export function getListMarkdown(
     .filter((childElement): childElement is HTMLElement => childElement instanceof HTMLElement)
     .map((childElement, index) => {
       const marker = isOrdered ? `${index + 1}.` : '-';
-      const checkboxPrefix = childElement.matches('[data-task="x"]') ? '[x] ' : '';
+      const inlineMarkdown = getListItemInlineMarkdown(childElement, readInlineMarkdown);
+      const listItemMarkdown = `${marker} ${getListItemTaskPrefix(childElement)}${inlineMarkdown}`;
+      const nestedListMarkdown = getNestedListMarkdown(childElement, readInlineMarkdown);
 
-      return `${marker} ${checkboxPrefix}${readInlineMarkdown(childElement).trim()}`;
+      return nestedListMarkdown
+        ? `${listItemMarkdown.trimEnd()}\n${nestedListMarkdown}`
+        : listItemMarkdown.trimEnd();
     })
     .join('\n');
 }

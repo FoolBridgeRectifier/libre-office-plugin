@@ -125,8 +125,10 @@ test('preserves checked and unchecked task checkbox markup', () => {
   );
 
   const checkboxElements = document.querySelectorAll<HTMLInputElement>('.task-list-item-checkbox');
+  const taskListItemElements = document.querySelectorAll('.task-list-item');
 
   expect(checkboxElements).toHaveLength(2);
+  expect(taskListItemElements).toHaveLength(2);
   expect(checkboxElements[0]?.checked).toBe(false);
   expect(checkboxElements[1]?.checked).toBe(true);
 });
@@ -152,7 +154,7 @@ test('checkbox toggles update checked state and task metadata', () => {
     cancelable: true,
   });
 
-  expect(fireEvent(checkboxElement, mouseDownEvent)).toBe(true);
+  expect(fireEvent(checkboxElement, mouseDownEvent)).toBe(false);
 
   fireEvent.click(checkboxElement);
 
@@ -160,6 +162,101 @@ test('checkbox toggles update checked state and task metadata', () => {
   expect(checkboxElement).toHaveAttribute('checked', '');
   expect(checkboxElement.closest('li')).toHaveAttribute('data-task', 'x');
   expect(handleHtmlSourceChange).toHaveBeenLastCalledWith(expect.stringContaining('data-task="x"'));
+});
+
+test('keyboard activation toggles checkbox state and emits changed html', () => {
+  const handleHtmlSourceChange = jest.fn();
+
+  render(
+    <HtmlEditor
+      htmlSource='<article><ul><li class="task-list-item" data-task=" "><input class="task-list-item-checkbox" type="checkbox">Todo</li></ul></article>'
+      onHtmlSourceChange={handleHtmlSourceChange}
+    />
+  );
+
+  const checkboxElement = document.querySelector<HTMLInputElement>('.task-list-item-checkbox');
+
+  if (!checkboxElement) {
+    throw new Error('Expected rendered task checkbox.');
+  }
+
+  expect(fireEvent.keyDown(checkboxElement, { key: ' ' })).toBe(false);
+  expect(checkboxElement.checked).toBe(true);
+  expect(checkboxElement.closest('li')).toHaveAttribute('data-task', 'x');
+  expect(handleHtmlSourceChange).toHaveBeenLastCalledWith(expect.stringContaining('checked=""'));
+});
+
+test('multiple checkbox activations emit the latest task state before autosave', () => {
+  const handleHtmlSourceChange = jest.fn();
+
+  render(
+    <HtmlEditor
+      htmlSource='<article><ul><li class="task-list-item" data-task=" "><input class="task-list-item-checkbox" type="checkbox">Todo</li></ul></article>'
+      onHtmlSourceChange={handleHtmlSourceChange}
+    />
+  );
+
+  const checkboxElement = document.querySelector<HTMLInputElement>('.task-list-item-checkbox');
+
+  if (!checkboxElement) {
+    throw new Error('Expected rendered task checkbox.');
+  }
+
+  fireEvent.click(checkboxElement);
+  fireEvent.keyDown(checkboxElement, { key: 'Enter' });
+
+  expect(checkboxElement.checked).toBe(false);
+  expect(checkboxElement.closest('li')).toHaveAttribute('data-task', ' ');
+  expect(handleHtmlSourceChange).toHaveBeenLastCalledWith(expect.stringContaining('data-task=" "'));
+});
+
+test('undo and redo shortcuts do not corrupt a toggled task state', () => {
+  const handleHtmlSourceChange = jest.fn();
+
+  render(
+    <HtmlEditor
+      htmlSource='<article><ul><li class="task-list-item" data-task=" "><input class="task-list-item-checkbox" type="checkbox">Todo</li></ul></article>'
+      onHtmlSourceChange={handleHtmlSourceChange}
+    />
+  );
+
+  const editorElement = screen.getByRole('textbox', { name: 'Local HTML editor' });
+  const checkboxElement = document.querySelector<HTMLInputElement>('.task-list-item-checkbox');
+
+  if (!checkboxElement) {
+    throw new Error('Expected rendered task checkbox.');
+  }
+
+  fireEvent.click(checkboxElement);
+  fireEvent.keyDown(editorElement, { ctrlKey: true, key: 'z' });
+  fireEvent.keyDown(editorElement, { ctrlKey: true, key: 'y' });
+
+  expect(checkboxElement.checked).toBe(true);
+  expect(checkboxElement.closest('li')).toHaveAttribute('data-task', 'x');
+  expect(handleHtmlSourceChange).toHaveBeenLastCalledWith(expect.stringContaining('data-task="x"'));
+});
+
+test('checkboxes inside protected raw content do not toggle or emit changes', () => {
+  const handleHtmlSourceChange = jest.fn();
+
+  render(
+    <HtmlEditor
+      htmlSource='<article><pre data-libre-protected="raw-markdown"><input class="task-list-item-checkbox" type="checkbox">Protected</pre></article>'
+      onHtmlSourceChange={handleHtmlSourceChange}
+    />
+  );
+
+  const checkboxElement = document.querySelector<HTMLInputElement>('.task-list-item-checkbox');
+
+  if (!checkboxElement) {
+    throw new Error('Expected protected task checkbox.');
+  }
+
+  fireEvent.click(checkboxElement);
+  fireEvent.keyDown(checkboxElement, { key: ' ' });
+
+  expect(checkboxElement.checked).toBe(false);
+  expect(handleHtmlSourceChange).not.toHaveBeenCalled();
 });
 
 test('input edits emit from the edited dom position without a leading insertion', () => {
@@ -399,5 +496,14 @@ test('snapshots mixed markdown text constructs in the editor', () => {
   expect(screen.getByRole('textbox', { name: 'Local HTML editor' })).toHaveTextContent(
     'Quoted text'
   );
+  expect(container).toMatchSnapshot();
+});
+
+test('snapshots task list rendering with nested and mixed items', () => {
+  const { container } = render(
+    <HtmlEditor htmlSource='<article><ul><li class="task-list-item" data-task=" "><input class="task-list-item-checkbox" type="checkbox">Todo</li><li class="task-list-item" data-task="x"><input checked class="task-list-item-checkbox" type="checkbox">Done<ul><li class="task-list-item" data-task=" "><input class="task-list-item-checkbox" type="checkbox">Nested</li></ul></li><li>Plain item</li></ul></article>' />
+  );
+
+  expect(document.querySelectorAll('.task-list-item-checkbox')).toHaveLength(3);
   expect(container).toMatchSnapshot();
 });

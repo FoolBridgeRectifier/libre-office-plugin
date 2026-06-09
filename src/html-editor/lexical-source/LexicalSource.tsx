@@ -1,4 +1,4 @@
-import { useEffect, useRef, type FormEvent, type MouseEvent } from 'react';
+import { useEffect, useRef, type FormEvent } from 'react';
 
 import { HTML_EDITOR_CLASS_NAME } from '../constants';
 import { LEXICAL_SOURCE_ERROR_MESSAGE } from './constants';
@@ -8,8 +8,12 @@ import {
   prepareHtmlForEditor,
   readHtmlFromEditor,
   syncTaskCheckboxColorHooks,
-  updateTaskCheckboxState,
 } from './source-html';
+import {
+  handleTaskCheckboxClick,
+  handleTaskCheckboxKeyDown,
+  handleTaskCheckboxMouseDown,
+} from './task-list/taskList';
 import type { LexicalSourceProps } from './interfaces';
 
 export function LexicalSource({
@@ -93,23 +97,16 @@ export function LexicalSource({
     emitEditorChange(event.currentTarget);
   };
 
-  const handleEditorClick = (event: MouseEvent<HTMLDivElement>) => {
-    const editorElement = updateTaskCheckboxState(event.target);
-
-    if (editorElement) {
-      event.stopPropagation();
-      emitEditorChange(editorElement);
-    }
-  };
-
   return (
     <div
       aria-label="Local HTML editor"
       className={HTML_EDITOR_CLASS_NAME}
       contentEditable
       onBlur={onEditorBlur}
-      onClickCapture={handleEditorClick}
+      onClickCapture={(event) => handleTaskCheckboxClick(event, { emitEditorChange })}
       onInputCapture={handleEditorInput}
+      onKeyDownCapture={(event) => handleTaskCheckboxKeyDown(event, { emitEditorChange })}
+      onMouseDownCapture={handleTaskCheckboxMouseDown}
       ref={editorElementRef}
       role="textbox"
       suppressContentEditableWarning

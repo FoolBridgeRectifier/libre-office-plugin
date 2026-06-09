@@ -38,6 +38,59 @@ test('exports highlight and strikethrough marks to markdown mirror syntax', () =
   );
 });
 
+test('exports checked unchecked and mixed task list items', () => {
+  const htmlSource = [
+    '<article>',
+    '<ul>',
+    '<li class="task-list-item" data-task=" "><input class="task-list-item-checkbox" type="checkbox">Todo</li>',
+    '<li class="task-list-item" data-task="x"><input checked class="task-list-item-checkbox" type="checkbox">Done</li>',
+    '<li>Plain</li>',
+    '</ul>',
+    '</article>',
+  ].join('');
+
+  expect(convertHtmlToMarkdownMirror(htmlSource)).toBe(
+    ['- [ ] Todo', '- [x] Done', '- Plain'].join('\n')
+  );
+});
+
+test('exports nested task lists without flattening child text into the parent item', () => {
+  const htmlSource = [
+    '<article>',
+    '<ol>',
+    '<li class="task-list-item" data-task=" ">',
+    '<input class="task-list-item-checkbox" type="checkbox">Parent',
+    '<ul>',
+    '<li class="task-list-item" data-task="x"><input checked class="task-list-item-checkbox" type="checkbox">Nested done</li>',
+    '<li class="task-list-item" data-task=" "><input class="task-list-item-checkbox" type="checkbox"></li>',
+    '</ul>',
+    '</li>',
+    '</ol>',
+    '</article>',
+  ].join('');
+
+  expect(convertHtmlToMarkdownMirror(htmlSource)).toBe(
+    ['1. [ ] Parent', '  - [x] Nested done', '  - [ ]'].join('\n')
+  );
+});
+
+test('exports task items containing Obsidian links tags and inline code', () => {
+  const htmlSource = [
+    '<article>',
+    '<ul>',
+    '<li class="task-list-item" data-task="x">',
+    '<input checked class="task-list-item-checkbox" type="checkbox">',
+    '<a data-libre-obsidian-link-source="[[Note|Link task]]">Link task</a> ',
+    '<a class="tag" href="#task/tag">#task/tag</a> ',
+    '<code>code</code>',
+    '</li>',
+    '</ul>',
+    '</article>',
+  ].join('');
+
+  expect(convertHtmlToMarkdownMirror(htmlSource)).toBe('- [x] [[Note|Link task]] #task/tag `code`');
+});
+
 test('preserves frontmatter above generated markdown body', () => {
   const markdownSource = '---\ntitle: Alpha\ntags: [demo]\n---\n\nOld body';
   const htmlSource = '<article><p>New body</p></article>';
@@ -245,4 +298,26 @@ test('stress exports repeated mixed markdown text constructs without dropping bl
 
   expect(markdownMirrorSource.match(/```ts/g)).toHaveLength(75);
   expect(markdownMirrorSource).toContain('| Row 74 | A\\|B |');
+});
+
+test('stress exports repeated nested task lists with stable checkbox states', () => {
+  const repeatedTaskLists = Array.from({ length: 80 }, (_unusedValue, sectionIndex) =>
+    [
+      '<ul>',
+      `<li class="task-list-item" data-task=" "><input class="task-list-item-checkbox" type="checkbox">Todo ${sectionIndex}</li>`,
+      `<li class="task-list-item" data-task="x"><input checked class="task-list-item-checkbox" type="checkbox">Done ${sectionIndex}<ul>`,
+      `<li class="task-list-item" data-task=" "><input class="task-list-item-checkbox" type="checkbox">Nested ${sectionIndex}</li>`,
+      '</ul></li>',
+      '</ul>',
+    ].join('')
+  ).join('');
+
+  const markdownMirrorSource = convertHtmlToMarkdownMirror(
+    `<article>${repeatedTaskLists}</article>`
+  );
+
+  expect(markdownMirrorSource.match(/^- \[ \] Todo /gm)).toHaveLength(80);
+  expect(markdownMirrorSource.match(/^- \[x\] Done /gm)).toHaveLength(80);
+  expect(markdownMirrorSource.match(/^ {2}- \[ \] Nested /gm)).toHaveLength(80);
+  expect(markdownMirrorSource).toContain('- [x] Done 79\n  - [ ] Nested 79');
 });
