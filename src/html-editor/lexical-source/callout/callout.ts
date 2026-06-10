@@ -25,6 +25,10 @@ import type {
   CalloutFoldMouseEvent,
 } from './interfaces';
 
+function getEditorHookDocument(editorRoot: ParentNode): Document {
+  return editorRoot instanceof Document ? editorRoot : (editorRoot as Node).ownerDocument!;
+}
+
 function ensureFoldControl(htmlDocument: Document, calloutElement: HTMLElement): void {
   if (!calloutElement.hasAttribute('data-callout-fold')) {
     return;
@@ -54,12 +58,14 @@ function ensureFoldControl(htmlDocument: Document, calloutElement: HTMLElement):
   syncFoldControlState(calloutElement, foldControlElement);
 }
 
-export function applyCalloutEditorHooks(htmlDocument: Document): void {
-  htmlDocument.querySelectorAll<HTMLElement>('.callout .callout-title').forEach((titleElement) => {
+export function applyCalloutEditorHooks(editorRoot: ParentNode): void {
+  const htmlDocument = getEditorHookDocument(editorRoot);
+
+  editorRoot.querySelectorAll<HTMLElement>('.callout .callout-title').forEach((titleElement) => {
     titleElement.setAttribute(EDITOR_CALLOUT_ICON_ATTRIBUTE, 'true');
   });
 
-  htmlDocument
+  editorRoot
     .querySelectorAll<HTMLElement>(CALLOUT_SELECTOR)
     .forEach((calloutElement) => ensureFoldControl(htmlDocument, calloutElement));
 }

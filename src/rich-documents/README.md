@@ -4,12 +4,12 @@
 
 `rich-documents` stores the relationship between a Markdown note and its hidden rich sources.
 
-Each mapping keeps a stable rich-document id, Markdown path, HTML path, ODT path, active source, platform/source timestamps, source snapshots, conflict state, and lifecycle state. Paths are rooted under `.libre-note-editor/documents/` and are generated from the stable rich id rather than the note filename.
+Each mapping keeps a stable rich-document id, Markdown path, HTML path, source snapshots, sync timestamps, conflict state, and lifecycle state. Paths are rooted under `.libre-note-editor/documents/` and are generated from the stable rich id rather than the note filename.
 
 ## Main Components
 
 - `richDocuments.ts` implements `createRichDocumentStore`, an exclusive-operation mapping store backed by Obsidian plugin data and sidecar files.
-- `interfaces.ts` defines mappings, file paths, plugin data, store contracts, source states, sync timestamps, vault adapter shape, active source values, conflict state, and lifecycle values.
+- `interfaces.ts` defines mappings, file paths, plugin data, store contracts, source states, sync timestamps, vault adapter shape, conflict state, and lifecycle values.
 - `constants.ts` defines plugin data version, rich id prefix, hidden document root, rich source filenames, mapping sidecar filename, and archive folder name.
 - `mapping/mapping.ts` creates active and archived mapping records plus stable rich-document ids.
 - `paths/paths.ts` sanitizes ids, creates rich-document paths, builds archive file paths, and verifies paths stay inside the hidden root.
@@ -21,4 +21,4 @@ Each mapping keeps a stable rich-document id, Markdown path, HTML path, ODT path
 
 ## How It Is Used
 
-`main.ts` creates one store on plugin load. `richDocumentWorkspace`, `markdown-sync`, `source-write`, `conversion`, and `conflicts` use the store to create mappings, update active sources, persist sync state, archive deleted notes, and recover from missing plugin data.
+`main.ts` creates one store on plugin load. `richDocumentWorkspace`, `markdown-sync`, `source-write`, and `conflicts` use the store to create mappings, persist sync state, archive deleted notes, and recover from missing plugin data.

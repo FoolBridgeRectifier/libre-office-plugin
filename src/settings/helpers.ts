@@ -4,16 +4,12 @@ import {
   MIN_INTERVAL_SECONDS,
 } from './constants';
 import type { Workspace } from 'obsidian';
-import type { OfficeRuntimeSetupState } from '../office-runtime/interfaces';
 import type {
   IntervalValidationResult,
-  LibreNoteEditorActiveSource,
   LibreNoteEditorConflictBehavior,
-  LibreNoteEditorMode,
   LibreNoteEditorPageLayout,
   LibreNoteEditorSettings,
   LibreNoteEditorSettingsPersistenceTarget,
-  LibreNoteEditorSourceEnvironment,
 } from './interfaces';
 
 export async function loadLibreNoteEditorSettings(
@@ -31,8 +27,6 @@ export function mergeLibreNoteEditorSettings(data: unknown): LibreNoteEditorSett
       DEFAULT_LIBRE_NOTE_EDITOR_SETTINGS.autosaveIntervalSeconds
     ),
     conflictBehavior: getConflictBehavior(storedSettings.conflictBehavior),
-    editorMode: getEditorMode(storedSettings.editorMode),
-    libreOfficePath: getString(storedSettings.libreOfficePath) ?? '',
     markdownSyncIntervalSeconds: getValidInterval(
       storedSettings.markdownSyncIntervalSeconds,
       DEFAULT_LIBRE_NOTE_EDITOR_SETTINGS.markdownSyncIntervalSeconds
@@ -43,28 +37,6 @@ export function mergeLibreNoteEditorSettings(data: unknown): LibreNoteEditorSett
         ? storedSettings.showMarkdownSourceFallback
         : DEFAULT_LIBRE_NOTE_EDITOR_SETTINGS.showMarkdownSourceFallback,
   };
-}
-
-export function resolveActiveEditorSource(
-  settings: LibreNoteEditorSettings,
-  environment: LibreNoteEditorSourceEnvironment
-): LibreNoteEditorActiveSource {
-  if (settings.editorMode === 'html-fallback' || environment.platform === 'mobile') {
-    return 'html-fallback';
-  }
-
-  return environment.isRuntimeReady ? 'desktop-odt' : 'html-fallback';
-}
-
-export function getLibreNoteEditorActiveSource(
-  settings: LibreNoteEditorSettings,
-  officeRuntimeSetupState: OfficeRuntimeSetupState,
-  isMobile: boolean
-): LibreNoteEditorActiveSource {
-  return resolveActiveEditorSource(settings, {
-    isRuntimeReady: officeRuntimeSetupState.status === 'ready',
-    platform: isMobile ? 'mobile' : 'desktop',
-  });
 }
 
 export function refreshOpenLibreNoteEditorViews(workspace: Workspace): void {
@@ -113,12 +85,6 @@ function getConflictBehavior(value: unknown): LibreNoteEditorConflictBehavior {
     : DEFAULT_LIBRE_NOTE_EDITOR_SETTINGS.conflictBehavior;
 }
 
-function getEditorMode(value: unknown): LibreNoteEditorMode {
-  return value === 'desktop-odt' || value === 'html-fallback' || value === 'automatic'
-    ? value
-    : DEFAULT_LIBRE_NOTE_EDITOR_SETTINGS.editorMode;
-}
-
 function getPageLayout(value: unknown): LibreNoteEditorPageLayout {
   return value === 'page-width' || value === 'pageless'
     ? value
@@ -130,10 +96,6 @@ function getStoredSettings(data: unknown): Partial<LibreNoteEditorSettings> {
   const nestedSettings = isRecord(dataRecord.settings) ? dataRecord.settings : dataRecord;
 
   return nestedSettings as Partial<LibreNoteEditorSettings>;
-}
-
-function getString(value: unknown): string | null {
-  return typeof value === 'string' ? value.trim() : null;
 }
 
 function getValidInterval(value: unknown, fallback: number): number {

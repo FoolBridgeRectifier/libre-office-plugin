@@ -40,7 +40,7 @@ export function hasIndependentMarkdownAndHtmlChanges(
   return markdownChanged && options.htmlSource !== options.previousHtmlSource;
 }
 
-export function hasRichSourceChange(sourceChanges: ReadonlyArray<SourceStateChange>): boolean {
+export function hasHtmlSourceChange(sourceChanges: ReadonlyArray<SourceStateChange>): boolean {
   return sourceChanges.some((sourceChange) => sourceChange.source !== 'markdown');
 }
 

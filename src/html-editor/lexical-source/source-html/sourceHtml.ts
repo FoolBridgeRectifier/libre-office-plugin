@@ -7,7 +7,7 @@ import {
   REMOTE_LOADING_ELEMENT_SELECTOR,
 } from '../../constants';
 import { wrapTableForHorizontalScroll } from '../../../attachments/tables/structure/structure';
-import { sanitizeHtmlFragmentSourceWithReport } from '../../../conversion';
+import { sanitizeHtmlFragmentSourceWithReport } from '../../../html-sanitizer';
 import { applyCalloutEditorHooks, removeCalloutEditorHooks } from '../callout/callout';
 import {
   applyHeadingCollapseEditorHooks,

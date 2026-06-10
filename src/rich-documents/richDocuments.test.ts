@@ -44,7 +44,6 @@ test('archives existing rich files when a markdown note is deleted', async () =>
   const { store, vault } = createStore();
   const mapping = await store.getOrCreateMapping('Delete Me.md');
   vault.files.set(mapping.htmlPath, '<p>draft</p>');
-  vault.files.set(mapping.odtPath, 'odt-bytes');
 
   const archivedMapping = await store.archiveMapping('Delete Me.md');
   const deleteMappingResult = await store.deleteMapping('Already Deleted.md');
@@ -57,7 +56,7 @@ test('archives existing rich files when a markdown note is deleted', async () =>
   );
 
   expect(deleteMappingResult).toBe(null);
-  expect(vault.renameCalls).toHaveLength(2);
+  expect(vault.renameCalls).toHaveLength(1);
 });
 
 test('recovers missing plugin data from rich document mapping sidecars', async () => {
@@ -148,6 +147,40 @@ test('drops unsafe persisted conflict copy paths during plugin data normalizatio
     expect(mapping.conflictState.conflictCopies[0]?.path).toBe(
       `${RICH_DOCUMENTS_ROOT_PATH}/rich-safe/conflicts/copy.html`
     );
+  }
+});
+
+test('normalizes legacy odt conflict copies to rich html during plugin data loading', async () => {
+  const legacyPluginData = {
+    mappings: [
+      {
+        conflictState: {
+          changedSources: ['html', 'odt'],
+          conflictCopies: [
+            {
+              createdAt: '2026-06-06T12:00:00.000Z',
+              path: `${RICH_DOCUMENTS_ROOT_PATH}/rich-safe/conflicts/legacy.odt`,
+              source: 'odt',
+            },
+          ],
+          detectedAt: '2026-06-06T12:00:00.000Z',
+          reason: 'multi-source-change',
+          status: 'conflicted',
+        },
+        markdownPath: 'Legacy Conflict.md',
+        richDocumentId: 'rich-safe',
+      },
+    ],
+  };
+
+  const { store } = createStore(legacyPluginData);
+  const mapping = (await store.loadMappings())[0];
+
+  expect(mapping?.conflictState.status).toBe('conflicted');
+
+  if (mapping?.conflictState.status === 'conflicted') {
+    expect(mapping.conflictState.changedSources).toEqual(['html']);
+    expect(mapping.conflictState.conflictCopies[0]?.source).toBe('html');
   }
 });
 

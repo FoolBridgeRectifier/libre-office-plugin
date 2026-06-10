@@ -29,7 +29,7 @@ function normalizeChangedSources(value: unknown): RichDocumentSourceKind[] {
   }
 
   return value.filter((sourceKind): sourceKind is RichDocumentSourceKind =>
-    ['html', 'markdown', 'odt'].includes(String(sourceKind))
+    ['html', 'markdown'].includes(String(sourceKind))
   );
 }
 
@@ -51,14 +51,16 @@ function normalizeConflictCopies(value: unknown): RichDocumentConflictCopy[] {
       {
         createdAt: typeof copyValue.createdAt === 'string' ? copyValue.createdAt : '',
         path: copyValue.path,
-        source: getLiteral(
-          copyValue.source,
-          ['desktop', 'html', 'markdown', 'mobile', 'odt'],
-          'html'
-        ),
+        source: getConflictCopySource(copyValue.source),
       },
     ];
   });
+}
+
+function getConflictCopySource(value: unknown): RichDocumentConflictCopy['source'] {
+  return value === 'desktop' || value === 'mobile' || value === 'odt'
+    ? 'html'
+    : getLiteral(value, ['html', 'markdown'], 'html');
 }
 
 function getLiteral<TValue extends string>(

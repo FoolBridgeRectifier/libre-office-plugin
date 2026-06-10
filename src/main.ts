@@ -1,4 +1,4 @@
-import { Platform, Plugin, type TFile, type WorkspaceLeaf } from 'obsidian';
+import { Plugin, type TFile, type WorkspaceLeaf } from 'obsidian';
 
 import { EditorView } from './editor-view/EditorView';
 import {
@@ -14,33 +14,26 @@ import {
 import { registerEditorViewLinkWarningRefresh } from './editor-view/link-warnings/linkWarnings';
 import { createRichDocumentEditorViewOptions } from './editor-view/options/options';
 import { flushOpenLibreEditors, registerRichDocumentMappingEvents } from './richDocumentWorkspace';
-import { registerOpenDesktopOdtCommand } from './desktop-odt-command/desktopOdtCommand';
 import { registerNativeMarkdownFallbackCommand } from './native-markdown-command/nativeMarkdownCommand';
 import { loadRichDocumentHtmlForStore } from './rich-html/richHtml';
-import { createSkippedMobileRuntimeSetupState } from './office-runtime/setup-state/setupState';
-import type { OfficeRuntimeSetupState } from './office-runtime/interfaces';
 import { createRichDocumentStore } from './rich-documents/richDocuments';
 import type { RichDocumentStore } from './rich-documents/interfaces';
 import { DEFAULT_LIBRE_NOTE_EDITOR_SETTINGS } from './settings/constants';
 import { LibreNoteEditorSettingsTab } from './settings/Settings';
 import {
-  getLibreNoteEditorActiveSource,
   loadLibreNoteEditorSettings,
   refreshOpenLibreNoteEditorViews,
   saveLibreNoteEditorSettings,
 } from './settings';
-import { detectLibreNoteEditorOfficeRuntime } from './settings/runtime/runtime';
 import type { LibreNoteEditorSettings } from './settings/interfaces';
 import '../styles.css';
 export default class LibreNoteEditorPlugin extends Plugin {
   private nativeFallbackLeaves = new WeakSet<WorkspaceLeaf>();
-  private officeRuntimeSetupState: OfficeRuntimeSetupState = createSkippedMobileRuntimeSetupState();
   private richDocumentStore: RichDocumentStore | null = null;
   settings: LibreNoteEditorSettings = DEFAULT_LIBRE_NOTE_EDITOR_SETTINGS;
 
   async onload(): Promise<void> {
     this.settings = await loadLibreNoteEditorSettings(this);
-    this.officeRuntimeSetupState = await detectLibreNoteEditorOfficeRuntime(this);
 
     this.addSettingTab(new LibreNoteEditorSettingsTab(this));
 
@@ -58,30 +51,13 @@ export default class LibreNoteEditorPlugin extends Plugin {
       (workspaceLeaf) =>
         new EditorView(
           workspaceLeaf,
-          createRichDocumentEditorViewOptions(
-            this.app,
-            richDocumentStore,
-            () => this.officeRuntimeSetupState,
-            () => this.settings,
-            () =>
-              getLibreNoteEditorActiveSource(
-                this.settings,
-                this.officeRuntimeSetupState,
-                Platform.isMobile
-              )
-          )
+          createRichDocumentEditorViewOptions(this.app, richDocumentStore, () => this.settings)
         )
     );
 
     registerNativeMarkdownFallbackCommand({
       getIsFallbackVisible: () => this.settings.showMarkdownSourceFallback,
       nativeFallbackLeaves: this.nativeFallbackLeaves,
-      target: this,
-    });
-
-    registerOpenDesktopOdtCommand({
-      getOfficeRuntimeSetupState: () => this.officeRuntimeSetupState,
-      getRichDocumentStore: () => this.richDocumentStore,
       target: this,
     });
 

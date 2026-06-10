@@ -6,8 +6,6 @@ export const MIN_INTERVAL_SECONDS = 1;
 export const DEFAULT_LIBRE_NOTE_EDITOR_SETTINGS = {
   autosaveIntervalSeconds: DEFAULT_AUTOSAVE_INTERVAL_SECONDS,
   conflictBehavior: 'manual',
-  editorMode: 'automatic',
-  libreOfficePath: '',
   markdownSyncIntervalSeconds: DEFAULT_MARKDOWN_SYNC_INTERVAL_SECONDS,
   pageLayout: 'pageless',
   showMarkdownSourceFallback: true,
@@ -17,12 +15,6 @@ export const CONFLICT_BEHAVIOR_OPTIONS = [
   { label: 'Manual resolution', value: 'manual' },
   { label: 'Keep rich HTML', value: 'keep-html' },
   { label: 'Keep markdown mirror', value: 'keep-markdown' },
-] as const;
-
-export const EDITOR_MODE_OPTIONS = [
-  { label: 'Automatic', value: 'automatic' },
-  { label: 'Desktop ODT', value: 'desktop-odt' },
-  { label: 'HTML fallback', value: 'html-fallback' },
 ] as const;
 
 export const PAGE_LAYOUT_OPTIONS = [

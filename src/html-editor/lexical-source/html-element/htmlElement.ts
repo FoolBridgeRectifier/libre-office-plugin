@@ -106,7 +106,7 @@ export class HtmlElementNode extends ElementNode {
   }
 
   canBeEmpty(): boolean {
-    return true;
+    return this.__tagName !== 'svg';
   }
 }
 

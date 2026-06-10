@@ -1,6 +1,6 @@
 import { HTML_FALLBACK_ACTIVE_SOURCE } from './constants';
 import { createSourceStates } from '../conflicts';
-import { sanitizeConvertedHtmlSourceWithReport } from '../conversion';
+import { sanitizeConvertedHtmlSourceWithReport } from '../html-sanitizer';
 import { convertMarkdownToHtmlWithObsidianRenderer } from '.';
 import { ensureVaultFolder } from '../rich-documents/vault/vault';
 import { createRichDocumentFilePaths } from '../rich-documents/paths/paths';

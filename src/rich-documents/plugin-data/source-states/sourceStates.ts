@@ -6,7 +6,6 @@ export function normalizeSourceStates(value: unknown): RichDocumentSourceStates 
   return {
     html: normalizeSourceState(sourceStatesRecord.html),
     markdown: normalizeSourceState(sourceStatesRecord.markdown),
-    odt: normalizeSourceState(sourceStatesRecord.odt),
   };
 }
 

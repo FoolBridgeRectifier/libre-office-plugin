@@ -41,44 +41,6 @@ test('shows future insert commands as disabled controls', () => {
   ).toBeDisabled();
 });
 
-test('shows dirty autosave status from the editor view', () => {
-  render(
-    <RibbonEditor
-      activeFilePath="Dirty.md"
-      autosaveStatus="dirty"
-      importedHtmlSource="<article><p>Original body</p></article>"
-    />
-  );
-
-  expect(screen.getByLabelText('HTML source status')).toHaveTextContent('Unsaved HTML changes');
-});
-
-test.each([
-  ['saved', 'HTML source saved'],
-  ['saving', 'Saving HTML'],
-  ['syncing-markdown', 'Syncing markdown'],
-  ['conflicted', 'Conflict detected'],
-  ['error', 'Autosave error'],
-] as const)('shows %s status label', (autosaveStatus, expectedLabel) => {
-  render(<RibbonEditor autosaveStatus={autosaveStatus} />);
-
-  expect(screen.getByLabelText('HTML source status')).toHaveTextContent(expectedLabel);
-});
-
-test('shows active source, mode, and layout status labels', () => {
-  render(
-    <RibbonEditor
-      activeEditorSource="desktop-odt"
-      editorMode="desktop-odt"
-      pageLayout="page-width"
-    />
-  );
-
-  expect(screen.getByLabelText('Active editor source')).toHaveTextContent('Desktop ODT source');
-  expect(screen.getByLabelText('Editor mode')).toHaveTextContent('Desktop ODT mode');
-  expect(screen.getByLabelText('Editor layout')).toHaveTextContent('Page width layout');
-});
-
 test('applies page-width chrome only at desktop breakpoints', () => {
   render(
     <RibbonEditor
@@ -89,41 +51,6 @@ test('applies page-width chrome only at desktop breakpoints', () => {
 
   expect(screen.getByLabelText('Editor surface')).toHaveClass('p-0');
   expect(screen.getByLabelText('Editor surface')).toHaveClass('libre-page-width');
-});
-
-test('shows only the top corner ODT loader while desktop source work is running', () => {
-  render(
-    <RibbonEditor
-      activeFilePath="Loaded.md"
-      desktopSourceStatus="loading"
-      importedHtmlSource={null}
-    />
-  );
-
-  const spinnerElement = screen.getByLabelText('ODT source loading').querySelector('[aria-hidden]');
-
-  if (!spinnerElement) {
-    throw new Error('Expected loading status to include a visible spinner indicator.');
-  }
-
-  expect(screen.getByLabelText('ODT source loading')).toHaveTextContent('ODT');
-  expect(spinnerElement).toHaveClass('motion-reduce:animate-none');
-  expect(screen.getByLabelText('HTML source status')).toHaveTextContent('HTML source saved');
-  expect(screen.queryByText('No rich HTML source loaded.')).toBeNull();
-});
-
-test('shows a top corner ODT error when desktop source conversion fails', () => {
-  render(
-    <RibbonEditor
-      activeFilePath="Loaded.md"
-      autosaveStatus="error"
-      desktopSourceStatus="error"
-      importedHtmlSource="<article><p>Previous body</p></article>"
-    />
-  );
-
-  expect(screen.getByLabelText('ODT source error')).toHaveTextContent('ODT error');
-  expect(screen.getByLabelText('HTML source status')).toHaveTextContent('Autosave error');
 });
 
 test('shows conflict recovery choices when a resolver is available', () => {
@@ -137,10 +64,10 @@ test('shows conflict recovery choices when a resolver is available', () => {
     />
   );
 
-  fireEvent.click(screen.getByRole('button', { name: 'Mobile' }));
+  fireEvent.click(screen.getByRole('button', { name: 'Rich HTML' }));
 
   expect(screen.getByLabelText('Conflict recovery')).toBeInTheDocument();
-  expect(handleResolveConflict).toHaveBeenCalledWith('mobile');
+  expect(handleResolveConflict).toHaveBeenCalledWith('html');
 });
 
 test('shows unresolved Obsidian link warning count', () => {

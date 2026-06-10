@@ -18,13 +18,7 @@ exports[`shows conflict recovery choices and emits selected choice 1`] = `
         class="rounded-ribbon-sm border px-3 py-1.5 font-sans text-[11px] transition-colors duration-150 ease-ribbon-fast motion-reduce:transition-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-button-focus-ring border-button-hover-border text-text-primary hover:bg-button-hover-bg"
         type="button"
       >
-        Desktop
-      </button>
-      <button
-        class="rounded-ribbon-sm border px-3 py-1.5 font-sans text-[11px] transition-colors duration-150 ease-ribbon-fast motion-reduce:transition-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-button-focus-ring border-button-hover-border text-text-primary hover:bg-button-hover-bg"
-        type="button"
-      >
-        Mobile
+        Rich HTML
       </button>
       <button
         class="rounded-ribbon-sm border px-3 py-1.5 font-sans text-[11px] transition-colors duration-150 ease-ribbon-fast motion-reduce:transition-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-button-focus-ring border-button-hover-border text-text-primary hover:bg-button-hover-bg"

@@ -280,13 +280,20 @@ test('input edits emit from the edited dom position without a leading insertion'
   );
 });
 
-test('controlled html source updates do not reload self-emitted editor input', () => {
+test('controlled html source updates emit the edited dom position without a leading insertion', () => {
+  const emittedHtmlSources: string[] = [];
+
   function ControlledEditor() {
     const [htmlSource, setHtmlSource] = useState(
       '<article><p>First paragraph</p><p>Last paragraph</p></article>'
     );
 
-    return <HtmlEditor htmlSource={htmlSource} onHtmlSourceChange={setHtmlSource} />;
+    const handleHtmlSourceChange = (nextHtmlSource: string) => {
+      emittedHtmlSources.push(nextHtmlSource);
+      setHtmlSource(nextHtmlSource);
+    };
+
+    return <HtmlEditor htmlSource={htmlSource} onHtmlSourceChange={handleHtmlSourceChange} />;
   }
 
   render(<ControlledEditor />);
@@ -297,8 +304,28 @@ test('controlled html source updates do not reload self-emitted editor input', (
   lastParagraphElement.textContent = 'Last paragraph typed';
   fireEvent.input(editorElement);
 
-  expect(screen.getByText('Last paragraph typed')).toBeVisible();
+  expect(emittedHtmlSources).toContain(
+    '<article><p>First paragraph</p><p>Last paragraph typed</p></article>'
+  );
   expect(editorElement.textContent?.startsWith('typed')).toBe(false);
+});
+
+test('user input emits sanitized html source', () => {
+  const handleHtmlSourceChange = jest.fn();
+
+  render(
+    <HtmlEditor
+      htmlSource="<article><p>Original</p></article>"
+      onHtmlSourceChange={handleHtmlSourceChange}
+    />
+  );
+
+  const editorElement = screen.getByRole('textbox', { name: 'Local HTML editor' });
+
+  editorElement.innerHTML = '<article><p onclick="bad()">Clean</p><script>bad()</script></article>';
+  fireEvent.input(editorElement);
+
+  expect(handleHtmlSourceChange).toHaveBeenLastCalledWith('<article><p>Clean</p></article>');
 });
 
 test('checkbox color follows changed task text color while defaulting through css', () => {
@@ -606,12 +633,14 @@ test('heading collapse hides content until the next same-or-higher heading', () 
 
   fireEvent.click(collapseButtons[0] as HTMLButtonElement);
 
-  expect(screen.getByText('Top body')).toHaveClass('libre-heading-collapse-hidden');
-  expect(screen.getByText('Nested')).toHaveClass('libre-heading-collapse-hidden');
-  expect(screen.getByText('Nested body')).toHaveClass('libre-heading-collapse-hidden');
+  expect(screen.getByText('Top body').closest('p')).toHaveClass('libre-heading-collapse-hidden');
+  expect(screen.getByText('Nested').closest('h2')).toHaveClass('libre-heading-collapse-hidden');
+  expect(screen.getByText('Nested body').closest('p')).toHaveClass('libre-heading-collapse-hidden');
 
-  expect(screen.getByText('Next')).not.toHaveClass('libre-heading-collapse-hidden');
-  expect(screen.getByText('Next body')).not.toHaveClass('libre-heading-collapse-hidden');
+  expect(screen.getByText('Next').closest('h1')).not.toHaveClass('libre-heading-collapse-hidden');
+  expect(screen.getByText('Next body').closest('p')).not.toHaveClass(
+    'libre-heading-collapse-hidden'
+  );
 });
 
 test('heading collapse follows Obsidian rendered block wrappers', () => {
@@ -652,7 +681,9 @@ test('heading collapse controls are keyboard accessible', () => {
   fireEvent.keyDown(collapseButton, { key: 'Enter' });
 
   expect(collapseButton).toHaveAttribute('aria-expanded', 'false');
-  expect(screen.getByText('Keyboard body')).toHaveClass('libre-heading-collapse-hidden');
+  expect(screen.getByText('Keyboard body').closest('p')).toHaveClass(
+    'libre-heading-collapse-hidden'
+  );
 });
 
 test('navigation and heading collapse interactions do not emit source changes', () => {
@@ -767,6 +798,20 @@ test('resets dirty state when changed html source is loaded', () => {
   expect(handleDirtyStateChange).toHaveBeenLastCalledWith(false);
 });
 
+test('initial html load does not mark the editor dirty', () => {
+  const handleDirtyStateChange = jest.fn();
+
+  render(
+    <HtmlEditor
+      htmlSource="<article><p>Original</p></article>"
+      onDirtyStateChange={handleDirtyStateChange}
+    />
+  );
+
+  expect(handleDirtyStateChange).toHaveBeenCalledWith(false);
+  expect(handleDirtyStateChange).not.toHaveBeenCalledWith(true);
+});
+
 test('emits editor blur for immediate autosave', () => {
   const handleEditorBlur = jest.fn();
 
@@ -833,6 +878,25 @@ test('allows delete input events inside protected raw blocks', () => {
   });
 
   expect(fireEvent(protectedElement, deleteEvent)).toBe(true);
+});
+
+test('protected raw blocks can be removed and emit sanitized html', () => {
+  const handleHtmlSourceChange = jest.fn();
+
+  render(
+    <HtmlEditor
+      htmlSource='<article><pre data-libre-protected="raw-markdown"># Raw</pre></article>'
+      onHtmlSourceChange={handleHtmlSourceChange}
+    />
+  );
+
+  const editorElement = screen.getByRole('textbox', { name: 'Local HTML editor' });
+  const protectedElement = screen.getByText('# Raw');
+
+  protectedElement.remove();
+  fireEvent.input(editorElement);
+
+  expect(handleHtmlSourceChange).toHaveBeenLastCalledWith('<article><br></article>');
 });
 
 test('keeps protected code fences and complex tables editable', () => {

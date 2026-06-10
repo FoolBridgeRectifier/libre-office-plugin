@@ -16,10 +16,15 @@ export interface HtmlSourcePluginProps {
   readonly initialHtmlSourceRef: MutableRefObject<string>;
   readonly isApplyingHtmlSourceRef: MutableRefObject<boolean>;
   readonly loadedHtmlSourceRef: MutableRefObject<string | null>;
+  readonly emitEditorChange: EmitLexicalSourceChange;
   readonly onDirtyStateChange?: (isDirty: boolean) => void;
   readonly onHtmlSourceChange?: (htmlSource: string) => void;
   readonly onInitializationError?: (message: string) => void;
   readonly onSecurityWarningChange?: (warningText: string | null) => void;
+}
+
+export interface ProtectedContentGuardPluginProps {
+  readonly isApplyingHtmlSourceRef: MutableRefObject<boolean>;
 }
 
 export type EmitLexicalSourceChange = (editorElement: HTMLElement) => void;

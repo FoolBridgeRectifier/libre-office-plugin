@@ -16,10 +16,12 @@ test('renders settings UI with persisted defaults', () => {
   settingsTab.display();
   document.body.appendChild(settingsTab.containerEl);
 
-  expect(screen.getByLabelText('LibreOffice path')).toHaveValue('');
   expect(screen.getByLabelText('Autosave interval')).toHaveValue('5');
   expect(screen.getByLabelText('Markdown sync interval')).toHaveValue('30');
-  expect(screen.getByLabelText('Editor mode')).toHaveValue('automatic');
+  expect(screen.getByLabelText('Editor layout')).toHaveValue('pageless');
+
+  expect(screen.queryByLabelText('LibreOffice path')).toBeNull();
+  expect(screen.queryByLabelText('Editor mode')).toBeNull();
 
   expect(settingsTab.containerEl).toMatchSnapshot();
 });
@@ -38,19 +40,19 @@ test('does not save invalid interval settings', async () => {
   expect(settingsTab.containerEl).toHaveTextContent('Use a value from 1 to 3600 seconds.');
 });
 
-test('persists valid editor mode changes', async () => {
+test('persists valid editor layout changes', async () => {
   const plugin = createSettingsPlugin();
   const settingsTab = new LibreNoteEditorSettingsTab(plugin);
 
   settingsTab.display();
   document.body.appendChild(settingsTab.containerEl);
 
-  fireEvent.change(screen.getByLabelText('Editor mode'), { target: { value: 'html-fallback' } });
+  fireEvent.change(screen.getByLabelText('Editor layout'), { target: { value: 'page-width' } });
   await Promise.resolve();
 
   expect(plugin.saveSettings).toHaveBeenCalledWith({
     ...DEFAULT_LIBRE_NOTE_EDITOR_SETTINGS,
-    editorMode: 'html-fallback',
+    pageLayout: 'page-width',
   });
 });
 

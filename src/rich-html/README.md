@@ -14,4 +14,4 @@ It keeps view and command modules from needing to know the full `richDocumentWor
 
 ## How It Is Used
 
-`editor-view/options` uses this module to load imported HTML and initialize autosave status. `desktop-odt-command` uses it to ensure HTML exists before creating or opening an ODT source.
+`editor-view/options` uses this module to load imported HTML and initialize autosave status before the React editor surface renders.

@@ -1,5 +1,4 @@
 import type {
-  RichDocumentActiveSource,
   RichDocumentConflictCopySource,
   RichDocumentMapping,
   RichDocumentSourceKind,
@@ -10,7 +9,7 @@ import type {
 
 export interface ConflictCreationOptions {
   readonly changedSources: ReadonlyArray<RichDocumentSourceKind>;
-  readonly desktopHtmlSource?: string;
+  readonly currentHtmlSource?: string;
   readonly detectedAt: string;
   readonly mapping: RichDocumentMapping;
   readonly reason:
@@ -41,11 +40,7 @@ export interface SourceStateChange {
   readonly source: RichDocumentSourceKind;
 }
 
-export type ConflictResolutionChoice =
-  | 'duplicate-conflict-copy'
-  | RichDocumentActiveSource
-  | 'desktop'
-  | 'mobile';
+export type ConflictResolutionChoice = 'duplicate-conflict-copy' | RichDocumentSourceKind;
 
 export interface ConflictResolutionOptions {
   readonly choice: ConflictResolutionChoice;

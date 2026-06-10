@@ -1,4 +1,4 @@
-export type RichDocumentActiveSource = 'markdown' | 'html' | 'odt';
+export type RichDocumentActiveSource = 'markdown' | 'html';
 
 export interface RichDocumentConflictCopy {
   readonly createdAt: string;
@@ -6,7 +6,7 @@ export interface RichDocumentConflictCopy {
   readonly source: RichDocumentConflictCopySource;
 }
 
-export type RichDocumentConflictCopySource = 'desktop' | 'html' | 'markdown' | 'mobile' | 'odt';
+export type RichDocumentConflictCopySource = 'html' | 'markdown';
 
 type RichDocumentConflictReason =
   | 'manual-recovery'
@@ -32,7 +32,6 @@ export interface RichDocumentFilePaths {
   readonly folderPath: string;
   readonly htmlPath: string;
   readonly mappingPath: string;
-  readonly odtPath: string;
 }
 
 export interface RichDocumentMapping {
@@ -43,7 +42,6 @@ export interface RichDocumentMapping {
   readonly lastEditorPlatform: RichDocumentEditorPlatform;
   readonly lifecycleState: RichDocumentLifecycleState;
   readonly markdownPath: string;
-  readonly odtPath: string;
   readonly richDocumentId: string;
   readonly sourceStates: RichDocumentSourceStates;
   readonly syncTimestamps: RichDocumentSyncTimestamps;
@@ -90,7 +88,7 @@ interface RichDocumentStorePatch {
   readonly syncTimestamps?: RichDocumentSyncTimestamps;
 }
 
-export type RichDocumentSourceKind = 'html' | 'markdown' | 'odt';
+export type RichDocumentSourceKind = 'html' | 'markdown';
 
 export interface RichDocumentSourceState {
   readonly contentHash: string | null;
@@ -101,14 +99,12 @@ export interface RichDocumentSourceState {
 export interface RichDocumentSourceStates {
   readonly html: RichDocumentSourceState | null;
   readonly markdown: RichDocumentSourceState | null;
-  readonly odt: RichDocumentSourceState | null;
 }
 
 export interface RichDocumentSyncTimestamps {
   readonly htmlSyncedAt: string | null;
   readonly lastSyncedAt: string | null;
   readonly markdownSyncedAt: string | null;
-  readonly odtSyncedAt: string | null;
 }
 
 export interface RichDocumentVaultAdapter {

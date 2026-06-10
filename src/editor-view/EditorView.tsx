@@ -7,10 +7,6 @@ import { LIBRE_MARKDOWN_VIEW_TYPE } from './constants';
 import { createEditorViewAutosaveController } from './autosave-controller/autosaveController';
 import { createEditorViewRoot, renderEditorViewAppElement } from './app-element/appElement';
 import {
-  refreshEditorViewDesktopSourceAfterLoad,
-  syncEditorViewDesktopSource,
-} from './desktop-source/desktopSource';
-import {
   applyEditorViewConflictResolutionResult,
   resolveEditorViewConflict,
 } from './conflict/conflict';
@@ -25,22 +21,16 @@ import {
   startEditorViewHtmlLoad,
 } from './state/state';
 import * as editorViewNavigation from './navigation/navigation';
-import { createSkippedMobileRuntimeSetupState } from '../office-runtime/setup-state/setupState';
 import type { AutosaveController, AutosaveStatus } from '../autosave/interfaces';
 import type { ConflictResolutionChoice } from '../conflicts/interfaces';
 import type { EditorViewOptions, EditorViewRenderTarget } from './interfaces';
-import type { OfficeRuntimeSetupState } from '../office-runtime/interfaces';
 
 export class EditorView extends FileView {
   allowNoFile = true;
-  activeEditorSource: EditorViewRenderTarget['activeEditorSource'] = 'desktop-odt';
   autosaveStatus: AutosaveStatus = 'saved';
-  desktopSourceStatus: 'idle' | 'loading' | 'error' = 'idle';
-  editorMode: EditorViewRenderTarget['editorMode'] = 'automatic';
   importedHtmlSource: string | null = null;
   isResolvingConflict = false;
   linkWarningCount = 0;
-  officeRuntimeSetupState: OfficeRuntimeSetupState;
   pageLayout: EditorViewRenderTarget['pageLayout'] = 'pageless';
   activeMarkdownFile: TFile | null = null;
   showHtmlEmptyState = false;
@@ -53,8 +43,6 @@ export class EditorView extends FileView {
 
     this.navigation = true;
     this.editorViewOptions = editorViewOptions;
-    this.officeRuntimeSetupState =
-      editorViewOptions.getOfficeRuntimeSetupState?.() ?? createSkippedMobileRuntimeSetupState();
 
     refreshEditorViewSettingsState(this);
 
@@ -93,7 +81,6 @@ export class EditorView extends FileView {
     setEditorViewAutosaveDocument(this.autosaveController, file, this.importedHtmlSource);
     this.autosaveStatus = loadedState.autosaveStatus;
     this.renderReactApp();
-    void refreshEditorViewDesktopSourceAfterLoad(this, file);
   }
   async onRename(file: TFile): Promise<void> {
     if (this.activeMarkdownFile?.path === file.path) {
@@ -126,7 +113,7 @@ export class EditorView extends FileView {
     this.reactRoot = null;
     this.contentEl.empty();
   }
-  handleEditorBlur = () => void syncEditorViewDesktopSource(this);
+  handleEditorBlur = () => void this.autosaveController.flushHtml();
   handleExternalLinkNavigate = (url: string) =>
     editorViewNavigation.navigateEditorViewExternalLink(this, url);
   handleHtmlSourceChange = (htmlSource: string) =>

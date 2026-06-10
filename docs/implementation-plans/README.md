@@ -31,8 +31,8 @@ After every plan:
 8. [Plan 08: Structured Markdown Blocks](./08-structured-markdown-blocks.md)
 9. [Plan 09: Attachments Images And Tables](./09-attachments-images-and-tables.md)
 10. [Plan 10: Conflict Detection And Recovery](./10-conflict-detection-and-recovery.md)
-11. [Plan 11: Desktop LibreOffice Runtime](./11-desktop-libreoffice-runtime.md)
-12. [Plan 12: ODT Conversion Pipeline](./12-odt-conversion-pipeline.md)
+11. [Plan 11: Desktop LibreOffice Runtime](./11-desktop-libreoffice-runtime.md) - obsolete historical plan
+12. [Plan 12: ODT Conversion Pipeline](./12-odt-conversion-pipeline.md) - obsolete historical plan
 13. [Plan 13: Settings And Status UI](./13-settings-and-status-ui.md)
 14. [Plan 14: Mobile And Pageless Hardening](./14-mobile-and-pageless-hardening.md)
 15. [Plan 15: Security And Release Acceptance](./15-security-and-release-acceptance.md)

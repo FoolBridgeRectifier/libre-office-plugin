@@ -1,1 +1,0 @@
-export { registerOpenDesktopOdtCommand } from './desktopOdtCommand';

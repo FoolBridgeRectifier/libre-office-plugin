@@ -17,20 +17,25 @@ test('creates conflict copies without deleting source files', async () => {
     new Map([
       ['Note.md', 'Markdown'],
       [mapping.htmlPath, '<article>HTML</article>'],
-      [mapping.odtPath, 'ODT'],
     ])
   );
 
   const conflictState = await createConflictState({
     changedSources: ['markdown', 'html'],
-    desktopHtmlSource: '<article>Desktop</article>',
+    currentHtmlSource: '<article>Current HTML</article>',
     detectedAt: '2026-06-05T12:34:56.789Z',
     mapping,
     reason: 'multi-source-change',
     vaultAdapter: vault.adapter,
   });
 
-  expect(conflictState.conflictCopies).toHaveLength(4);
+  const conflictCopySources = conflictState.conflictCopies.map(
+    (conflictCopy) => conflictCopy.source
+  );
+
+  expect(conflictState.conflictCopies).toHaveLength(2);
+  expect(conflictCopySources).toEqual(['html', 'markdown']);
+
   expect(vault.files.get('Note.md')).toBe('Markdown');
   expect(vault.files.get(mapping.htmlPath)).toBe('<article>HTML</article>');
 });

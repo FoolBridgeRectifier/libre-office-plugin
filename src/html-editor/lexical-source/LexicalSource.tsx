@@ -1,15 +1,16 @@
-import { useEffect, useRef, type FormEvent } from 'react';
+import { useCallback, useMemo, useRef } from 'react';
+import { ContentEditable } from '@lexical/react/LexicalContentEditable';
+import { LexicalComposer } from '@lexical/react/LexicalComposer';
 
 import { HTML_EDITOR_CLASS_NAME } from '../constants';
-import { LEXICAL_SOURCE_ERROR_MESSAGE } from './constants';
+import { LEXICAL_EDITOR_NAMESPACE, LEXICAL_SOURCE_ERROR_MESSAGE } from './constants';
+import { HtmlElementNode, LockedHtmlNode } from './html-element/htmlElement';
+import { HtmlSourcePlugin, InteractionPlugin, ProtectedContentGuardPlugin } from './plugins';
 import {
   getHtmlSecurityWarningText,
-  isInsideProtectedContent,
-  prepareHtmlForEditor,
   readHtmlFromEditor,
-  syncTaskCheckboxColorHooks,
+  syncRichTextEditorHooks,
 } from './source-html';
-import { createLexicalSourceInteractionHandlers } from './helpers';
 import type { LexicalSourceProps } from './interfaces';
 
 export function LexicalSource({
@@ -30,92 +31,57 @@ export function LexicalSource({
 
   const skipNextClickNavigationUrlRef = useRef<string | null>(null);
 
-  const emitEditorChange = (editorElement: HTMLElement) => {
-    syncTaskCheckboxColorHooks(editorElement);
+  const editorConfig = useMemo(
+    () => ({
+      namespace: LEXICAL_EDITOR_NAMESPACE,
+      nodes: [HtmlElementNode, LockedHtmlNode],
+      onError: () => onInitializationError?.(LEXICAL_SOURCE_ERROR_MESSAGE),
+    }),
+    [onInitializationError]
+  );
 
-    const currentHtmlSource = readHtmlFromEditor(editorElement);
+  const emitEditorChange = useCallback(
+    (editorElement: HTMLElement) => {
+      syncRichTextEditorHooks(editorElement);
 
-    loadedHtmlSourceRef.current = currentHtmlSource;
-    onSecurityWarningChange?.(getHtmlSecurityWarningText(currentHtmlSource));
-    onHtmlSourceChange?.(currentHtmlSource);
-    onDirtyStateChange?.(currentHtmlSource !== initialHtmlSourceRef.current);
-  };
+      const currentHtmlSource = readHtmlFromEditor(editorElement);
 
-  useEffect(() => {
-    if (loadedHtmlSourceRef.current === htmlSource) return;
-
-    const editorElement = editorElementRef.current;
-
-    if (!editorElement) return;
-
-    isApplyingHtmlSourceRef.current = true;
-    onSecurityWarningChange?.(getHtmlSecurityWarningText(htmlSource));
-
-    try {
-      editorElement.innerHTML = prepareHtmlForEditor(htmlSource);
-      syncTaskCheckboxColorHooks(editorElement);
-
-      initialHtmlSourceRef.current = readHtmlFromEditor(editorElement);
-      loadedHtmlSourceRef.current = htmlSource;
-      onDirtyStateChange?.(false);
-    } catch {
-      onInitializationError?.(LEXICAL_SOURCE_ERROR_MESSAGE);
-    } finally {
-      isApplyingHtmlSourceRef.current = false;
-    }
-  }, [htmlSource, onDirtyStateChange, onInitializationError, onSecurityWarningChange]);
-
-  useEffect(() => {
-    const editorElement = editorElementRef.current;
-
-    if (!editorElement) {
-      return;
-    }
-
-    const handleBeforeInput = (event: InputEvent) => {
-      // Protected source blocks are visible but only removable from the editor.
-      if (isInsideProtectedContent(event.target) && !event.inputType.startsWith('delete')) {
-        event.preventDefault();
-      }
-    };
-
-    editorElement.addEventListener('beforeinput', handleBeforeInput);
-
-    return () => {
-      editorElement.removeEventListener('beforeinput', handleBeforeInput);
-    };
-  }, []);
-
-  const handleEditorInput = (event: FormEvent<HTMLDivElement>) => {
-    if (isApplyingHtmlSourceRef.current) {
-      return;
-    }
-
-    emitEditorChange(event.currentTarget);
-  };
-
-  const interactionHandlers = createLexicalSourceInteractionHandlers({
-    emitEditorChange,
-    ...(onExternalLinkNavigate ? { onExternalLinkNavigate } : {}),
-    ...(onInternalLinkNavigate ? { onInternalLinkNavigate } : {}),
-    ...(onTagNavigate ? { onTagNavigate } : {}),
-    skipNextClickNavigationUrlRef,
-  });
+      loadedHtmlSourceRef.current = currentHtmlSource;
+      onSecurityWarningChange?.(getHtmlSecurityWarningText(currentHtmlSource));
+      onHtmlSourceChange?.(currentHtmlSource);
+      onDirtyStateChange?.(currentHtmlSource !== initialHtmlSourceRef.current);
+    },
+    [onDirtyStateChange, onHtmlSourceChange, onSecurityWarningChange]
+  );
 
   return (
-    <div
-      aria-label="Local HTML editor"
-      className={HTML_EDITOR_CLASS_NAME}
-      contentEditable
-      onBlur={onEditorBlur}
-      onClickCapture={interactionHandlers.onClickCapture}
-      onInputCapture={handleEditorInput}
-      onKeyDownCapture={interactionHandlers.onKeyDownCapture}
-      onMouseDownCapture={interactionHandlers.onMouseDownCapture}
-      ref={editorElementRef}
-      role="textbox"
-      suppressContentEditableWarning
-      tabIndex={0}
-    />
+    <LexicalComposer initialConfig={editorConfig}>
+      <ContentEditable
+        aria-label="Local HTML editor"
+        className={HTML_EDITOR_CLASS_NAME}
+        onBlur={onEditorBlur}
+        ref={editorElementRef}
+        role="textbox"
+        tabIndex={0}
+      />
+      <HtmlSourcePlugin
+        emitEditorChange={emitEditorChange}
+        htmlSource={htmlSource}
+        initialHtmlSourceRef={initialHtmlSourceRef}
+        isApplyingHtmlSourceRef={isApplyingHtmlSourceRef}
+        loadedHtmlSourceRef={loadedHtmlSourceRef}
+        {...(onDirtyStateChange ? { onDirtyStateChange } : {})}
+        {...(onInitializationError ? { onInitializationError } : {})}
+        {...(onSecurityWarningChange ? { onSecurityWarningChange } : {})}
+      />
+      <ProtectedContentGuardPlugin isApplyingHtmlSourceRef={isApplyingHtmlSourceRef} />
+      <InteractionPlugin
+        emitEditorChange={emitEditorChange}
+        skipNextClickNavigationUrlRef={skipNextClickNavigationUrlRef}
+        {...(onExternalLinkNavigate ? { onExternalLinkNavigate } : {})}
+        {...(onInternalLinkNavigate ? { onInternalLinkNavigate } : {})}
+        {...(onTagNavigate ? { onTagNavigate } : {})}
+      />
+    </LexicalComposer>
   );
 }

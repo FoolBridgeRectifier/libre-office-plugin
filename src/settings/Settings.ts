@@ -1,11 +1,10 @@
 import { PluginSettingTab, Setting } from 'obsidian';
 
-import { CONFLICT_BEHAVIOR_OPTIONS, EDITOR_MODE_OPTIONS, PAGE_LAYOUT_OPTIONS } from './constants';
+import { CONFLICT_BEHAVIOR_OPTIONS, PAGE_LAYOUT_OPTIONS } from './constants';
 import { validateIntervalSeconds } from './helpers';
 import { addSettingsDropdown } from './dropdown/dropdown';
 import type {
   LibreNoteEditorConflictBehavior,
-  LibreNoteEditorMode,
   LibreNoteEditorPageLayout,
   LibreNoteEditorSettingsPlugin,
 } from './interfaces';
@@ -25,33 +24,12 @@ export class LibreNoteEditorSettingsTab extends PluginSettingTab {
     containerEl.empty();
     containerEl.createEl('h2', { text: 'Libre Note Editor' });
 
-    this.addLibreOfficePathSetting();
     this.addIntervalSetting('Autosave interval', 'autosaveIntervalSeconds');
     this.addIntervalSetting('Markdown sync interval', 'markdownSyncIntervalSeconds');
     this.addConflictBehaviorSetting();
 
-    this.addEditorModeSetting();
     this.addPageLayoutSetting();
     this.addMarkdownFallbackSetting();
-  }
-
-  private addLibreOfficePathSetting(): void {
-    new Setting(this.containerEl)
-      .setName('LibreOffice path')
-      .setDesc('Optional local executable path retained for setup visibility.')
-      .addText((text) => {
-        text
-          .setPlaceholder('Bundled runtime is used by default')
-          .setValue(this.plugin.settings.libreOfficePath)
-          .onChange(async (libreOfficePath) => {
-            await this.plugin.saveSettings({
-              ...this.plugin.settings,
-              libreOfficePath: libreOfficePath.trim(),
-            });
-          });
-
-        text.inputEl.setAttribute('aria-label', 'LibreOffice path');
-      });
   }
 
   private addIntervalSetting(
@@ -92,20 +70,6 @@ export class LibreNoteEditorSettingsTab extends PluginSettingTab {
           conflictBehavior: conflictBehavior as LibreNoteEditorConflictBehavior,
         }),
       options: CONFLICT_BEHAVIOR_OPTIONS,
-    });
-  }
-
-  private addEditorModeSetting(): void {
-    addSettingsDropdown({
-      containerElement: this.containerEl,
-      currentValue: this.plugin.settings.editorMode,
-      label: 'Editor mode',
-      onChange: (editorMode) =>
-        this.plugin.saveSettings({
-          ...this.plugin.settings,
-          editorMode: editorMode as LibreNoteEditorMode,
-        }),
-      options: EDITOR_MODE_OPTIONS,
     });
   }
 

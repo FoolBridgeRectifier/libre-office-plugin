@@ -31,7 +31,7 @@ test('registers the Libre markdown view and routing events on load', async () =>
 
   expect(registerView).toHaveBeenCalledWith(LIBRE_MARKDOWN_VIEW_TYPE, expect.any(Function));
 
-  expect(addCommand).toHaveBeenCalledTimes(2);
+  expect(addCommand).toHaveBeenCalledTimes(1);
   expect(registerEvent).toHaveBeenCalledTimes(5);
   expect(mockRichDocumentStore.getOrCreateMapping).toHaveBeenCalledWith('Open.md');
 });

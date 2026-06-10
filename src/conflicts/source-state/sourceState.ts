@@ -45,7 +45,6 @@ export async function createSourceStates(
       path: mapping.markdownPath,
       vaultAdapter,
     }),
-    odt: await createSourceSnapshot({ path: mapping.odtPath, vaultAdapter }),
   };
 }
 
@@ -53,7 +52,7 @@ export function collectChangedSourceStates(
   previousStates: RichDocumentSourceStates,
   currentStates: RichDocumentSourceStates
 ): SourceStateChange[] {
-  return (['markdown', 'html', 'odt'] as const)
+  return (['markdown', 'html'] as const)
     .map((source) => ({
       currentState: currentStates[source],
       previousState: previousStates[source],

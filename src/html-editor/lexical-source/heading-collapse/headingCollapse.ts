@@ -14,6 +14,20 @@ import {
 } from './helpers';
 import type { HeadingCollapseKeyboardEvent, HeadingCollapseMouseEvent } from './interfaces';
 
+function getEditorHookDocument(editorRoot: ParentNode): Document {
+  if (editorRoot instanceof Document) {
+    return editorRoot;
+  }
+
+  const ownerDocument = (editorRoot as Node).ownerDocument;
+
+  if (!ownerDocument) {
+    throw new Error('Expected editor hook root to belong to a document.');
+  }
+
+  return ownerDocument;
+}
+
 function ensureHeadingCollapseControl(htmlDocument: Document, headingElement: HTMLElement): void {
   headingElement.setAttribute(HEADING_COLLAPSE_HEADING_ATTRIBUTE, 'true');
 
@@ -29,8 +43,10 @@ function ensureHeadingCollapseControl(htmlDocument: Document, headingElement: HT
   syncHeadingCollapseButtonState(headingElement, buttonElement);
 }
 
-export function applyHeadingCollapseEditorHooks(htmlDocument: Document): void {
-  htmlDocument
+export function applyHeadingCollapseEditorHooks(editorRoot: ParentNode): void {
+  const htmlDocument = getEditorHookDocument(editorRoot);
+
+  editorRoot
     .querySelectorAll<HTMLElement>(HEADING_SELECTOR)
     .forEach((headingElement) => ensureHeadingCollapseControl(htmlDocument, headingElement));
 }

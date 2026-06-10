@@ -7,18 +7,6 @@ exports[`renders settings UI with persisted defaults 1`] = `
   </h2>
   <div>
     <span>
-      LibreOffice path
-    </span>
-    <p>
-      Optional local executable path retained for setup visibility.
-    </p>
-    <input
-      aria-label="LibreOffice path"
-      placeholder="Bundled runtime is used by default"
-    />
-  </div>
-  <div>
-    <span>
       Autosave interval
     </span>
     <p>
@@ -63,30 +51,6 @@ exports[`renders settings UI with persisted defaults 1`] = `
         value="keep-markdown"
       >
         Keep markdown mirror
-      </option>
-    </select>
-  </div>
-  <div>
-    <span>
-      Editor mode
-    </span>
-    <select
-      aria-label="Editor mode"
-    >
-      <option
-        value="automatic"
-      >
-        Automatic
-      </option>
-      <option
-        value="desktop-odt"
-      >
-        Desktop ODT
-      </option>
-      <option
-        value="html-fallback"
-      >
-        HTML fallback
       </option>
     </select>
   </div>

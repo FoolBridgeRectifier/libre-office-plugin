@@ -1,6 +1,7 @@
 export {
   isInsideProtectedContent,
   isTaskCheckboxTarget,
+  syncRichTextEditorHooks,
   syncTaskCheckboxColorHooks,
   toggleTaskCheckboxState,
   updateTaskCheckboxState,

@@ -6,12 +6,7 @@ import { LIBRE_NOTE_EDITOR_CONTENT_CLASS_NAMES } from '../constants';
 import { shouldRouteFileToLibreEditor } from '../helpers';
 import type { AutosaveStatus } from '../../autosave/interfaces';
 import type { ConflictResolutionChoice } from '../../conflicts/interfaces';
-import type { OfficeRuntimeSetupState } from '../../office-runtime/interfaces';
-import type {
-  LibreNoteEditorActiveSource,
-  LibreNoteEditorMode,
-  LibreNoteEditorPageLayout,
-} from '../../settings/interfaces';
+import type { LibreNoteEditorPageLayout } from '../../settings/interfaces';
 import type { EditorViewRenderTarget } from '../interfaces';
 import type { Root } from 'react-dom/client';
 import type { TFile } from 'obsidian';
@@ -24,14 +19,10 @@ export function createEditorViewRoot(contentElement: HTMLElement): Root {
 
 function createEditorViewAppElement(
   activeMarkdownFile: TFile | null,
-  activeEditorSource: LibreNoteEditorActiveSource,
   autosaveStatus: AutosaveStatus,
-  desktopSourceStatus: 'idle' | 'loading' | 'error',
-  editorMode: LibreNoteEditorMode,
   importedHtmlSource: string | null,
   isResolvingConflict: boolean,
   linkWarningCount: number,
-  officeRuntimeSetupState: OfficeRuntimeSetupState,
   pageLayout: LibreNoteEditorPageLayout,
   showHtmlEmptyState: boolean,
   onEditorBlur: () => void,
@@ -47,14 +38,10 @@ function createEditorViewAppElement(
 
   return createElement(App, {
     activeFilePath,
-    activeEditorSource,
     autosaveStatus,
-    desktopSourceStatus,
-    editorMode,
     importedHtmlSource,
     isResolvingConflict,
     linkWarningCount,
-    officeRuntimeSetupState,
     pageLayout,
     showHtmlEmptyState,
     onEditorBlur,
@@ -73,14 +60,10 @@ export function renderEditorViewAppElement(
   reactRoot?.render(
     createEditorViewAppElement(
       target.activeMarkdownFile,
-      target.activeEditorSource,
       target.autosaveStatus,
-      target.desktopSourceStatus,
-      target.editorMode,
       target.importedHtmlSource,
       target.isResolvingConflict,
       target.linkWarningCount,
-      target.officeRuntimeSetupState,
       target.pageLayout,
       target.showHtmlEmptyState,
       target.handleEditorBlur,

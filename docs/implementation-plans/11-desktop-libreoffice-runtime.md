@@ -1,5 +1,9 @@
 # Plan 11: Desktop LibreOffice Runtime
 
+> Obsolete historical plan. Libre Note Editor no longer bundles LibreOffice,
+> detects desktop office runtimes, or uses ODT as a current product path. The
+> active architecture is the HTML/Lexical core described in `SYSTEM_DESIGN.md`.
+
 ## Goal
 
 Detect a local LibreOffice runtime on desktop and expose setup state without requiring it on mobile.

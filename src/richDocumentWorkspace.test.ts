@@ -117,7 +117,7 @@ test('creates conflict copies when markdown and html changed independently', asy
 
   await expect(
     saveRichDocumentHtml({
-      htmlSource: '<article>Desktop edit</article>',
+      htmlSource: '<article>Current edit</article>',
       markdownPath: 'Note.md',
       previousHtmlSource: '<article>Original</article>',
       richDocumentStore,
@@ -130,7 +130,10 @@ test('creates conflict copies when markdown and html changed independently', asy
   expect(updatedMapping.conflictState.status).toBe('conflicted');
 
   if (updatedMapping.conflictState.status === 'conflicted') {
-    expect(updatedMapping.conflictState.conflictCopies).toHaveLength(3);
+    expect(updatedMapping.conflictState.conflictCopies).toHaveLength(2);
+    expect(
+      updatedMapping.conflictState.conflictCopies.map((conflictCopy) => conflictCopy.source)
+    ).toEqual(['html', 'markdown']);
   }
 
   expect(vault.files.get('Note.md')).toBe('External markdown');

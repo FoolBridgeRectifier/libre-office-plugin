@@ -32,25 +32,21 @@ function createConflictCopy(
   };
 }
 
-test('desktop conflict choice writes desktop html and markdown mirror', async () => {
-  const mapping = createConflictedMapping([
-    createConflictCopy('conflicts/desktop.html', 'desktop'),
-    createConflictCopy('conflicts/html.html', 'html'),
-  ]);
+test('html conflict choice writes rich html and markdown mirror', async () => {
+  const mapping = createConflictedMapping([createConflictCopy('conflicts/html.html', 'html')]);
 
   const richDocumentStore = createMarkdownSyncStore(mapping);
 
   const vault = createVaultAdapter(
     new Map([
       ['Note.md', '---\ntags: [libre]\n---\n\nExternal markdown'],
-      [mapping.htmlPath, '<article><p>Mobile</p></article>'],
-      ['conflicts/desktop.html', '<article><h1>Desktop</h1></article>'],
-      ['conflicts/html.html', '<article><h1>Mobile</h1></article>'],
+      [mapping.htmlPath, '<article><p>External HTML</p></article>'],
+      ['conflicts/html.html', '<article><h1>Rich HTML</h1></article>'],
     ])
   );
 
   const result = await resolveRichDocumentConflict({
-    choice: 'desktop',
+    choice: 'html',
     getCurrentTimestamp: () => '2026-06-06',
     markdownPath: 'Note.md',
     richDocumentStore,
@@ -59,9 +55,9 @@ test('desktop conflict choice writes desktop html and markdown mirror', async ()
 
   const updatedMapping = await richDocumentStore.getOrCreateMapping('Note.md');
 
-  expect(result).toBe('<article><h1>Desktop</h1></article>');
-  expect(vault.files.get(mapping.htmlPath)).toBe('<article><h1>Desktop</h1></article>');
-  expect(vault.files.get('Note.md')).toBe('---\ntags: [libre]\n---\n\n# Desktop');
+  expect(result).toBe('<article><h1>Rich HTML</h1></article>');
+  expect(vault.files.get(mapping.htmlPath)).toBe('<article><h1>Rich HTML</h1></article>');
+  expect(vault.files.get('Note.md')).toBe('---\ntags: [libre]\n---\n\n# Rich HTML');
 
   expect(updatedMapping.activeSource).toBe('html');
   expect(updatedMapping.conflictState.status).toBe('none');

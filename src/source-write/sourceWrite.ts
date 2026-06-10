@@ -1,12 +1,12 @@
 import { createMarkdownMirrorSource } from '../autosave';
 import { collectChangedSourceStates, createConflictState, createSourceStates } from '../conflicts';
-import { sanitizeConvertedHtmlSource } from '../conversion';
+import { sanitizeConvertedHtmlSource } from '../html-sanitizer';
 import {
   getHtmlSaveConflictSources,
   getMarkdownMirrorConflictSources,
+  hasHtmlSourceChange,
   hasExternalHtmlChange,
   hasIndependentMarkdownAndHtmlChanges,
-  hasRichSourceChange,
   isArchivedMarkdownMissing,
   updateMarkdownSyncTimestamp,
 } from './helpers';
@@ -37,7 +37,7 @@ export async function saveRichDocumentHtml(options: RichDocumentHtmlSaveOptions)
     options.previousHtmlSource
   );
 
-  const richSourceChanged = hasRichSourceChange(sourceChanges);
+  const htmlSourceChanged = hasHtmlSourceChange(sourceChanges);
   const localHtmlChanged = sanitizedHtmlSource !== options.previousHtmlSource;
 
   const richFileDeleted = sourceChanges.some(
@@ -51,12 +51,12 @@ export async function saveRichDocumentHtml(options: RichDocumentHtmlSaveOptions)
 
   if (
     htmlChanged ||
-    richSourceChanged ||
+    htmlSourceChanged ||
     hasIndependentMarkdownAndHtmlChanges(markdownChanged, options)
   ) {
     const conflictState = await createConflictState({
       changedSources: getHtmlSaveConflictSources(sourceChanges, htmlChanged, localHtmlChanged),
-      desktopHtmlSource: sanitizedHtmlSource,
+      currentHtmlSource: sanitizedHtmlSource,
       detectedAt: new Date().toISOString(),
       mapping,
       reason: richFileDeleted ? 'missing-rich-file' : 'multi-source-change',
@@ -107,7 +107,7 @@ export async function syncMarkdownMirror(options: RichDocumentSourceWriteOptions
 
   const markdownChanged = sourceChanges.some((sourceChange) => sourceChange.source === 'markdown');
 
-  const richSourceChanged = hasRichSourceChange(sourceChanges);
+  const htmlSourceChanged = hasHtmlSourceChange(sourceChanges);
 
   const richFileDeleted = sourceChanges.some(
     (sourceChange) =>
@@ -118,10 +118,10 @@ export async function syncMarkdownMirror(options: RichDocumentSourceWriteOptions
     throw new Error('Libre Note Editor conflict is unresolved.');
   }
 
-  if (markdownChanged || richSourceChanged) {
+  if (markdownChanged || htmlSourceChanged) {
     const conflictState = await createConflictState({
       changedSources: getMarkdownMirrorConflictSources(sourceChanges),
-      desktopHtmlSource: sanitizedHtmlSource,
+      currentHtmlSource: sanitizedHtmlSource,
       detectedAt: new Date().toISOString(),
       mapping,
       reason: richFileDeleted ? 'missing-rich-file' : 'multi-source-change',

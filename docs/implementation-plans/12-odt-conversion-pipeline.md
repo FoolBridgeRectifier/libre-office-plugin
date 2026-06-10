@@ -1,5 +1,9 @@
 # Plan 12: ODT Conversion Pipeline
 
+> Obsolete historical plan. Libre Note Editor no longer creates, opens, or
+> synchronizes ODT files. The active architecture is the HTML/Lexical core
+> described in `SYSTEM_DESIGN.md`.
+
 ## Goal
 
 Add local ODT creation and conversion so desktop edits use `.odt` as the rich source while keeping HTML and markdown mirrors synchronized.

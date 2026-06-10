@@ -1,0 +1,162 @@
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
+
+exports[`shows dirty autosave status from the editor view 1`] = `
+<div>
+  <section
+    aria-label="Libre Note Editor"
+    class="flex h-full w-full min-w-0 max-w-full flex-col overflow-hidden bg-ribbon-bg font-sans text-text-primary"
+  >
+    <nav
+      aria-label="Ribbon tabs"
+      class="flex overflow-x-auto bg-ribbon-purple shadow-ribbon-raised"
+    >
+      <button
+        aria-pressed="true"
+        class="min-h-8 whitespace-nowrap px-4 font-sans text-[11px] font-medium transition-colors duration-150 ease-ribbon-fast motion-reduce:transition-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-button-focus-ring bg-ribbon-bg text-text-primary"
+        type="button"
+      >
+        Home
+      </button>
+      <button
+        aria-pressed="false"
+        class="min-h-8 whitespace-nowrap px-4 font-sans text-[11px] font-medium transition-colors duration-150 ease-ribbon-fast motion-reduce:transition-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-button-focus-ring text-white hover:bg-ribbon-purple-mid"
+        type="button"
+      >
+        Insert
+      </button>
+      <button
+        aria-pressed="false"
+        class="min-h-8 whitespace-nowrap px-4 font-sans text-[11px] font-medium transition-colors duration-150 ease-ribbon-fast motion-reduce:transition-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-button-focus-ring text-white hover:bg-ribbon-purple-mid"
+        type="button"
+      >
+        View
+      </button>
+    </nav>
+    <div
+      aria-label="Home commands"
+      class="flex w-full min-w-0 max-w-full flex-wrap gap-0 overflow-x-auto border-b border-ribbon-border bg-ribbon-bg px-2 py-2 shadow-ribbon-raised"
+    >
+      <section
+        aria-label="Clipboard"
+        class="flex min-w-fit shrink-0 flex-col justify-between gap-1 border-r border-ribbon-border px-2 last:border-r-0"
+      >
+        <div
+          class="flex flex-wrap items-start gap-1"
+        >
+          <button
+            aria-label="Copy formatting between rich note selections."
+            class="flex min-w-16 flex-col items-center gap-1 rounded-ribbon-sm border px-2 py-1.5 font-sans text-[10px] transition-colors duration-150 ease-ribbon-fast motion-reduce:transition-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-button-focus-ring border-transparent text-text-primary hover:border-button-hover-border hover:bg-button-hover-bg"
+            type="button"
+          >
+            <span>
+              Painter
+            </span>
+          </button>
+          <button
+            aria-label="Paste clipboard content into the rich editor."
+            class="flex min-w-16 flex-col items-center gap-1 rounded-ribbon-sm border px-2 py-1.5 font-sans text-[10px] transition-colors duration-150 ease-ribbon-fast motion-reduce:transition-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-button-focus-ring border-transparent text-text-primary hover:border-button-hover-border hover:bg-button-hover-bg"
+            type="button"
+          >
+            <span>
+              Paste
+            </span>
+          </button>
+        </div>
+        <span
+          class="text-center font-sans text-[9px] uppercase tracking-normal text-text-muted"
+        >
+          Clipboard
+        </span>
+      </section>
+      <section
+        aria-label="Basic Text"
+        class="flex min-w-fit shrink-0 flex-col justify-between gap-1 border-r border-ribbon-border px-2 last:border-r-0"
+      >
+        <div
+          class="flex flex-wrap items-start gap-1"
+        >
+          <button
+            aria-label="Apply bold formatting to the current selection."
+            class="flex min-w-16 flex-col items-center gap-1 rounded-ribbon-sm border px-2 py-1.5 font-sans text-[10px] transition-colors duration-150 ease-ribbon-fast motion-reduce:transition-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-button-focus-ring border-transparent text-text-primary hover:border-button-hover-border hover:bg-button-hover-bg"
+            type="button"
+          >
+            <span>
+              Bold
+            </span>
+          </button>
+          <button
+            aria-label="Apply italic formatting to the current selection."
+            class="flex min-w-16 flex-col items-center gap-1 rounded-ribbon-sm border px-2 py-1.5 font-sans text-[10px] transition-colors duration-150 ease-ribbon-fast motion-reduce:transition-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-button-focus-ring border-transparent text-text-primary hover:border-button-hover-border hover:bg-button-hover-bg"
+            type="button"
+          >
+            <span>
+              Italic
+            </span>
+          </button>
+        </div>
+        <span
+          class="text-center font-sans text-[9px] uppercase tracking-normal text-text-muted"
+        >
+          Basic Text
+        </span>
+      </section>
+    </div>
+    <main
+      class="flex w-full min-w-0 max-w-full flex-1 flex-col gap-4 overflow-auto bg-ribbon-bg px-3 py-3 text-text-primary sm:px-6 sm:py-5"
+    >
+      <article
+        aria-label="Editor surface"
+        class="relative box-border min-h-72 w-full min-w-0 max-w-full overflow-hidden rounded-ribbon-sm bg-editor-bg text-editor-text p-0"
+      >
+        <div
+          aria-label="Local HTML editor"
+          class="libre-html-editor libre-markdown-text-surface markdown-preview-view min-h-64 w-full min-w-0 max-w-full box-border m-2 !m-[8px] [&.markdown-preview-view]:!m-[8px] overflow-x-hidden rounded-ribbon-sm bg-editor-bg p-0 !p-0 [&.markdown-preview-view]:!p-0 font-sans text-editor-text max-w-[calc(100%-16px)] [&.markdown-preview-view]:!max-w-[calc(100%-16px)] [caret-color:var(--editor-caret)] [&_*]:[caret-color:var(--editor-caret)] [&::selection]:bg-[var(--editor-selection)] [&_*::selection]:bg-[var(--editor-selection)] outline-none [overflow-wrap:anywhere] focus-visible:outline focus-visible:outline-2 focus-visible:outline-button-focus-ring [&>*]:box-border [&>*]:min-w-0 [&>*]:max-w-full [&>article]:ps-[22px] [&_p]:my-[0.45rem] [&_p]:leading-[1.6] [&_h1]:mt-[0.85rem] [&_h1]:mb-[0.35rem] [&_h1]:text-[1.65em] [&_h2]:mt-[0.85rem] [&_h2]:mb-[0.35rem] [&_h2]:text-[1.45em] [&_h3]:mt-[0.85rem] [&_h3]:mb-[0.35rem] [&_h3]:text-[1.25em] [&_h4]:mt-[0.85rem] [&_h4]:mb-[0.35rem] [&_h4]:text-[1.1em] [&_h5]:mt-[0.85rem] [&_h5]:mb-[0.35rem] [&_h5]:text-[1em] [&_h6]:mt-[0.85rem] [&_h6]:mb-[0.35rem] [&_h6]:text-[1em] [&_h1]:font-bold [&_h2]:font-bold [&_h3]:font-bold [&_h4]:font-bold [&_h5]:font-bold [&_h6]:font-bold [&_h1]:leading-[1.25] [&_h2]:leading-[1.25] [&_h3]:leading-[1.25] [&_h4]:leading-[1.25] [&_h5]:leading-[1.25] [&_h6]:leading-[1.25] [&_h1]:text-editor-text [&_h2]:text-editor-text [&_h3]:text-editor-text [&_h4]:text-editor-text [&_h5]:text-editor-text [&_h6]:text-editor-text [&_strong]:font-bold [&_strong]:text-editor-text [&_b]:font-bold [&_b]:text-editor-text [&_em]:italic [&_i]:italic [&_del]:line-through [&_s]:line-through [&_del]:decoration-current [&_s]:decoration-current [&_mark]:rounded-ribbon-sm [&_mark]:bg-editor-mark-bg [&_mark]:px-[0.08em] [&_mark]:text-editor-mark-text [&_code]:text-editor-code-text [&_:not(pre)>code]:[border-radius:6px] [&_:not(pre)>code]:bg-editor-code-bg [&_:not(pre)>code]:px-[0.28em] [&_:not(pre)>code]:py-[0.1em] [&_:not(pre)>code]:font-mono [&_:not(pre)>code]:text-[0.9em] [&_:not(pre)>code]:text-editor-code-text [&_pre]:my-[0.65rem] [&_pre]:max-w-full [&_pre]:overflow-x-auto [&_pre]:whitespace-pre [&_pre]:[border-radius:6px] [&_pre]:border [&_pre]:border-editor-border [&_pre]:bg-editor-code-bg [&_pre]:px-[0.9rem] [&_pre]:py-3 [&_pre]:font-mono [&_pre]:text-[0.92em] [&_pre]:leading-[1.5] [&_pre]:text-editor-code-text [&_pre_code]:border-0 [&_pre_code]:bg-transparent [&_pre_code]:p-0 [&_pre_code]:font-inherit [&_pre_code]:text-inherit [&_blockquote]:my-[0.65rem] [&_blockquote]:ms-0 [&_blockquote]:me-0 [&_blockquote]:border-s-4 [&_blockquote]:border-editor-quote-border [&_blockquote]:py-[0.05rem] [&_blockquote]:ps-[0.85rem] [&_blockquote]:pe-0 [&_blockquote]:text-editor-muted [&_hr]:my-4 [&_hr]:border-0 [&_hr]:border-t [&_hr]:border-editor-hr [&_table]:my-[0.65rem] [&_table]:min-w-max [&_table]:border-collapse [&_table]:text-editor-text [&_th]:border [&_td]:border [&_th]:border-editor-border [&_td]:border-editor-border [&_th]:bg-editor-table-header-bg [&_th]:p-[0.35rem_0.55rem] [&_td]:p-[0.35rem_0.55rem] [&_th]:align-top [&_td]:align-top [&_th]:font-semibold [&_[data-libre-protected=raw-markdown]]:border-dashed [&_[data-libre-protected=raw-markdown]]:bg-editor-code-bg [&_[data-libre-protected=raw-markdown]]:text-editor-muted [&_[data-libre-protected=raw-markdown]]:whitespace-pre-wrap [&_ul]:my-[0.45rem] [&_ol]:my-[0.45rem] [&_ul]:max-w-full [&_ol]:max-w-full [&_ul]:min-w-0 [&_ol]:min-w-0 [&_ul]:list-outside [&_ol]:list-outside [&_ul]:ps-5 [&_ol]:ps-5 [&_ul]:leading-[1.55] [&_ol]:leading-[1.55] [&_ul]:[overflow-wrap:anywhere] [&_ol]:[overflow-wrap:anywhere] [&_ul_ul]:ps-3 [&_ul_ol]:ps-3 [&_ol_ul]:ps-3 [&_ol_ol]:ps-3 [&_li]:my-[0.15rem] [&_li]:!ms-0 [&_li]:min-w-0 [&_li]:[overflow-wrap:anywhere] [&_.libre-contained-editor-media]:h-auto [&_.libre-contained-editor-media]:max-w-full [&_.libre-contained-editor-media]:object-contain [&_.libre-protected-html-block]:max-w-full [&_.libre-protected-html-block]:overflow-x-auto [&_.libre-table-scroll]:max-w-full [&_.libre-table-scroll]:overflow-x-auto [&_.task-list-item-checkbox]:appearance-none [&_.task-list-item-checkbox]:bg-editor-bg [&_.task-list-item-checkbox]:[border:max(1px,0.08em)_solid_currentColor] [&_.task-list-item-checkbox]:rounded-[0.18em] [&_.task-list-item-checkbox]:box-border [&_.task-list-item-checkbox]:text-[var(--libre-task-checkbox-color,var(--ribbon-purple))] [&_.task-list-item-checkbox]:!inline-grid [&_.task-list-item-checkbox]:[font-size:inherit] [&_.task-list-item-checkbox]:!h-[1em] [&_.task-list-item-checkbox]:!min-h-[1em] [&_.task-list-item-checkbox]:!w-[1em] [&_.task-list-item-checkbox]:!min-w-[1em] [&_.task-list-item-checkbox]:justify-items-center [&_.task-list-item-checkbox]:!leading-[0] [&_.task-list-item-checkbox]:!ms-0 [&_.task-list-item-checkbox]:!me-[0.35em] [&_.task-list-item-checkbox]:place-content-center [&_.task-list-item-checkbox]:place-items-center [&_.task-list-item-checkbox]:overflow-hidden [&_.task-list-item-checkbox]:!relative [&_.task-list-item-checkbox]:!top-auto [&_.task-list-item-checkbox]:align-[-0.08em] [&_.task-list-item-checkbox:checked]:bg-current [&_.task-list-item-checkbox:checked]:border-current [&_.task-list-item-checkbox:checked::after]:content-[''] [&_.task-list-item-checkbox:checked::after]:!absolute [&_.task-list-item-checkbox:checked::after]:!block [&_.task-list-item-checkbox:checked::after]:!left-1/2 [&_.task-list-item-checkbox:checked::after]:!top-1/2 [&_.task-list-item-checkbox:checked::after]:!m-0 [&_.task-list-item-checkbox:checked::after]:!h-[0.72em] [&_.task-list-item-checkbox:checked::after]:!w-[0.72em] [&_.task-list-item-checkbox:checked::after]:!-translate-x-1/2 [&_.task-list-item-checkbox:checked::after]:!-translate-y-1/2 [&_.task-list-item-checkbox:checked::after]:![background:var(--background-primary,#ffffff)] [&_.task-list-item-checkbox:checked::after]:![-webkit-mask:var(--libre-checkbox-check-icon)_center/contain_no-repeat] [&_.task-list-item-checkbox:checked::after]:![mask:var(--libre-checkbox-check-icon)_center/contain_no-repeat] [&_.callout]:[--libre-callout-color:var(--callout-color,var(--editor-callout-default))] [&_.callout]:relative [&_.callout]:my-3 [&_.callout]:[border-radius:6px] [&_.callout]:px-3 [&_.callout]:py-[0.65rem] [&_.callout]:text-editor-text [&_.callout]:[background:rgba(var(--libre-callout-color),0.08)] [&_.callout]:[border:1px_solid_rgba(var(--libre-callout-color),0.22)] [&_.callout]:![border-inline-start-width:4px] [&_.callout]:![border-inline-start-style:solid] [&_.callout]:![border-inline-start-color:rgba(var(--libre-callout-color),0.8)] [&_.callout[data-callout=note]]:[--libre-callout-color:var(--editor-callout-blue)] [&_.callout[data-callout=info]]:[--libre-callout-color:var(--editor-callout-blue)] [&_.callout[data-callout=todo]]:[--libre-callout-color:var(--editor-callout-cyan)] [&_.callout[data-callout=tip]]:[--libre-callout-color:var(--editor-callout-cyan)] [&_.callout[data-callout=hint]]:[--libre-callout-color:var(--editor-callout-cyan)] [&_.callout[data-callout=important]]:[--libre-callout-color:var(--editor-callout-cyan)] [&_.callout[data-callout=success]]:[--libre-callout-color:var(--editor-callout-green)] [&_.callout[data-callout=check]]:[--libre-callout-color:var(--editor-callout-green)] [&_.callout[data-callout=done]]:[--libre-callout-color:var(--editor-callout-green)] [&_.callout[data-callout=question]]:[--libre-callout-color:var(--editor-callout-orange)] [&_.callout[data-callout=help]]:[--libre-callout-color:var(--editor-callout-orange)] [&_.callout[data-callout=faq]]:[--libre-callout-color:var(--editor-callout-orange)] [&_.callout[data-callout=warning]]:[--libre-callout-color:var(--editor-callout-orange)] [&_.callout[data-callout=caution]]:[--libre-callout-color:var(--editor-callout-orange)] [&_.callout[data-callout=attention]]:[--libre-callout-color:var(--editor-callout-orange)] [&_.callout[data-callout=failure]]:[--libre-callout-color:var(--editor-callout-red)] [&_.callout[data-callout=fail]]:[--libre-callout-color:var(--editor-callout-red)] [&_.callout[data-callout=missing]]:[--libre-callout-color:var(--editor-callout-red)] [&_.callout[data-callout=danger]]:[--libre-callout-color:var(--editor-callout-red)] [&_.callout[data-callout=error]]:[--libre-callout-color:var(--editor-callout-red)] [&_.callout[data-callout=bug]]:[--libre-callout-color:var(--editor-callout-red)] [&_.callout[data-callout=abstract]]:[--libre-callout-color:var(--editor-callout-purple)] [&_.callout[data-callout=summary]]:[--libre-callout-color:var(--editor-callout-purple)] [&_.callout[data-callout=tldr]]:[--libre-callout-color:var(--editor-callout-purple)] [&_.callout[data-callout=example]]:[--libre-callout-color:var(--editor-callout-purple)] [&_.callout[data-callout=quote]]:[--libre-callout-color:var(--editor-callout-gray)] [&_.callout[data-callout=cite]]:[--libre-callout-color:var(--editor-callout-gray)] [&_.callout-title[data-libre-editor-callout-icon=true]]:!flex [&_.callout-title[data-libre-editor-callout-icon=true]]:w-full [&_.callout-title[data-libre-editor-callout-icon=true]]:box-border [&_.callout-title[data-libre-editor-callout-icon=true]]:items-start [&_.callout-title[data-libre-editor-callout-icon=true]]:gap-[0.35rem] [&_.callout-title[data-libre-editor-callout-icon=true]]:text-[rgba(var(--libre-callout-color),1)] [&_.callout-title[data-libre-editor-callout-icon=true]::before]:content-[''] [&_.callout-title[data-libre-editor-callout-icon=true]::before]:inline-block [&_.callout-title[data-libre-editor-callout-icon=true]::before]:h-[1em] [&_.callout-title[data-libre-editor-callout-icon=true]::before]:w-[1em] [&_.callout-title[data-libre-editor-callout-icon=true]::before]:flex-[0_0_auto] [&_.callout-title[data-libre-editor-callout-icon=true]::before]:self-center [&_.callout-title[data-libre-editor-callout-icon=true]::before]:bg-current [&_.callout-title[data-libre-editor-callout-icon=true]::before]:leading-none [&_.callout-title[data-libre-editor-callout-icon=true]::before]:[-webkit-mask:var(--libre-callout-title-icon)_center/contain_no-repeat] [&_.callout-title[data-libre-editor-callout-icon=true]::before]:[mask:var(--libre-callout-title-icon)_center/contain_no-repeat] [&_.libre-callout-fold_svg]:!block [&_.libre-callout-fold_svg]:!h-[20px] [&_.libre-callout-fold_svg]:!w-[20px] [&_.libre-callout-fold_svg]:min-w-[20px] [&_.libre-callout-fold_svg]:flex-[0_0_20px] [&_.libre-callout-fold_svg]:origin-center [&_.libre-callout-fold_svg]:scale-[1.4] [&_.libre-callout-fold_svg]:overflow-visible [&_.libre-callout-fold_svg]:!text-inherit [&_.libre-callout-fold[aria-expanded=true]_.libre-callout-fold-icon-collapsed]:!hidden [&_.libre-callout-fold[aria-expanded=false]_.libre-callout-fold-icon-expanded]:!hidden [&_.callout.is-collapsed>.callout-content]:hidden [&_.callout[data-callout-fold="-"]>.callout-content]:hidden [&_.callout-title-inner]:min-w-0 [&_.callout-title-inner]:flex-[0_1_auto] [&_.callout-title>.callout-fold]:!hidden [&_.callout-content]:mt-[0.35rem] [&_.callout-content>*:first-child]:mt-0 [&_.callout-content>*:last-child]:mb-0 [&_.callout-title[data-libre-editor-callout-icon=true]_.callout-icon]:!hidden [&_[data-libre-heading-collapse-heading=true]]:relative [&_[data-libre-heading-collapse-heading=true]]:box-border [&_.libre-heading-collapse[aria-expanded=true]_.libre-heading-collapse-icon-collapsed]:!hidden [&_.libre-heading-collapse[aria-expanded=false]_.libre-heading-collapse-icon-expanded]:!hidden [&_.libre-heading-collapse-hidden]:!hidden [&_h1:hover>.libre-heading-collapse]:!opacity-100 [&_h2:hover>.libre-heading-collapse]:!opacity-100 [&_h3:hover>.libre-heading-collapse]:!opacity-100 [&_h4:hover>.libre-heading-collapse]:!opacity-100 [&_h5:hover>.libre-heading-collapse]:!opacity-100 [&_h6:hover>.libre-heading-collapse]:!opacity-100 [&_h1:focus-within>.libre-heading-collapse]:!opacity-100 [&_h2:focus-within>.libre-heading-collapse]:!opacity-100 [&_h3:focus-within>.libre-heading-collapse]:!opacity-100 [&_h4:focus-within>.libre-heading-collapse]:!opacity-100 [&_h5:focus-within>.libre-heading-collapse]:!opacity-100 [&_h6:focus-within>.libre-heading-collapse]:!opacity-100 [&_.libre-heading-collapse:hover]:!opacity-100 [&_.libre-heading-collapse:focus]:!opacity-100 [&_.libre-imported-markdown_.callout]:!my-0"
+          contenteditable="true"
+          data-lexical-editor="true"
+          role="textbox"
+          spellcheck="true"
+          style="user-select: text; white-space: pre-wrap; word-break: break-word;"
+          tabindex="0"
+        >
+          <article
+            dir="auto"
+          >
+            <p>
+              <span
+                data-lexical-text="true"
+              >
+                Original body
+              </span>
+            </p>
+          </article>
+        </div>
+      </article>
+    </main>
+    <footer
+      class="flex w-full min-w-0 max-w-full flex-wrap justify-between gap-2 border-t border-ribbon-border px-4 py-2 font-sans text-[11px] text-text-muted"
+    >
+      <span
+        aria-label="HTML source status"
+      >
+        Unsaved HTML changes
+      </span>
+      <span
+        aria-label="Editor layout"
+      >
+        Pageless layout
+      </span>
+      <span
+        aria-label="Obsidian link warnings"
+      >
+        No unresolved link targets
+      </span>
+      <span
+        aria-label="Active markdown file"
+        class="max-w-full truncate text-text-secondary"
+      >
+        Dirty.md
+      </span>
+    </footer>
+  </section>
+</div>
+`;

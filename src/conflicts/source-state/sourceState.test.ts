@@ -37,16 +37,14 @@ test('collects changed source states from hash and delete changes', () => {
   const previousStates = {
     html: { contentHash: 'a', exists: true, modifiedTime: 1 },
     markdown: { contentHash: 'b', exists: true, modifiedTime: 1 },
-    odt: { contentHash: 'c', exists: true, modifiedTime: 1 },
   };
 
   const currentStates = {
-    html: { contentHash: 'a', exists: true, modifiedTime: 2 },
+    html: { contentHash: null, exists: false, modifiedTime: null },
     markdown: { contentHash: 'changed', exists: true, modifiedTime: 1 },
-    odt: { contentHash: null, exists: false, modifiedTime: null },
   };
 
   expect(
     collectChangedSourceStates(previousStates, currentStates).map((change) => change.source)
-  ).toEqual(['markdown', 'odt']);
+  ).toEqual(['markdown', 'html']);
 });

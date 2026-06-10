@@ -1,6 +1,5 @@
 import { createRichDocumentMapping } from './rich-documents';
 import { mockObsidianSettingExports } from './mainObsidianSettingTestHelpers';
-import type { OfficeRuntimeSetupState } from './office-runtime/interfaces';
 
 export { createMetadataCacheMock } from './mainMetadataCacheTestHelpers';
 export {
@@ -28,25 +27,6 @@ export const mockRichDocumentStore = {
   recoverMappings: jest.fn(),
   renameMapping: jest.fn(),
   updateMapping: jest.fn(),
-};
-
-export const mockOfficeRuntimeSetupState: OfficeRuntimeSetupState = {
-  executablePath:
-    'C:\\Vault\\.obsidian\\plugins\\libre-note-editor\\runtime\\LibreOffice\\program\\soffice.exe',
-  isBlocking: false,
-  message: 'LibreOffice ready from bundled runtime.',
-  source: 'bundled',
-  status: 'ready',
-  version: 'LibreOffice 24.8.0.0',
-};
-
-export const mockDesktopConversionRuntime = {
-  executablePath:
-    'C:\\Vault\\.obsidian\\plugins\\libre-note-editor\\runtime\\LibreOffice\\program\\soffice.exe',
-  process: {
-    executeFile: jest.fn(),
-    launchFile: jest.fn(),
-  },
 };
 
 jest.mock(
@@ -92,17 +72,6 @@ jest.mock('./rich-documents/richDocuments', () => ({
   createRichDocumentStore: jest.fn(() => mockRichDocumentStore),
 }));
 
-jest.mock('./office-runtime/officeRuntime', () => ({
-  detectOfficeRuntime: jest.fn(async () => mockOfficeRuntimeSetupState),
-}));
-
-jest.mock('./conversion/conversion', () => ({
-  createDefaultDesktopConversionRuntime: jest.fn(async () => mockDesktopConversionRuntime),
-  ensureDesktopOdtSource: jest.fn(async () => undefined),
-  openDesktopOdtSource: jest.fn(async () => undefined),
-  syncDesktopOdtSave: jest.fn(),
-}));
-
 jest.mock('./markdown-sync/markdownSync', () => ({
   ensureFirstMarkdownImport: jest.fn(async () => ({
     frontmatter: null,
@@ -117,9 +86,6 @@ jest.mock('./markdown-sync', () => ({
 
 beforeEach(() => {
   jest.clearAllMocks();
-
-  jest.mocked(mockDesktopConversionRuntime.process.executeFile).mockReset();
-  jest.mocked(mockDesktopConversionRuntime.process.launchFile).mockReset();
 
   mockRichDocumentStore.getOrCreateMapping.mockResolvedValue(mockMapping);
   mockRichDocumentStore.loadMappings.mockResolvedValue([]);

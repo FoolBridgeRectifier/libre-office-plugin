@@ -2,20 +2,12 @@ import type { TFile, ViewCreator } from 'obsidian';
 
 import type { AutosaveController, AutosaveStatus } from '../autosave/interfaces';
 import type { ConflictResolutionChoice } from '../conflicts/interfaces';
-import type { OfficeRuntimeSetupState } from '../office-runtime/interfaces';
 import type { ObsidianLinkWarning } from '../obsidian-links/interfaces';
-import type {
-  LibreNoteEditorActiveSource,
-  LibreNoteEditorMode,
-  LibreNoteEditorPageLayout,
-} from '../settings/interfaces';
+import type { LibreNoteEditorPageLayout } from '../settings/interfaces';
 
 export interface EditorViewOptions {
   readonly htmlAutosaveIntervalMs?: number;
   readonly markdownSyncIntervalMs?: number;
-  getActiveEditorSource?(): LibreNoteEditorActiveSource;
-  getEditorMode?(): LibreNoteEditorMode;
-  getOfficeRuntimeSetupState?(): OfficeRuntimeSetupState;
   getPageLayout?(): LibreNoteEditorPageLayout;
   getInitialAutosaveStatus?(file: TFile): Promise<AutosaveStatus>;
   getLinkWarnings(markdownPath: string, htmlSource: string): ReadonlyArray<ObsidianLinkWarning>;
@@ -23,14 +15,12 @@ export interface EditorViewOptions {
   navigateInternalLink?(target: string, sourcePath: string): void;
   navigateTag?(tagText: string): void;
   openExternalLink?(url: string): void;
-  prepareDesktopSource?(file: TFile): Promise<void>;
   saveHtmlSource(
     markdownPath: string,
     htmlSource: string,
     previousHtmlSource: string
   ): Promise<void>;
   resolveConflict(markdownPath: string, choice: ConflictResolutionChoice): Promise<string | null>;
-  syncDesktopSource?(file: TFile): Promise<string | null>;
   syncMarkdownMirror(markdownPath: string, htmlSource: string): Promise<void>;
 }
 
@@ -43,7 +33,6 @@ export interface EditorViewLoadedState {
 export interface EditorViewLoadedStateTarget {
   autosaveStatus: AutosaveStatus;
   activeMarkdownFile: TFile | null;
-  desktopSourceStatus: 'idle' | 'loading' | 'error';
   importedHtmlSource: string | null;
   isResolvingConflict: boolean;
   linkWarningCount: number;
@@ -57,15 +46,11 @@ export interface EditorViewSourceTarget extends EditorViewLoadedStateTarget {
 }
 
 export interface EditorViewRenderTarget {
-  activeEditorSource: LibreNoteEditorActiveSource;
   readonly activeMarkdownFile: TFile | null;
   readonly autosaveStatus: AutosaveStatus;
-  readonly desktopSourceStatus: 'idle' | 'loading' | 'error';
-  editorMode: LibreNoteEditorMode;
   readonly importedHtmlSource: string | null;
   readonly isResolvingConflict: boolean;
   readonly linkWarningCount: number;
-  readonly officeRuntimeSetupState: OfficeRuntimeSetupState;
   pageLayout: LibreNoteEditorPageLayout;
   readonly showHtmlEmptyState: boolean;
   handleEditorBlur(): void;
@@ -74,10 +59,6 @@ export interface EditorViewRenderTarget {
   handleInternalLinkNavigate(target: string): void;
   handleResolveConflict(choice: ConflictResolutionChoice): void;
   handleTagNavigate(tagText: string): void;
-}
-
-export interface EditorViewDesktopSourceTarget extends EditorViewSourceTarget {
-  activeEditorSource: LibreNoteEditorActiveSource;
 }
 
 export interface FileTrackingView {

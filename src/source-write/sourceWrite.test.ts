@@ -4,7 +4,7 @@ import { createMarkdownSyncStore, createVaultAdapter } from '../markdownSyncTest
 import { saveRichDocumentHtml, syncMarkdownMirror } from './sourceWrite';
 import type { RichDocumentMapping } from '../rich-documents/interfaces';
 
-async function createOdtTrackedFixture(): Promise<{
+async function createHtmlTrackedFixture(): Promise<{
   readonly mapping: RichDocumentMapping;
   readonly richDocumentStore: ReturnType<typeof createMarkdownSyncStore>;
   readonly vault: ReturnType<typeof createVaultAdapter>;
@@ -15,7 +15,6 @@ async function createOdtTrackedFixture(): Promise<{
     new Map([
       ['Note.md', 'Original markdown'],
       [baseMapping.htmlPath, '<article>Original</article>'],
-      [baseMapping.odtPath, 'Original ODT'],
     ])
   );
 
@@ -27,14 +26,14 @@ async function createOdtTrackedFixture(): Promise<{
   return { mapping, richDocumentStore: createMarkdownSyncStore(mapping), vault };
 }
 
-test('creates conflict when odt changes before html save', async () => {
-  const { mapping, richDocumentStore, vault } = await createOdtTrackedFixture();
+test('creates conflict when html changes before html save', async () => {
+  const { mapping, richDocumentStore, vault } = await createHtmlTrackedFixture();
 
-  vault.files.set(mapping.odtPath, 'External ODT');
+  vault.files.set(mapping.htmlPath, '<article>External HTML</article>');
 
   await expect(
     saveRichDocumentHtml({
-      htmlSource: '<article>Desktop edit</article>',
+      htmlSource: '<article>Current edit</article>',
       markdownPath: 'Note.md',
       previousHtmlSource: '<article>Original</article>',
       richDocumentStore,
@@ -47,16 +46,16 @@ test('creates conflict when odt changes before html save', async () => {
   expect(updatedMapping.conflictState.status).toBe('conflicted');
 
   if (updatedMapping.conflictState.status === 'conflicted') {
-    expect(updatedMapping.conflictState.changedSources).toEqual(['odt', 'html']);
+    expect(updatedMapping.conflictState.changedSources).toEqual(['html']);
   }
 
-  expect(vault.files.get(mapping.odtPath)).toBe('External ODT');
+  expect(vault.files.get(mapping.htmlPath)).toBe('<article>External HTML</article>');
 });
 
-test('does not overwrite markdown when odt changes before mirror sync', async () => {
-  const { mapping, richDocumentStore, vault } = await createOdtTrackedFixture();
+test('does not overwrite markdown when html changes before mirror sync', async () => {
+  const { mapping, richDocumentStore, vault } = await createHtmlTrackedFixture();
 
-  vault.files.set(mapping.odtPath, 'External ODT');
+  vault.files.set(mapping.htmlPath, '<article>External HTML</article>');
 
   await expect(
     syncMarkdownMirror({
@@ -74,7 +73,7 @@ test('does not overwrite markdown when odt changes before mirror sync', async ()
 });
 
 test('does not overwrite externally changed markdown task state during mirror sync', async () => {
-  const { mapping, richDocumentStore, vault } = await createOdtTrackedFixture();
+  const { mapping, richDocumentStore, vault } = await createHtmlTrackedFixture();
 
   vault.files.set('Note.md', '- [x] External task state');
 
@@ -95,7 +94,7 @@ test('does not overwrite externally changed markdown task state during mirror sy
 });
 
 test('skips source writes after a markdown note has been archived and deleted', async () => {
-  const { mapping, richDocumentStore, vault } = await createOdtTrackedFixture();
+  const { mapping, richDocumentStore, vault } = await createHtmlTrackedFixture();
 
   const archivedMapping = {
     ...mapping,
@@ -129,7 +128,7 @@ test('skips source writes after a markdown note has been archived and deleted', 
 });
 
 test('sanitizes unsafe html before rich source writes and markdown sync', async () => {
-  const { richDocumentStore, vault } = await createOdtTrackedFixture();
+  const { richDocumentStore, vault } = await createHtmlTrackedFixture();
 
   await saveRichDocumentHtml({
     htmlSource: '<article><p onclick="bad()">Clean body</p><script>bad()</script></article>',

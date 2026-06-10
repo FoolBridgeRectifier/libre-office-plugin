@@ -61,7 +61,7 @@ function normalizeRichDocumentMapping(value: unknown): RichDocumentMapping[] {
   // Paths are repaired from the rich id if persisted data points outside our document root.
   return [
     {
-      activeSource: getLiteral(value.activeSource, ['markdown', 'html', 'odt'], 'markdown'),
+      activeSource: getActiveSource(value.activeSource),
       archivedAt: typeof value.archivedAt === 'string' ? value.archivedAt : null,
       conflictState: normalizeConflictState(value.conflictState),
       htmlPath: getSafePath(value.htmlPath, richDocumentFilePaths.htmlPath),
@@ -72,7 +72,6 @@ function normalizeRichDocumentMapping(value: unknown): RichDocumentMapping[] {
       ),
       lifecycleState: getLiteral(value.lifecycleState, ['active', 'archived'], 'active'),
       markdownPath: value.markdownPath,
-      odtPath: getSafePath(value.odtPath, richDocumentFilePaths.odtPath),
       richDocumentId,
       sourceStates: normalizeSourceStates(value.sourceStates),
       syncTimestamps: normalizeSyncTimestamps(value.syncTimestamps),
@@ -88,8 +87,11 @@ function normalizeSyncTimestamps(value: unknown): RichDocumentSyncTimestamps {
     htmlSyncedAt: getNullableString(timestampRecord.htmlSyncedAt),
     lastSyncedAt: getNullableString(timestampRecord.lastSyncedAt),
     markdownSyncedAt: getNullableString(timestampRecord.markdownSyncedAt),
-    odtSyncedAt: getNullableString(timestampRecord.odtSyncedAt),
   };
+}
+
+function getActiveSource(value: unknown): RichDocumentMapping['activeSource'] {
+  return value === 'odt' ? 'html' : getLiteral(value, ['markdown', 'html'], 'markdown');
 }
 
 function getSafePath(value: unknown, fallbackPath: string): string {

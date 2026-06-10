@@ -37,8 +37,6 @@ export async function resolveRichDocumentConflict(
   } else if (activeSource === 'html' && selectedSource !== null) {
     htmlSource = selectedSource;
     await writeHtmlResolutionSources(mapping, options, htmlSource);
-  } else if (activeSource === 'odt' && selectedSource !== null) {
-    await options.vaultAdapter.write(mapping.odtPath, selectedSource);
   }
 
   const sourceStates = await createSourceStates(mapping, options.vaultAdapter);

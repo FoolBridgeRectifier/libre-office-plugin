@@ -8,7 +8,7 @@ It prepares imported HTML for editing, loads it into a bundled local Lexical edi
 
 ## Protected Content
 
-Protected content is the existing internal name for HTML that must survive round trips or needs special export handling. Examples include frontmatter templates, Markdown source facts, raw Markdown fallback blocks, code fences, complex table source, remote-image fallbacks, and desktop-only embed fallbacks.
+Protected content is the existing internal name for HTML that must survive round trips or needs special export handling. Examples include frontmatter templates, Markdown source facts, raw Markdown fallback blocks, code fences, complex table source, remote-image fallbacks, and unsupported embed fallbacks.
 
 The stored marker is `data-libre-protected`. Code fences and complex tables stay editable and removable in Lexical; Markdown export uses their current DOM instead of stale preserved source attributes. Other protected content is read-only but still removable through selection/delete flows.
 
@@ -25,4 +25,4 @@ The editor adds `data-libre-editor-protected`, `contenteditable="false"`, and `l
 
 ## How It Is Used
 
-`ribbon-editor` renders `HtmlEditor` inside the editor surface. Input events flow to `editor-view`, which forwards them to `autosave`; blur events trigger desktop-source sync when desktop ODT mode is active.
+`ribbon-editor` renders `HtmlEditor` inside the editor surface. Input events flow to `editor-view`, which forwards them to `autosave`; blur events flush pending HTML edits.

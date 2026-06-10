@@ -4,6 +4,8 @@ import {
   TASK_LIST_ITEM_CHECKBOX_SELECTOR,
   TASK_LIST_ITEM_SELECTOR,
 } from '../../../constants';
+import { applyCalloutEditorHooks } from '../../callout/callout';
+import { applyHeadingCollapseEditorHooks } from '../../heading-collapse/headingCollapse';
 
 export function removeEmptyClassAttribute(element: HTMLElement): void {
   if (!element.getAttribute('class')) {
@@ -56,6 +58,12 @@ export function syncTaskCheckboxColorHooks(editorElement: HTMLElement): void {
         checkboxElement.style.removeProperty(TASK_CHECKBOX_COLOR_PROPERTY);
       }
     });
+}
+
+export function syncRichTextEditorHooks(editorElement: HTMLElement): void {
+  applyCalloutEditorHooks(editorElement);
+  applyHeadingCollapseEditorHooks(editorElement);
+  syncTaskCheckboxColorHooks(editorElement);
 }
 
 export function updateTaskCheckboxState(

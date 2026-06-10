@@ -2,9 +2,7 @@ import { useState } from 'react';
 
 import { ConflictRecoveryPanel } from '../conflict-recovery/ConflictRecovery';
 import { HtmlEditor } from '../html-editor/HtmlEditor';
-import { createSkippedMobileRuntimeSetupState } from '../office-runtime/setup-state/setupState';
 import { DEFAULT_RIBBON_TAB_ID, RIBBON_TABS } from './constants';
-import { DesktopSourceLoader } from './desktop-source-loader/DesktopSourceLoader';
 import { StatusFooter } from './status-footer/StatusFooter';
 import { RibbonTabBar } from './tab-bar/TabBar';
 import {
@@ -19,14 +17,10 @@ import type { RibbonEditorProps } from './interfaces';
 
 export function RibbonEditor({
   activeFilePath = null,
-  activeEditorSource = 'html-fallback',
   autosaveStatus = 'saved',
-  desktopSourceStatus = 'idle',
-  editorMode = 'automatic',
   importedHtmlSource = null,
   isResolvingConflict = false,
   linkWarningCount = 0,
-  officeRuntimeSetupState = createSkippedMobileRuntimeSetupState(),
   pageLayout = 'pageless',
   showHtmlEmptyState = activeFilePath === null,
   onEditorBlur,
@@ -118,8 +112,6 @@ export function RibbonEditor({
         ) : null}
 
         <article aria-label="Editor surface" className={pageClassName}>
-          <DesktopSourceLoader status={desktopSourceStatus} />
-
           <HtmlEditor
             htmlSource={importedHtmlSource}
             showEmptyState={showHtmlEmptyState}
@@ -134,12 +126,9 @@ export function RibbonEditor({
 
       <StatusFooter
         activeFilePath={activeFilePath}
-        activeEditorSource={activeEditorSource}
-        editorMode={editorMode}
         filePathClassName={filePathClassName}
         htmlSourceStatusText={getAutosaveStatusText(autosaveStatus)}
         linkWarningStatusText={getLinkWarningStatusText(linkWarningCount)}
-        officeRuntimeSetupState={officeRuntimeSetupState}
         pageLayout={pageLayout}
         statusClassName={statusClassName}
       />

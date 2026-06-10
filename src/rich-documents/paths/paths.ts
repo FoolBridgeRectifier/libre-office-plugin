@@ -4,7 +4,6 @@ import {
   RICH_DOCUMENT_HTML_FILE_NAME,
   RICH_DOCUMENT_ID_PREFIX,
   RICH_DOCUMENT_MAPPING_FILE_NAME,
-  RICH_DOCUMENT_ODT_FILE_NAME,
 } from '../constants';
 import type { RichDocumentFilePaths } from '../interfaces';
 
@@ -17,7 +16,6 @@ export function createRichDocumentFilePaths(richDocumentId: string): RichDocumen
     folderPath,
     htmlPath: `${folderPath}/${RICH_DOCUMENT_HTML_FILE_NAME}`,
     mappingPath: `${folderPath}/${RICH_DOCUMENT_MAPPING_FILE_NAME}`,
-    odtPath: `${folderPath}/${RICH_DOCUMENT_ODT_FILE_NAME}`,
   };
 }
 

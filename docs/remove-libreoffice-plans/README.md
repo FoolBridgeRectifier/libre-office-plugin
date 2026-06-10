@@ -9,6 +9,7 @@ Remove LibreOffice and ODT from the core editor while keeping rich HTML editing,
 - `CONVENTIONS.md`
 - `DESIGN.md`
 - `docs/remove-libreoffice-change-inventory.md`
+- `docs/remove-libreoffice-plans/final-source-search-checklist.md`
 - `SYSTEM_DESIGN.md`
 
 ## Sequence

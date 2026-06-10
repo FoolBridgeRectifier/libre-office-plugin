@@ -4,11 +4,6 @@ import {
   syncMarkdownMirror,
 } from '../../richDocumentWorkspace';
 import {
-  createDefaultDesktopConversionRuntime,
-  ensureDesktopOdtSource,
-  syncDesktopOdtSave,
-} from '../../conversion/conversion';
-import {
   getInitialRichDocumentAutosaveStatus,
   loadRichDocumentHtmlForStore,
 } from '../../rich-html/richHtml';
@@ -22,24 +17,16 @@ import { openExternalUrl, openInternalLinkTarget, openTagSearch } from './helper
 import type { EditorViewOptions } from '../interfaces';
 import type { App } from 'obsidian';
 import type { RichDocumentStore } from '../../rich-documents/interfaces';
-import type {
-  LibreNoteEditorActiveSource,
-  LibreNoteEditorSettings,
-} from '../../settings/interfaces';
+import type { LibreNoteEditorSettings } from '../../settings/interfaces';
 
 export function createRichDocumentEditorViewOptions(
   app: App,
   richDocumentStore: RichDocumentStore,
-  getOfficeRuntimeSetupState: NonNullable<EditorViewOptions['getOfficeRuntimeSetupState']>,
-  getSettings: () => LibreNoteEditorSettings,
-  getActiveEditorSource: () => LibreNoteEditorActiveSource
+  getSettings: () => LibreNoteEditorSettings
 ): EditorViewOptions {
   const settings = getSettings();
 
   return {
-    getActiveEditorSource,
-    getEditorMode: () => getSettings().editorMode,
-    getOfficeRuntimeSetupState,
     getPageLayout: () => getSettings().pageLayout,
     htmlAutosaveIntervalMs: secondsToMilliseconds(settings.autosaveIntervalSeconds),
     markdownSyncIntervalMs: secondsToMilliseconds(settings.markdownSyncIntervalSeconds),
@@ -54,21 +41,6 @@ export function createRichDocumentEditorViewOptions(
     navigateTag: (tagText) => openTagSearch(app, tagText),
     openExternalLink: (url) => {
       void openExternalUrl(url);
-    },
-    prepareDesktopSource: async (file) => {
-      const mapping = await richDocumentStore.getMappingByMarkdownPath(file.path);
-      const runtime = await createDefaultDesktopConversionRuntime(getOfficeRuntimeSetupState());
-
-      if (!mapping || !runtime) {
-        return;
-      }
-
-      await ensureDesktopOdtSource({
-        mapping,
-        richDocumentStore,
-        runtime,
-        vaultAdapter: app.vault.adapter,
-      });
     },
     resolveConflict: async (markdownPath, choice) => {
       return resolveRichDocumentConflict({
@@ -88,21 +60,6 @@ export function createRichDocumentEditorViewOptions(
         richDocumentStore,
         vaultAdapter: app.vault.adapter,
       }),
-    syncDesktopSource: async (file) => {
-      const mapping = await richDocumentStore.getMappingByMarkdownPath(file.path);
-      const runtime = await createDefaultDesktopConversionRuntime(getOfficeRuntimeSetupState());
-
-      if (!mapping || !runtime) {
-        return null;
-      }
-
-      return syncDesktopOdtSave({
-        mapping,
-        richDocumentStore,
-        runtime,
-        vaultAdapter: app.vault.adapter,
-      });
-    },
     syncMarkdownMirror: (markdownPath, htmlSource) =>
       syncMarkdownMirror({
         htmlSource,
@@ -118,11 +75,11 @@ async function convertMarkdownSourceToHtml(
   markdownSource: string,
   sourcePath: string
 ): Promise<string> {
-  const conversionResult = await convertMarkdownToHtmlWithObsidianRenderer(markdownSource, {
+  const renderResult = await convertMarkdownToHtmlWithObsidianRenderer(markdownSource, {
     markdownRenderer: (bodyMarkdown, containerElement, renderedSourcePath) =>
       renderMarkdownWithObsidian(app, bodyMarkdown, containerElement, renderedSourcePath),
     sourcePath,
   });
 
-  return conversionResult.htmlSource;
+  return renderResult.htmlSource;
 }

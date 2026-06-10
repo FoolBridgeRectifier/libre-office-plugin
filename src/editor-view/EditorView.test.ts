@@ -85,27 +85,16 @@ test('exposes Obsidian FileView metadata for markdown panes', () => {
   expect(editorView.getViewType()).toBe(LIBRE_MARKDOWN_VIEW_TYPE);
 });
 
-test('does not wait for desktop source refresh before rendering imported html', async () => {
-  const syncDesktopSource = jest.fn(() => new Promise<string | null>(() => undefined));
-
-  const editorView = createEditorView(
-    jest.fn(async () => '<article>Immediate</article>'),
-    jest.fn(() => []),
-    undefined,
-    undefined,
-    { syncDesktopSource }
-  );
+test('renders imported html without extra source state', async () => {
+  const editorView = createEditorView(jest.fn(async () => '<article>Immediate</article>'));
 
   await (editorView as EditorView & { onOpen(): Promise<void> }).onOpen();
   await editorView.onLoadFile(createFile('Immediate.md', 'md'));
-
-  expect(syncDesktopSource).toHaveBeenCalledWith(createFile('Immediate.md', 'md'));
 
   expect(mockReactRoot.render).toHaveBeenLastCalledWith(
     expect.objectContaining({
       props: expect.objectContaining({
         activeFilePath: 'Immediate.md',
-        desktopSourceStatus: 'loading',
         importedHtmlSource: '<article>Immediate</article>',
       }),
     })

@@ -50,6 +50,7 @@ function createEditorViewOptions(): EditorViewOptions {
 
 function getLastAppProps() {
   return mockReactRoot.render.mock.lastCall?.[0].props as {
+    onEditorBlur(): void;
     onHtmlSourceChange(htmlSource: string): void;
   };
 }
@@ -91,4 +92,26 @@ test('flushes the previous note before switching files', async () => {
     'First.md',
     '<article>First changed</article>'
   );
+});
+
+test('flushes pending html when the editor blurs', async () => {
+  const options = createEditorViewOptions();
+  const editorView = new EditorView({} as WorkspaceLeaf, options);
+
+  await (editorView as EditorView & { onOpen(): Promise<void> }).onOpen();
+  await editorView.onLoadFile(createMarkdownFile('Blur.md'));
+
+  getLastAppProps().onHtmlSourceChange('<article>Blur changed</article>');
+  getLastAppProps().onEditorBlur();
+
+  await Promise.resolve();
+  await Promise.resolve();
+
+  expect(options.saveHtmlSource).toHaveBeenCalledWith(
+    'Blur.md',
+    '<article>Blur changed</article>',
+    '<article>Blur.md</article>'
+  );
+
+  expect(options.syncMarkdownMirror).not.toHaveBeenCalled();
 });

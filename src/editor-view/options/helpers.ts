@@ -26,10 +26,10 @@ export async function openInternalLinkTarget(
 
 export async function openExternalUrl(
   url: string,
-  runtimeRequire: NodeJS.Require = require,
+  electronRequire: NodeJS.Require = require,
   browserOpen: typeof globalThis.open = globalThis.open
 ): Promise<void> {
-  const electronShell = getElectronShell(runtimeRequire);
+  const electronShell = getElectronShell(electronRequire);
 
   if (electronShell?.openExternal) {
     await electronShell.openExternal(url);
@@ -41,10 +41,10 @@ export async function openExternalUrl(
 }
 
 function getElectronShell(
-  runtimeRequire: NodeJS.Require
+  electronRequire: NodeJS.Require
 ): Partial<ElectronRuntime['shell']> | null {
   try {
-    const electronRuntime = runtimeRequire('electron') as ElectronRuntime;
+    const electronRuntime = electronRequire('electron') as ElectronRuntime;
 
     return electronRuntime.shell ?? null;
   } catch {

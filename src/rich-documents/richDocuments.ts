@@ -98,7 +98,7 @@ export function createRichDocumentStore(options: RichDocumentStoreOptions) {
 
         const timestamp = getCurrentTimestamp();
 
-        const [htmlPath, odtPath] = await archiveRichDocumentFiles(
+        const htmlPath = await archiveRichDocumentFiles(
           options.vaultAdapter,
           existingMapping,
           timestamp
@@ -107,7 +107,6 @@ export function createRichDocumentStore(options: RichDocumentStoreOptions) {
         const archivedMapping = createArchivedRichDocumentMapping(
           existingMapping,
           htmlPath,
-          odtPath,
           timestamp
         );
 

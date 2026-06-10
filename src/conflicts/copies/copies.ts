@@ -51,21 +51,23 @@ async function writeConflictCopy(
 export async function createConflictState(options: ConflictCreationOptions) {
   const conflictCopies: RichDocumentConflictCopy[] = [];
 
-  await copyExistingSource(options, 'markdown', options.mapping.markdownPath, conflictCopies);
-  await copyExistingSource(options, 'html', options.mapping.htmlPath, conflictCopies);
-  await copyExistingSource(options, 'odt', options.mapping.odtPath, conflictCopies);
-
-  if (options.desktopHtmlSource !== undefined) {
+  if (options.currentHtmlSource !== undefined) {
     conflictCopies.push(
       await writeConflictCopy({
-        content: options.desktopHtmlSource,
+        content: options.currentHtmlSource,
         detectedAt: options.detectedAt,
         mapping: options.mapping,
-        source: 'desktop',
+        source: 'html',
         sourcePath: options.mapping.htmlPath,
         vaultAdapter: options.vaultAdapter,
       })
     );
+  }
+
+  await copyExistingSource(options, 'markdown', options.mapping.markdownPath, conflictCopies);
+
+  if (options.currentHtmlSource === undefined) {
+    await copyExistingSource(options, 'html', options.mapping.htmlPath, conflictCopies);
   }
 
   return {

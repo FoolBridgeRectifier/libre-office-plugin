@@ -80,14 +80,14 @@ test('resolves conflicts from the React app callback and refreshes html source',
     props: { onResolveConflict(choice: ConflictResolutionChoice): Promise<void> };
   };
 
-  await renderedElement.props.onResolveConflict('desktop');
+  await renderedElement.props.onResolveConflict('html');
 
   const expectedResolvedProps = {
     autosaveStatus: 'saved',
     importedHtmlSource: '<article>Resolved</article>',
   };
 
-  expect(resolveConflict).toHaveBeenCalledWith('Conflict.md', 'desktop');
+  expect(resolveConflict).toHaveBeenCalledWith('Conflict.md', 'html');
 
   expect(mockReactRoot.render).toHaveBeenLastCalledWith(
     expect.objectContaining({

@@ -1,0 +1,1 @@
+export { ProtectedContentGuardPlugin } from './ProtectedContentGuard';

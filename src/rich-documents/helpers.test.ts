@@ -16,7 +16,6 @@ test('creates rich document paths inside the documents root', () => {
 
   expect(paths.folderPath).toBe(`${RICH_DOCUMENTS_ROOT_PATH}/---Unsafe-Note-md`);
   expect(paths.htmlPath).toBe(`${RICH_DOCUMENTS_ROOT_PATH}/---Unsafe-Note-md/document.html`);
-  expect(paths.odtPath).toBe(`${RICH_DOCUMENTS_ROOT_PATH}/---Unsafe-Note-md/document.odt`);
 
   expect(isPathInsideRichDocumentsRoot(paths.htmlPath)).toBe(true);
   expect(isPathInsideRichDocumentsRoot('../outside/document.html')).toBe(false);

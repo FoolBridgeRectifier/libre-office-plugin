@@ -123,24 +123,9 @@ exports[`sets the Home ribbon tab active by default 1`] = `
         HTML source saved
       </span>
       <span
-        aria-label="Active editor source"
-      >
-        HTML fallback source
-      </span>
-      <span
-        aria-label="Editor mode"
-      >
-        Automatic mode
-      </span>
-      <span
         aria-label="Editor layout"
       >
         Pageless layout
-      </span>
-      <span
-        aria-label="LibreOffice runtime status"
-      >
-        Mobile HTML editing does not require LibreOffice.
       </span>
       <span
         aria-label="Obsidian link warnings"

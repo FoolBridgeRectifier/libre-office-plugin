@@ -11,7 +11,7 @@ import type {
 export function getActiveSourceForChoice(
   choice: ConflictResolutionChoice
 ): RichDocumentActiveSource {
-  if (choice === 'desktop' || choice === 'mobile' || choice === 'duplicate-conflict-copy') {
+  if (choice === 'duplicate-conflict-copy') {
     return 'html';
   }
 
@@ -22,17 +22,11 @@ function getConflictCopySources(
   choice: ConflictResolutionChoice
 ): ReadonlyArray<RichDocumentConflictCopySource> {
   switch (choice) {
-    case 'desktop':
-      return ['desktop', 'html'];
-    case 'mobile':
     case 'html':
-      return ['html', 'desktop'];
+    case 'duplicate-conflict-copy':
+      return ['html'];
     case 'markdown':
       return ['markdown'];
-    case 'odt':
-      return ['odt'];
-    case 'duplicate-conflict-copy':
-      return ['html', 'desktop'];
   }
 }
 
@@ -77,7 +71,7 @@ export async function writeDuplicateConflictCopy(
     return;
   }
 
-  const conflictCopyPath = createConflictCopyPath(mapping, mapping.htmlPath, 'desktop', resolvedAt);
+  const conflictCopyPath = createConflictCopyPath(mapping, mapping.htmlPath, 'html', resolvedAt);
   const conflictFolderPath = conflictCopyPath.split('/').slice(0, -1).join('/');
 
   if (!(await options.vaultAdapter.exists(conflictFolderPath))) {
@@ -120,10 +114,8 @@ export function getSync(
       : mapping.syncTimestamps.markdownSyncedAt;
 
   return {
-    ...mapping.syncTimestamps,
     htmlSyncedAt,
     lastSyncedAt: resolvedAt,
     markdownSyncedAt,
-    odtSyncedAt: activeSource === 'odt' ? resolvedAt : mapping.syncTimestamps.odtSyncedAt,
   };
 }

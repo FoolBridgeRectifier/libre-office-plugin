@@ -78,12 +78,9 @@ export async function archiveRichDocumentFiles(
   vaultAdapter: RichDocumentVaultAdapter,
   mapping: RichDocumentMapping,
   timestamp: string
-): Promise<readonly [string, string]> {
-  // Archive both current rich formats together so the mapping remains internally consistent.
-  const htmlPath = await archiveVaultFileIfPresent(vaultAdapter, mapping.htmlPath, timestamp);
-  const odtPath = await archiveVaultFileIfPresent(vaultAdapter, mapping.odtPath, timestamp);
-
-  return [htmlPath, odtPath];
+): Promise<string> {
+  // Archive only the current rich HTML file; legacy sidecars are left untouched.
+  return archiveVaultFileIfPresent(vaultAdapter, mapping.htmlPath, timestamp);
 }
 
 async function readRecoveredMapping(

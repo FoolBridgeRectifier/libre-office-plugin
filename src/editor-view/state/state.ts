@@ -61,7 +61,6 @@ export function startEditorViewHtmlLoad(target: EditorViewLoadedStateTarget, fil
 
 export function applyEditorViewUnloadedState(target: EditorViewLoadedStateTarget): void {
   target.activeMarkdownFile = null;
-  target.desktopSourceStatus = 'idle';
   target.importedHtmlSource = null;
   target.linkWarningCount = 0;
 
@@ -104,8 +103,6 @@ export function refreshEditorViewLinkWarnings(target: EditorViewSourceTarget): v
 export function refreshEditorViewSettingsState(
   target: EditorViewRenderTarget & { readonly editorViewOptions: EditorViewOptions }
 ): void {
-  target.activeEditorSource = target.editorViewOptions.getActiveEditorSource?.() ?? 'desktop-odt';
-  target.editorMode = target.editorViewOptions.getEditorMode?.() ?? 'automatic';
   target.pageLayout = target.editorViewOptions.getPageLayout?.() ?? 'pageless';
 }
 

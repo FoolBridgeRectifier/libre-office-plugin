@@ -1,7 +1,6 @@
 import { DEFAULT_LIBRE_NOTE_EDITOR_SETTINGS } from './constants';
 import {
   mergeLibreNoteEditorSettings,
-  resolveActiveEditorSource,
   secondsToMilliseconds,
   validateIntervalSeconds,
 } from './helpers';
@@ -14,17 +13,26 @@ test('merges saved settings with new defaults', () => {
   const settings = mergeLibreNoteEditorSettings({
     settings: {
       autosaveIntervalSeconds: 10,
-      editorMode: 'html-fallback',
-      libreOfficePath: ' C:\\LibreOffice\\program\\soffice.exe ',
+      pageLayout: 'page-width',
     },
   });
 
   expect(settings).toEqual({
     ...DEFAULT_LIBRE_NOTE_EDITOR_SETTINGS,
     autosaveIntervalSeconds: 10,
-    editorMode: 'html-fallback',
-    libreOfficePath: 'C:\\LibreOffice\\program\\soffice.exe',
+    pageLayout: 'page-width',
   });
+});
+
+test('drops old runtime and source-mode settings during migration', () => {
+  const settings = mergeLibreNoteEditorSettings({
+    settings: {
+      editorMode: 'desktop-odt',
+      libreOfficePath: 'C:\\LibreOffice\\program\\soffice.exe',
+    },
+  });
+
+  expect(settings).toEqual(DEFAULT_LIBRE_NOTE_EDITOR_SETTINGS);
 });
 
 test('rejects invalid intervals before saving', () => {
@@ -52,25 +60,12 @@ test('converts valid interval seconds to milliseconds for autosave wiring', () =
   expect(secondsToMilliseconds(15)).toBe(15000);
 });
 
-test('editor mode changes affect active source selection', () => {
-  expect(
-    resolveActiveEditorSource(
-      { ...DEFAULT_LIBRE_NOTE_EDITOR_SETTINGS, editorMode: 'automatic' },
-      { isRuntimeReady: true, platform: 'desktop' }
-    )
-  ).toBe('desktop-odt');
+test('old html fallback mode normalizes safely to current defaults', () => {
+  const settings = mergeLibreNoteEditorSettings({
+    settings: {
+      editorMode: 'html-fallback',
+    },
+  });
 
-  expect(
-    resolveActiveEditorSource(
-      { ...DEFAULT_LIBRE_NOTE_EDITOR_SETTINGS, editorMode: 'automatic' },
-      { isRuntimeReady: true, platform: 'mobile' }
-    )
-  ).toBe('html-fallback');
-
-  expect(
-    resolveActiveEditorSource(
-      { ...DEFAULT_LIBRE_NOTE_EDITOR_SETTINGS, editorMode: 'html-fallback' },
-      { isRuntimeReady: true, platform: 'desktop' }
-    )
-  ).toBe('html-fallback');
+  expect(settings).toEqual(DEFAULT_LIBRE_NOTE_EDITOR_SETTINGS);
 });

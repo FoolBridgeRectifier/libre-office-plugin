@@ -24,7 +24,6 @@ export function createRichDocumentMapping(
     lastEditorPlatform,
     lifecycleState: 'active',
     markdownPath,
-    odtPath: richDocumentFilePaths.odtPath,
     richDocumentId: sanitizeRichDocumentId(richDocumentId),
     sourceStates: createEmptySourceStates(),
     syncTimestamps: createSyncTimestamps(timestamp),
@@ -34,7 +33,6 @@ export function createRichDocumentMapping(
 export function createArchivedRichDocumentMapping(
   mapping: RichDocumentMapping,
   htmlPath: string,
-  odtPath: string,
   timestamp: string
 ): RichDocumentMapping {
   // Archiving keeps the identity intact while marking the rich files as no longer active.
@@ -43,7 +41,6 @@ export function createArchivedRichDocumentMapping(
     archivedAt: timestamp,
     htmlPath,
     lifecycleState: 'archived',
-    odtPath,
   };
 }
 
@@ -56,12 +53,11 @@ export function createStableRichDocumentId(timestamp: string, randomValue: numbe
 }
 
 function createSyncTimestamps(timestamp: string): RichDocumentSyncTimestamps {
-  // A fresh mapping begins as markdown-sourced until HTML or ODT imports are created.
+  // A fresh mapping begins as markdown-sourced until HTML imports are created.
   return {
     htmlSyncedAt: null,
     lastSyncedAt: timestamp,
     markdownSyncedAt: timestamp,
-    odtSyncedAt: null,
   };
 }
 
@@ -69,6 +65,5 @@ function createEmptySourceStates(): RichDocumentSourceStates {
   return {
     html: null,
     markdown: null,
-    odt: null,
   };
 }

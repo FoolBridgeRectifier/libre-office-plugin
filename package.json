@@ -17,6 +17,7 @@
   "dependencies": {
     "@fluentui/react-icons": "^2.0.328",
     "@lexical/html": "^0.45.0",
+    "@lexical/react": "^0.45.0",
     "classnames": "^2.5.1",
     "gray-matter": "^4.0.3",
     "lexical": "^0.45.0",
