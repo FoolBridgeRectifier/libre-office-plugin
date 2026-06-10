@@ -52,7 +52,9 @@ export function getEditorPageClassName(pageLayout: LibreNoteEditorPageLayout): s
   return classNames(
     'relative box-border min-h-72 w-full min-w-0 max-w-full overflow-hidden rounded-ribbon-sm bg-editor-bg',
     'text-editor-text',
-    pageLayout === 'page-width' ? 'libre-page-width p-0' : 'p-0'
+    pageLayout === 'page-width'
+      ? 'libre-page-width p-0 md:mx-auto md:max-w-[816px] md:border md:border-ribbon-border md:p-6 md:shadow-ribbon-raised'
+      : 'p-0'
   );
 }
 

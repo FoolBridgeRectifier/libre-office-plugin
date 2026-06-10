@@ -1,0 +1,19 @@
+{
+  "$schema": "https://unpkg.com/knip@6/schema.json",
+  "entry": ["src/main.ts", "src/**/*.test.ts", "src/**/*.test.tsx", "scripts/**/*.mjs"],
+  "project": ["src/**/*.{ts,tsx}", "scripts/**/*.mjs"],
+  "ignoreFiles": ["src/**/index.ts"],
+  "ignoreDependencies": [
+    "@babel/plugin-transform-modules-commonjs",
+    "@eslint/js",
+    "eslint-config-prettier",
+    "eslint-import-resolver-typescript",
+    "eslint-plugin-import",
+    "eslint-plugin-react",
+    "eslint-plugin-react-hooks",
+    "eslint-plugin-sonarjs",
+    "tailwindcss",
+    "typescript-eslint"
+  ],
+  "eslint": false
+}

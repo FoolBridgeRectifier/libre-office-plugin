@@ -1,10 +1,12 @@
 import { createElement } from 'react';
 import { renderToStaticMarkup } from 'react-dom/server';
 import { CaretDown16Filled, CaretRight16Filled } from '@fluentui/react-icons';
+import classNames from 'classnames';
 
 import {
   HEADING_COLLAPSE_BUTTON_ATTRIBUTE,
   HEADING_COLLAPSE_BUTTON_CLASS_NAME,
+  HEADING_COLLAPSE_BUTTON_STYLE_CLASS_NAME,
   HEADING_COLLAPSE_COLLAPSED_ATTRIBUTE,
   HEADING_COLLAPSE_HIDDEN_ATTRIBUTE,
   HEADING_COLLAPSE_HIDDEN_CLASS_NAME,
@@ -45,7 +47,12 @@ export function createHeadingCollapseButton(htmlDocument: Document): HTMLButtonE
 
   buttonElement.setAttribute(HEADING_COLLAPSE_BUTTON_ATTRIBUTE, 'true');
   buttonElement.setAttribute('aria-label', 'Toggle heading collapse');
-  buttonElement.className = HEADING_COLLAPSE_BUTTON_CLASS_NAME;
+
+  buttonElement.className = classNames(
+    HEADING_COLLAPSE_BUTTON_CLASS_NAME,
+    HEADING_COLLAPSE_BUTTON_STYLE_CLASS_NAME
+  );
+
   buttonElement.contentEditable = 'false';
 
   buttonElement.type = 'button';

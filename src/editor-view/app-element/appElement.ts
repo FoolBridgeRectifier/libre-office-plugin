@@ -2,7 +2,7 @@ import { createElement } from 'react';
 import { createRoot } from 'react-dom/client';
 
 import { App } from '../../App';
-import { LIBRE_NOTE_EDITOR_CONTENT_CLASS_NAME } from '../constants';
+import { LIBRE_NOTE_EDITOR_CONTENT_CLASS_NAMES } from '../constants';
 import { shouldRouteFileToLibreEditor } from '../helpers';
 import type { AutosaveStatus } from '../../autosave/interfaces';
 import type { ConflictResolutionChoice } from '../../conflicts/interfaces';
@@ -17,7 +17,7 @@ import type { Root } from 'react-dom/client';
 import type { TFile } from 'obsidian';
 
 export function createEditorViewRoot(contentElement: HTMLElement): Root {
-  contentElement.classList.add(LIBRE_NOTE_EDITOR_CONTENT_CLASS_NAME);
+  contentElement.classList.add(...LIBRE_NOTE_EDITOR_CONTENT_CLASS_NAMES.split(' '));
 
   return createRoot(contentElement);
 }

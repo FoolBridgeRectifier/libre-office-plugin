@@ -1,12 +1,14 @@
 import { createElement } from 'react';
 import { renderToStaticMarkup } from 'react-dom/server';
 import { CaretDown16Regular, CaretRight16Regular } from '@fluentui/react-icons';
+import classNames from 'classnames';
 
 import {
   EDITOR_CALLOUT_FOLD_CONTROL_ATTRIBUTE,
   EDITOR_CALLOUT_FOLD_CONTROL_CLASS_NAME,
 } from '../../constants';
 import {
+  CALLOUT_FOLD_CONTROL_STYLE_CLASS_NAME,
   CALLOUT_FOLD_ICON_COLLAPSED_CLASS_NAME,
   CALLOUT_FOLD_ICON_EXPANDED_CLASS_NAME,
   CALLOUT_CONTENT_SELECTOR,
@@ -32,7 +34,11 @@ export function getFluentCaretIconMarkup(): string {
 export function createFoldControl(htmlDocument: Document): HTMLButtonElement {
   const foldControlElement = htmlDocument.createElement('button');
 
-  foldControlElement.className = EDITOR_CALLOUT_FOLD_CONTROL_CLASS_NAME;
+  foldControlElement.className = classNames(
+    EDITOR_CALLOUT_FOLD_CONTROL_CLASS_NAME,
+    CALLOUT_FOLD_CONTROL_STYLE_CLASS_NAME
+  );
+
   foldControlElement.type = 'button';
 
   foldControlElement.setAttribute('aria-label', 'Toggle callout fold');

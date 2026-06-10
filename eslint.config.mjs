@@ -5,6 +5,7 @@ import tsParser from 'typescript-eslint';
 import importPlugin from 'eslint-plugin-import';
 import reactPlugin from 'eslint-plugin-react';
 import reactHooksPlugin from 'eslint-plugin-react-hooks';
+import sonarjsPlugin from 'eslint-plugin-sonarjs';
 import prettierConfig from 'eslint-config-prettier';
 
 const strictStructurePlugin = {
@@ -373,7 +374,8 @@ const strictStructurePlugin = {
       meta: {
         type: 'problem',
         docs: {
-          description: 'Disallow custom CSS files and imports outside the Tailwind entry file.',
+          description:
+            'Disallow app CSS outside the Tailwind entry and require Tailwind utilities for styling.',
         },
         schema: [],
       },
@@ -381,6 +383,8 @@ const strictStructurePlugin = {
         const currentFilePath = context.filename.replace(/\\/g, '/');
         const projectRootPath = process.cwd();
         const allowedCssFilePath = 'styles.css';
+        const styleSheetExtensions = new Set(['.css', '.less', '.pcss', '.sass', '.scss']);
+        const allowedTailwindEntrySelectors = new Set([':root', '.theme-dark', '.theme-light']);
         const ignoredFolderNames = new Set([
           '.git',
           '.e2e-vault',
@@ -395,8 +399,11 @@ const strictStructurePlugin = {
         const getRelativePath = (filePath) =>
           path.relative(projectRootPath, filePath).replace(/\\/g, '/');
 
-        const getCssFilePaths = (folderPath) => {
-          const cssFilePaths = [];
+        const isStyleSheetPath = (filePath) =>
+          styleSheetExtensions.has(path.extname(filePath).toLowerCase());
+
+        const getStyleSheetFilePaths = (folderPath) => {
+          const styleSheetFilePaths = [];
 
           for (const directoryEntry of readdirSync(folderPath, { withFileTypes: true })) {
             if (ignoredFolderNames.has(directoryEntry.name)) {
@@ -406,20 +413,89 @@ const strictStructurePlugin = {
             const entryPath = path.join(folderPath, directoryEntry.name);
 
             if (directoryEntry.isDirectory()) {
-              cssFilePaths.push(...getCssFilePaths(entryPath));
+              styleSheetFilePaths.push(...getStyleSheetFilePaths(entryPath));
               continue;
             }
 
-            if (directoryEntry.isFile() && directoryEntry.name.endsWith('.css')) {
-              cssFilePaths.push(getRelativePath(entryPath));
+            if (directoryEntry.isFile() && isStyleSheetPath(directoryEntry.name)) {
+              styleSheetFilePaths.push(getRelativePath(entryPath));
             }
           }
 
-          return cssFilePaths;
+          return styleSheetFilePaths;
         };
 
         const isAllowedTailwindEntryImport = (sourceValue) =>
           currentFilePath.endsWith('/src/main.ts') && sourceValue === '../styles.css';
+
+        const getLiteralStringValue = (node) =>
+          node?.type === 'Literal' && typeof node.value === 'string' ? node.value : null;
+
+        const reportStyleSheetImport = (node) => {
+          context.report({
+            node,
+            message:
+              'Do not import stylesheet files. Use Tailwind classes and the shared Tailwind entry.',
+          });
+        };
+
+        const isCreateStyleElementCall = (node) => {
+          if (node.callee.type !== 'MemberExpression') {
+            return false;
+          }
+
+          const propertyNode = node.callee.property;
+          const propertyName =
+            propertyNode.type === 'Identifier' ? propertyNode.name : propertyNode.value;
+
+          return (
+            propertyName === 'createElement' && getLiteralStringValue(node.arguments[0]) === 'style'
+          );
+        };
+
+        const isCssInJsTag = (node) => {
+          const calleeNode = node.tag;
+
+          if (calleeNode.type === 'Identifier') {
+            return calleeNode.name === 'css' || calleeNode.name === 'styled';
+          }
+
+          return (
+            calleeNode.type === 'MemberExpression' &&
+            calleeNode.object.type === 'Identifier' &&
+            calleeNode.object.name === 'styled'
+          );
+        };
+
+        const checkTailwindEntryDefinitionsOnly = (programNode) => {
+          const tailwindEntryPath = path.join(projectRootPath, allowedCssFilePath);
+
+          if (!existsSync(tailwindEntryPath)) {
+            return;
+          }
+
+          const sourceLines = readFileSync(tailwindEntryPath, 'utf8').split(/\r?\n/);
+
+          for (const [lineIndex, sourceLine] of sourceLines.entries()) {
+            const trimmedLine = sourceLine.trim();
+
+            if (!trimmedLine.endsWith('{')) {
+              continue;
+            }
+
+            const selectorText = trimmedLine.slice(0, -1).trim();
+            const isAllowedThemeBlock = selectorText.startsWith('@theme ');
+
+            if (isAllowedThemeBlock || allowedTailwindEntrySelectors.has(selectorText)) {
+              continue;
+            }
+
+            context.report({
+              node: programNode,
+              message: `${allowedCssFilePath}:${lineIndex + 1} defines "${selectorText}". Only Tailwind setup, theme aliases, and design-token blocks are allowed in ${allowedCssFilePath}. Use Tailwind classes for styling.`,
+            });
+          }
+        };
 
         return {
           Program(programNode) {
@@ -427,23 +503,23 @@ const strictStructurePlugin = {
               return;
             }
 
-            const customCssFilePaths = getCssFilePaths(projectRootPath).filter(
-              (cssFilePath) => cssFilePath !== allowedCssFilePath
+            const customStyleSheetFilePaths = getStyleSheetFilePaths(projectRootPath).filter(
+              (styleSheetFilePath) => styleSheetFilePath !== allowedCssFilePath
             );
 
-            if (customCssFilePaths.length === 0) {
-              return;
+            if (customStyleSheetFilePaths.length > 0) {
+              context.report({
+                node: programNode,
+                message: `Only ${allowedCssFilePath} is allowed. Use Tailwind classes instead of stylesheet files: ${customStyleSheetFilePaths.join(', ')}.`,
+              });
             }
 
-            context.report({
-              node: programNode,
-              message: `Only ${allowedCssFilePath} is allowed. Use Tailwind classes instead of CSS files: ${customCssFilePaths.join(', ')}.`,
-            });
+            checkTailwindEntryDefinitionsOnly(programNode);
           },
           ImportDeclaration(node) {
             const sourceValue = node.source.value;
 
-            if (typeof sourceValue !== 'string' || !sourceValue.endsWith('.css')) {
+            if (typeof sourceValue !== 'string' || !isStyleSheetPath(sourceValue)) {
               return;
             }
 
@@ -451,10 +527,51 @@ const strictStructurePlugin = {
               return;
             }
 
+            reportStyleSheetImport(node);
+          },
+          CallExpression(node) {
+            const sourceValue = getLiteralStringValue(node.arguments[0]);
+
+            if (isCreateStyleElementCall(node)) {
+              context.report({
+                node,
+                message: 'Do not create style elements. Use Tailwind classes instead.',
+              });
+
+              return;
+            }
+
+            if (!sourceValue || !isStyleSheetPath(sourceValue)) {
+              return;
+            }
+
+            if (node.callee.type === 'Identifier' && node.callee.name === 'require') {
+              reportStyleSheetImport(node);
+              return;
+            }
+
+            if (node.callee.type === 'Import') {
+              reportStyleSheetImport(node);
+            }
+          },
+          JSXOpeningElement(node) {
+            if (node.name.type !== 'JSXIdentifier' || node.name.name !== 'style') {
+              return;
+            }
+
             context.report({
               node,
-              message:
-                'Do not import CSS files. Use Tailwind classes and the shared Tailwind entry.',
+              message: 'Do not add style tags. Use Tailwind classes instead.',
+            });
+          },
+          TaggedTemplateExpression(node) {
+            if (!isCssInJsTag(node)) {
+              return;
+            }
+
+            context.report({
+              node,
+              message: 'Do not define CSS-in-JS styles. Use Tailwind classes instead.',
             });
           },
         };
@@ -1773,6 +1890,7 @@ export default [
       import: importPlugin,
       react: reactPlugin,
       'react-hooks': reactHooksPlugin,
+      sonarjs: sonarjsPlugin,
       'strict-structure': strictStructurePlugin,
     },
     languageOptions: {
@@ -1885,6 +2003,16 @@ export default [
       'no-trailing-spaces': 'warn',
       'eol-last': 'warn',
       'no-useless-assignment': 'warn',
+
+      // Redundancy checks
+      'sonarjs/no-redundant-boolean': 'error',
+      'sonarjs/no-redundant-jump': 'error',
+      'sonarjs/no-redundant-optional': 'error',
+      'sonarjs/no-identical-functions': 'error',
+      'sonarjs/no-identical-conditions': 'error',
+      'sonarjs/no-identical-expressions': 'error',
+      'sonarjs/no-duplicated-branches': 'error',
+      'sonarjs/no-all-duplicated-branches': 'error',
 
       // Structural strictness
       'strict-structure/types-only-in-interfaces-file': 'error',
